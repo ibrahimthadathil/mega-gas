@@ -8,10 +8,10 @@ import {
   Command,
   Frame,
   GalleryVerticalEnd,
+  LayoutDashboardIcon,
   Map,
   PieChart,
   Settings2,
-  SquareTerminal,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -52,14 +52,14 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
+      title: "Dashboard",
       url: "#",
-      icon: SquareTerminal,
+      icon: LayoutDashboardIcon,
       isActive: true,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "User Mangment",
+          url: "/admin/ums",
         },
         {
           title: "Starred",
