@@ -24,13 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
-const formSchema = z.object({
-  username: z.string().min(1, { message: "Username is required." }),
-  mobile: z
-    .string()
-    .regex(/^\d{10}$/, { message: "Please enter a valid 10-digit mobile number." }),
-});
+import { formSchema } from "@/lib/schema/zodSchema";
 
 export function UserLoginForm() {
   const router = useRouter();
@@ -39,31 +33,24 @@ export function UserLoginForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
-      mobile: "",
+      email: "",
+      password: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsSubmitting(true);
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log("Form values:", values);
-    
-    // Simulate sending OTP
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    // On success, navigate to OTP page
-    router.push("/user/otp");
-  }
-
+  };
+  
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">
         <div className="flex justify-center items-center mb-2">
-            <LogIn className="h-8 w-8 text-primary" />
+          <LogIn className="h-8 w-8 text-primary" />
         </div>
-        <CardTitle className="text-2xl font-bold">Welcome to AuthFlow</CardTitle>
+        <CardTitle className="text-2xl font-bold">Welcome to MEGA</CardTitle>
         <CardDescription>
-          Enter your details to sign in to your account.
+          Enter your email and password to sign in.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -71,12 +58,16 @@ export function UserLoginForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="username"
+              name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="yourusername" {...field} />
+                    <Input
+                      type="email"
+                      placeholder="you@example.com"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -84,19 +75,19 @@ export function UserLoginForm() {
             />
             <FormField
               control={form.control}
-              name="mobile"
+              name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mobile Number</FormLabel>
+                  <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="tel" placeholder="1234567890" {...field} />
+                    <Input type="password" placeholder="••••••••" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Sending OTP..." : "Continue"}
+              {isSubmitting ? "Signing in..." : "Sign In"}
             </Button>
           </form>
         </Form>
