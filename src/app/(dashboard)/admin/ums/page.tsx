@@ -207,33 +207,33 @@ const Page = () => {
     }
   }
 
-  // Filter and sort users
-  const filteredAndSortedUsers = useMemo(() => {
-    let filtered = users.filter(user => {
-      const search = searchQuery.toLowerCase()
-      return (
-        user.firstName.toLowerCase().includes(search) ||
-        user.email.toLowerCase().includes(search) ||
-        user.role.toLowerCase().includes(search)
-      )
-    })
+  // // Filter and sort users
+  // const filteredAndSortedUsers = useMemo(() => {
+  //   let filtered = users.filter(user => {
+  //     const search = searchQuery.toLowerCase()
+  //     return (
+  //       user.firstName.toLowerCase().includes(search) ||
+  //       user.email.toLowerCase().includes(search) ||
+  //       user.role.toLowerCase().includes(search)
+  //     )
+  //   })
 
-    // Sort based on selected option
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'name':
-          return a.firstName.localeCompare(b.firstName)
-        case 'email':
-          return a.email.localeCompare(b.email)
-        case 'role':
-          return a.role.localeCompare(b.role)
-        default:
-          return 0
-      }
-    })
+  //   // // Sort based on selected option
+  //   // filtered.sort((a, b) => {
+  //   //   switch (sortBy) {
+  //   //     case 'name':
+  //   //       return a.firstName.localeCompare(b.firstName)
+  //   //     case 'email':
+  //   //       return a.email.localeCompare(b.email)
+  //   //     case 'role':
+  //   //       return a.role.localeCompare(b.role)
+  //   //     default:
+  //   //       return 0
+  //   //   }
+  //   // })
 
-    return filtered
-  }, [users, searchQuery, sortBy])
+  //   return filtered
+  // }, [users, searchQuery, sortBy])
 
   const columns = [
     {
@@ -343,7 +343,7 @@ const Page = () => {
       </div>
 
       {/* Data Table */}
-      <DataTable data={filteredAndSortedUsers} columns={columns} />
+      <DataTable data={users} columns={columns} />
     </div>
   )
 }

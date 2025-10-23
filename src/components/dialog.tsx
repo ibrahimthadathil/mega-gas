@@ -1,9 +1,19 @@
-"use client"
-import type React from "react"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+"use client";
+import type React from "react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -12,69 +22,70 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-
-interface User {
-  _id?: string
-  username: string
-  password: string
-  email: string
-  phone: string
-  role: string
-  isActive: boolean
-}
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { IUser } from "@/types/types";
+import { userFormSchema } from "@/lib/schema/zodSchema";
+import { toast } from "sonner";
 
 interface UserDialogProps {
-  user?: User
-  onSave: (userData: Omit<User, "_id">, userId?: string) => void
-  trigger: React.ReactNode
+  user?: IUser;
+  onSave: (userData: Omit<IUser, "_id">, userId?: string) => void;
+  trigger: React.ReactNode;
 }
 
+type UserFormValues = z.infer<typeof userFormSchema>;
+
 const UserDialog: React.FC<UserDialogProps> = ({ user, onSave, trigger }) => {
-  const [open, setOpen] = useState(false)
-  const [formData, setFormData] = useState({
-    username: user?.username || "",
-    password: user?.password || "",
-    email: user?.email || "",
-    phone: user?.phone || "",
-    role: user?.role || "Driver",
-    isActive: user?.isActive ?? true,
-  })
+  const [open, setOpen] = useState(false);
 
-  const handleSubmit = () => {
-    if (!formData.username || !formData.password || !formData.email || !formData.phone) return
+  const form = useForm<UserFormValues>({
+    resolver: zodResolver(userFormSchema),
+    defaultValues: {
+      username: user?.username || "",
+      password: user?.password || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
+      role: user?.role,
+    },
+  });
 
-    onSave(formData, user?._id)
-    setOpen(false)
+  const handleSubmit = async(userData: UserFormValues) => {
+   try {
+     console.log(userData);
+     const {data} = await axios.post('/api/admin/auth',userData)
+     setOpen(false);
+    toast.warning('reached back')
+   } catch (error) {
+    toast.error((error as Error).message)
+   }
 
-    // Reset form if adding new user
-    if (!user) {
-      setFormData({
-        username: "",
-        password: "",
-        email: "",
-        phone: "",
-        role: "Driver",
-        isActive: true,
-      })
-    }
-  }
+    
+  };
 
   const handleOpenChange = (newOpen: boolean) => {
-    setOpen(newOpen)
+    setOpen(newOpen);
     if (newOpen && user) {
       // Reset form data when opening for edit
-      setFormData({
+      form.reset({
         username: user.username,
         password: user.password,
         email: user.email,
         phone: user.phone,
         role: user.role,
-        isActive: user.isActive,
-      })
+      });
+    } else if (!newOpen) {
+      // Reset form when closing
+      form.reset();
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -83,70 +94,116 @@ const UserDialog: React.FC<UserDialogProps> = ({ user, onSave, trigger }) => {
         <DialogHeader>
           <DialogTitle>{user ? "Edit User" : "Add New User"}</DialogTitle>
           <DialogDescription>
-            {user ? "Update user information here." : "Add a new user to the system."}
+            {user
+              ? "Update user information here."
+              : "Add a new user to the system."}
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="username">Username</Label>
-            <Input
-              id="username"
-              value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              placeholder="Enter username"
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter username" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              placeholder="Enter password"
+
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Enter password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              placeholder="Enter email"
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="Enter email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="phone">Phone</Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              placeholder="Enter phone number"
+
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="tel"
+                      placeholder="Enter phone number"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="role">Role</Label>
-            <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-              <SelectTrigger id="role">
-                <SelectValue placeholder="Select role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Driver">Driver</SelectItem>
-                <SelectItem value="Staff">Staff</SelectItem>
-                <SelectItem value="Admin">Admin</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-         
-        </div>
-        <DialogFooter>
-          <Button onClick={handleSubmit}>{user ? "Save Changes" : "Add User"}</Button>
-        </DialogFooter>
+
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Role</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Driver">Driver</SelectItem>
+                      <SelectItem value="Staff">Staff</SelectItem>
+                      <SelectItem value="Admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter>
+              <Button type="submit">
+                {user ? "Save Changes" : "Add User"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
-export default UserDialog
+export default UserDialog;
