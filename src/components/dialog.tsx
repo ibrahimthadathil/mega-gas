@@ -49,7 +49,7 @@ const UserDialog: React.FC<UserDialogProps> = ({ user, onSave, trigger }) => {
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
-      username: user?.username || "",
+      user_name: user?.user_name || "",
       password: user?.password || "",
       email: user?.email || "",
       phone: user?.phone || "",
@@ -60,6 +60,7 @@ const UserDialog: React.FC<UserDialogProps> = ({ user, onSave, trigger }) => {
   const handleSubmit = async(userData: UserFormValues) => {
    try {
      console.log(userData);
+     alert(userData.user_name)
      const {data} = await axios.post('/api/admin/auth',userData)
      setOpen(false);
     toast.warning('reached back')
@@ -75,7 +76,7 @@ const UserDialog: React.FC<UserDialogProps> = ({ user, onSave, trigger }) => {
     if (newOpen && user) {
       // Reset form data when opening for edit
       form.reset({
-        username: user.username,
+        user_name: user.user_name,
         password: user.password,
         email: user.email,
         phone: user.phone,
@@ -106,7 +107,7 @@ const UserDialog: React.FC<UserDialogProps> = ({ user, onSave, trigger }) => {
           >
             <FormField
               control={form.control}
-              name="username"
+              name="user_name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Username</FormLabel>

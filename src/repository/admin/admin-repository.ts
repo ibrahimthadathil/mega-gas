@@ -8,15 +8,15 @@ const creatUserAuth = async (email: string, password: string) => {
       password,
     });
     if (error) throw error;
-    console.log('🔥',data.user);
-    
+
     return data.user;
   } catch (error) {
+    console.log((error as Error).message);
     throw error;
   }
 };
 
-const createUserProfile = async (user: IUser|{auth_id:string} ) => {
+const createUserProfile = async (user: IUser | { auth_id: string }) => {
   try {
     const { data, error } = await supabaseAdmin
       .from("users")
@@ -24,17 +24,22 @@ const createUserProfile = async (user: IUser|{auth_id:string} ) => {
       .select()
       .single();
     if (error) throw error;
-    return null;
+    return data;
   } catch (error) {
+    console.log((error as Error).message);
     throw error;
   }
 };
 
-const findByEmail = async (email:string) => {
+const findByEmail = async (email: string) => {
   try {
-    const {data,error} = await supabaseAdmin.from('users').select("*").eq("email",email).single()
-    if(error)throw error
-    return data
+    const { data, error } = await supabaseAdmin
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
+    if (error) throw error;
+    return data;
   } catch (error) {}
 };
 
