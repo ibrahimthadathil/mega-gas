@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { formSchema } from "@/lib/schema/zodSchema";
+import axios from "axios";
+import { toast } from "sonner";
 
 export function UserLoginForm() {
   const router = useRouter();
@@ -39,9 +41,17 @@ export function UserLoginForm() {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("Form values:", values);
+    try {
+      console.log("Form values:", values);
+      const { data } = await axios.post("/api/user/auth", values);
+      if (data.success) {
+        toast.success(data.message)
+      } else toast.error(data.message);
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
   };
-  
+
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="text-center">

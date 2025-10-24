@@ -1,5 +1,5 @@
+import supabaseAdmin from "@/lib/supabase/supabaseAdmin";
 import { add_User } from "@/services/admin/auth-service.ts/userService";
-import { IUser } from "@/types/types";
 import { NextResponse } from "next/server";
 
 export const POST = async (req: Request) => {
@@ -8,9 +8,8 @@ export const POST = async (req: Request) => {
 
     if (data) {
       const { success } = await add_User(data);
-      if (success)
-        return NextResponse.json({ message: "user Reached" }, { status: 200 });
-      else throw new Error("moonji");
+      if (success) return NextResponse.json({ message: "cretated successfully" }, { status: 201 });
+      else throw new Error("Faied to create user");
     } else throw new Error("Failed to load the form data");
   } catch (error) {
     return NextResponse.json(
@@ -19,3 +18,18 @@ export const POST = async (req: Request) => {
     );
   }
 };
+
+
+export async function DELETE() {
+  try {
+    const { data } = await supabaseAdmin.auth.admin.listUsers();
+
+    for (const user of data.users) {
+      await supabaseAdmin.auth.admin.deleteUser(user.id);
+    }
+    return NextResponse.json({ message: "All auth users deleted ✅" });
+  } catch (error: any) {
+    return NextResponse.json({ message: error.message || "Error deleting users" }, { status: 500 });
+  }
+}
+
