@@ -32,6 +32,14 @@ const createUserProfile = async (user: IUser | { auth_id: string }) => {
   }
 };
 
+const existUserCheck = async (email:string) => {
+  try {
+  } catch (error) {
+    throw new Error((error as Error).message);
+    
+  }
+} 
+
 const findByEmail = async (email: string) => {
   try {
     const { data, error } = await supabaseAdmin
@@ -44,4 +52,4 @@ const findByEmail = async (email: string) => {
   } catch (error) {}
 };
 
-export { creatUserAuth, createUserProfile, findByEmail };
+export { creatUserAuth, createUserProfile, findByEmail, existUserCheck };

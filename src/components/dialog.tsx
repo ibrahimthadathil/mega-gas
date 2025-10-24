@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -57,18 +57,18 @@ const UserDialog: React.FC<UserDialogProps> = ({ user, onSave, trigger }) => {
     },
   });
 
-  const handleSubmit = async(userData: UserFormValues) => {
-   try {
-     console.log(userData);
-     alert(userData.user_name)
-     const {data} = await axios.post('/api/admin/auth',userData)
-     setOpen(false);
-    toast.warning('reached back')
-   } catch (error) {
-    toast.error((error as Error).message)
-   }
-
-    
+  const handleSubmit = async (userData: UserFormValues) => {
+    try {
+      const { data } = await axios.post("/api/admin/auth", userData);
+      if (data.success) {
+        setOpen(false);
+        toast.success(data.message);
+      } else toast.error(data.message);
+    } catch (error) {
+      toast.error(
+        ((error as AxiosError).response?.data as Record<string, String>).message
+      );
+    }
   };
 
   const handleOpenChange = (newOpen: boolean) => {
