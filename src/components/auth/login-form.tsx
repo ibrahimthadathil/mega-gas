@@ -27,9 +27,14 @@ import { Input } from "@/components/ui/input";
 import { formSchema } from "@/lib/schema/zodSchema";
 import axios from "axios";
 import { toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "@/redux/slice/auth/authSlicer";
+
 
 export function UserLoginForm() {
   const router = useRouter();
+  const dispatch = useDispatch();
+
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -42,10 +47,17 @@ export function UserLoginForm() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log("Form values:", values);
       const { data } = await axios.post("/api/user/auth", values);
       if (data.success) {
-        toast.success(data.message)
+        dispatch(
+          loginSuccess({
+            user_name: data.profile.user_name,
+            role: data.profile.role,
+            email: data.profile.email,
+          })
+        )
+      router.push('/user/dashboard')
+        toast.success(data.message);
       } else toast.error(data.message);
     } catch (error) {
       toast.error((error as Error).message);
