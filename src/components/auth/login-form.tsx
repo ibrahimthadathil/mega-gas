@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { LogIn } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,16 +24,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { formSchema } from "@/lib/schema/zodSchema";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "@/redux/slice/auth/authSlicer";
 
-
 export function UserLoginForm() {
   const router = useRouter();
   const dispatch = useDispatch();
-
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -47,20 +44,28 @@ export function UserLoginForm() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      setIsSubmitting(true);
       const { data } = await axios.post("/api/user/auth", values);
       if (data.success) {
+        console.log('*****',data);
+        
+        setIsSubmitting(false);
         dispatch(
           loginSuccess({
             user_name: data.profile.user_name,
             role: data.profile.role,
             email: data.profile.email,
           })
-        )
-      router.push('/user/dashboard')
+        );
+        localStorage.setItem("access_token", data?.access_token);
+        router.push("/user/dashboard");
         toast.success(data.message);
       } else toast.error(data.message);
     } catch (error) {
-      toast.error((error as Error).message);
+      setIsSubmitting(false);
+      toast.error(
+        ((error as AxiosError).response?.data as Record<string, any>).message
+      );
     }
   };
 
@@ -108,7 +113,11 @@ export function UserLoginForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className={`w-full ${isSubmitting ? "opacity-30" : ""}`}
+              disabled={isSubmitting}
+            >
               {isSubmitting ? "Signing in..." : "Sign In"}
             </Button>
           </form>
