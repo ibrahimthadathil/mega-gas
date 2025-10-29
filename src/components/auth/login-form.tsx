@@ -46,9 +46,7 @@ export function UserLoginForm() {
     try {
       setIsSubmitting(true);
       const { data } = await axios.post("/api/user/auth", values);
-      if (data.success) {
-        console.log('*****',data);
-        
+      if (data.success) {        
         setIsSubmitting(false);
         dispatch(
           loginSuccess({
