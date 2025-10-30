@@ -1,0 +1,7 @@
+import { Rootstate } from "../index.js";
+
+export const selectAuth = (state: Rootstate) => state.user;
+export const selectIsAuthenticated = (state: Rootstate) => state.user.is_authenticated;
+export const selectUserRole = (state: Rootstate) => state.user.role;
+// export const selectUserId = (state: Rootstate) => state.user.user_id;
+export const selectUserName = (state: Rootstate) => state.user.user_name;
