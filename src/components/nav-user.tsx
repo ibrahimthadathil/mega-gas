@@ -29,6 +29,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useDispatch } from "react-redux"
+import { logout } from "@/redux/slice/auth/authSlicer"
+import { toast } from "sonner"
+import { redirect } from "next/navigation"
 
 export function NavUser({
   user,
@@ -39,8 +43,13 @@ export function NavUser({
     avatar: string
   }
 }) {
+  const dispatch = useDispatch()
   const { isMobile } = useSidebar()
-
+  const logoutUser = () => {
+    dispatch(logout())
+    toast.warning('Logged Out')
+    redirect('/user/login')
+  }
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -102,7 +111,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={()=>logoutUser()}>
               <LogOut />
               Log out
             </DropdownMenuItem>

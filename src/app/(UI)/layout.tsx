@@ -1,3 +1,4 @@
+"use client";
 import {
   SidebarInset,
   SidebarProvider,
@@ -13,7 +14,19 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
+import { useSelector } from "react-redux";
+import { selectIsAuthenticated } from "@/redux/store/selectors/authSelectors";
+import { useEffect } from "react";
+import { redirect } from "next/navigation";
+import { toast } from "sonner";
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const is_authenticated = useSelector(selectIsAuthenticated);
+  useEffect(() => {
+    if (!is_authenticated) {
+      toast.error("Login Required");
+      redirect("/user/login");
+    }
+  }, []);
   return (
     <SidebarProvider>
       <AppSidebar />
