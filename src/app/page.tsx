@@ -1,7 +1,15 @@
+"use Client";
 import { Button } from "@/components/ui/button";
+import { selectIsAuthenticated } from "@/redux/store/selectors/authSelectors";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 
 export default function Home() {
+  const isAuthenticated = useSelector(selectIsAuthenticated)
+  const router = useRouter()
+  if(!isAuthenticated)router.push('/user/login')
+  else router.push('/user/dashboard')  
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}

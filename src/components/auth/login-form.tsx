@@ -56,8 +56,9 @@ export function UserLoginForm() {
           })
         );
         localStorage.setItem("access_token", data?.access_token);
-        router.push("/user/dashboard");
         toast.success(data.message);
+       if(data.profile.role==='admin') router.push("/admin/dashboard");
+       else router.push('/user/dashboard')
       } else toast.error(data.message);
     } catch (error) {
       setIsSubmitting(false);
