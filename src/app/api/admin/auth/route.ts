@@ -20,7 +20,20 @@ export const POST = async (req: Request) => {
   }
 };
 
-export async function DELETE() {
+export const PUT = async (req:Request)=>{
+try {
+  
+} catch (error) {
+   console.log((error as Error).message);
+
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: 400 }
+    );
+}
+}
+
+export const DELETE =async()=> {
   try {
     const { data } = await supabaseAdmin.auth.admin.listUsers();
 
