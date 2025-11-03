@@ -6,7 +6,7 @@
   }) => {
     try {
       const {session,profile,success,message} = await userLogIn(credential.email, credential.password)
-      if(success)return {success,access_token:session?.access_token,refresh_token:session?.refresh_token,profile,message:'Logged In Successfully'}
+      if(success)return {success,session,profile,message:'Logged In Successfully'}
       else return { success,message }
     } catch (error) {
       console.log((error as Error).message);
@@ -15,3 +15,4 @@
   };
 
   export { userLoginService };
+

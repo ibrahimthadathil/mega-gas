@@ -1,4 +1,4 @@
-"use Client";
+"use client";
 import { Button } from "@/components/ui/button";
 import { selectIsAuthenticated } from "@/redux/store/selectors/authSelectors";
 import Link from "next/link";

@@ -5,20 +5,32 @@ import { NextResponse } from "next/server";
 export const POST = async (req: Request) => {
   try {
     const data = await req.json();
-    const { message, access_token, refresh_token, profile, success } =
+    const { message ,profile, session, success } =
       await userLoginService(data);
-    if (success && refresh_token) {
+    if (success ) {
       const res = NextResponse.json(
-        { message, profile, success ,access_token},
+        { message, profile, success },
         { status: STATUS.SUCCESS.code }
       );
 
-      res.cookies.set("rfr_token", refresh_token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-        maxAge: 60 * 60 * 24,
-      });
+      if (session?.access_token) {
+        res.cookies.set("access_token", session.access_token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+          maxAge: 60 * 60, // 1 hour
+          path: "/",
+        });
+      }
+      if (session?.refresh_token) {
+        res.cookies.set("refresh_token", session.refresh_token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+          maxAge: 60 * 60 * 24 * 7, // 7 days
+          path: "/",
+        });
+      }
 
       return res;
     }

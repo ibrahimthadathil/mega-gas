@@ -43,11 +43,10 @@ export function UserLoginForm() {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsSubmitting(true);
     try {
-      setIsSubmitting(true);
       const { data } = await axios.post("/api/user/auth", values);
-      if (data.success) {        
-        setIsSubmitting(false);
+      if (data.success) {
         dispatch(
           loginSuccess({
             user_name: data.profile.user_name,
@@ -55,16 +54,16 @@ export function UserLoginForm() {
             email: data.profile.email,
           })
         );
-        localStorage.setItem("access_token", data?.access_token);
         toast.success(data.message);
-       if(data.profile.role==='admin') router.push("/admin/dashboard");
-       else router.push('/user/dashboard')
+        const isAdmin = String(data.profile.role).toLowerCase() === "admin";
+        router.push(isAdmin ? "/admin/dashboard" : "/user/dashboard");
       } else toast.error(data.message);
     } catch (error) {
-      setIsSubmitting(false);
       toast.error(
         ((error as AxiosError).response?.data as Record<string, any>).message
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

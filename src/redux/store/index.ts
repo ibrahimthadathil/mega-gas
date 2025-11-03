@@ -11,6 +11,12 @@ const persist_Config: PersistConfig<RootState> = {
   whitelist: ["user"],
   storage,
   transforms: [encryptor],
+  // Throttle writes to storage to improve performance (ms)
+  throttle: 200,
+  // Write to storage with a delay to batch updates
+  writeFailHandler: (err) => {
+    console.error("Persist write error:", err);
+  },
 };
 
 type RootState = ReturnType<typeof rootReducer>;
