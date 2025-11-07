@@ -10,7 +10,7 @@ import SalesSection from "@/app/(UI)/user/sales/_section/sales-section"
 import ExpensesSection from "@/app/(UI)/user/sales/_section/expenses-section"
 import NetSalesSummarySection from "@/app/(UI)/user/sales/_section/net-sales-summary-section"
 import VerificationDialog from "@/app/(UI)/user/sales/_section/verification-dialog"
-import ClosingStockSection from "@/app/(UI)/user/sales/_section/currency-denomination-section"
+import ClosingStockSection from "@/app/(UI)/user/sales/_section/clossing-stock-section"
 import CurrencyDenominationsSection from "@/app/(UI)/user/sales/_section/currency-denomination-section"
 import { Button } from "@/components/ui/button"
 
@@ -59,7 +59,7 @@ export default function Home() {
     return sum + baseAmount + deliveryAmount
   }, 0)
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0)
-  const netSales = totalSales - totalExpenses
+const netSales = Number(totalSales || 0) - Number(totalExpenses || 0)
 
   const handleVerify = () => {
     setIsVerified(true)
@@ -88,7 +88,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-background">
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
         {/* Header */}
         <div className="text-center">
           <h1 className="text-3xl font-bold text-foreground">Daily Report</h1>

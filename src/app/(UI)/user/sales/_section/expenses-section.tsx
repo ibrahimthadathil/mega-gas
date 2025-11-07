@@ -6,9 +6,10 @@ import SimpleCard from "@/components/ui/simple-card"
 
 interface Expense {
   id: string
-  date: string
+  date?: string
   name: string
   amount: number
+  
   image?: string
 }
 
