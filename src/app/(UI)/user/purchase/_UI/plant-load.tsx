@@ -21,15 +21,8 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { DatePicker } from "@/components/ui/date-picker";
 import { useState } from "react";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
 
 interface Product {
   id: string;
@@ -41,7 +34,7 @@ interface Product {
 interface PlantLoadFormData {
   invoiceNumber: string;
   sapNumber: string;
-  date: string;
+  date: Date | undefined;
 }
 
 interface DialogFormData {
@@ -61,7 +54,7 @@ export default function PlantLoadSection() {
     defaultValues: {
       invoiceNumber: "",
       sapNumber: "",
-      date: "",
+      date: undefined,
     },
   });
 
@@ -111,6 +104,10 @@ export default function PlantLoadSection() {
     setProducts(products.filter((product) => product.id !== id));
   };
 
+  const handleDateChange = (date: Date | undefined) => {
+    setValueMain("date", date, { shouldValidate: true });
+  };
+
   const isProceedDisabled = products.length === 0;
   const mainFormData = watchMain();
 
@@ -156,39 +153,10 @@ export default function PlantLoadSection() {
                 <Label htmlFor="date" className="text-sm font-medium">
                   Date
                 </Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={`w-full justify-start text-left font-normal ${
-                        !watchMain("date") ? "text-muted-foreground" : ""
-                      }`}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {watchMain("date")
-                        ? format(new Date(watchMain("date")), "PPP")
-                        : "Pick a date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="p-0" align="end">
-                    <Calendar
-                      mode="single"
-                      selected={
-                        watchMain("date")
-                          ? new Date(watchMain("date"))
-                          : undefined
-                      }
-                      onSelect={(date) => {
-                        if (date) {
-                          setValueMain("date", date.toISOString(), {
-                            shouldValidate: true,
-                          });
-                        }
-                      }}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker 
+                  date={watchMain("date")} 
+                  onDateChange={handleDateChange} 
+                />
               </div>
             </div>
           </form>
