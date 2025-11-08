@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import DatePickerSection from "@/components/ui/date-picker"
+import { DatePicker } from "@/components/ui/date-picker"
 import DeliveryPartnerSection from "@/app/(UI)/user/sales/_section/delivery-partner-section"
 import OldStockSection from "@/app/(UI)/user/sales/_section/old-stock-section"
 import LoadSection from "@/app/(UI)/user/sales/_section/load-section"
@@ -59,7 +59,7 @@ export default function Home() {
     return sum + baseAmount + deliveryAmount
   }, 0)
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0)
-const netSales = Number(totalSales || 0) - Number(totalExpenses || 0)
+  const netSales = Number(totalSales || 0) - Number(totalExpenses || 0)
 
   const handleVerify = () => {
     setIsVerified(true)
@@ -98,7 +98,11 @@ const netSales = Number(totalSales || 0) - Number(totalExpenses || 0)
         {!isVerified ? (
           <>
             {/* Input Sections */}
-            <DatePickerSection date={selectedDate} onChange={setSelectedDate} />
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Select Date</label>
+              <DatePicker date={selectedDate} onDateChange={setSelectedDate} />
+            </div>
+            
             <DeliveryPartnerSection
               value={deliveryPartner}
               onChange={setDeliveryPartner}
