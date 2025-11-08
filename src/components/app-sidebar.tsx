@@ -98,6 +98,10 @@ const data = {
           title: "Load slip",
           url: "/user/stock/load-slip",
         },
+        {
+          title: "Stock Transfer",
+          url: "/user/stock/transfer",
+        },
     
       ],
     },
