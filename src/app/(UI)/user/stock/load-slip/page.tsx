@@ -1,8 +1,9 @@
+import { TripSheet } from "@/app/(UI)/user/stock/_UI/trip-sheet"
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-background p-4 sm:p-6">
-      <h1>load slip view</h1>
+      <TripSheet />
     </main>
   )
 }

@@ -62,33 +62,19 @@ const data = {
           title: "User Mangment",
           url: "/admin/ums",
         },
-        // {
-        //   title: "Starred",
-        //   url: "#",
-        // },
-        // {
-        //   title: "Settings",
-        //   url: "#",
-        // },
+      
       ],
     },
     {
       title: "Sales",
-      url: "#",
+      url: "/user/sales",
       icon: ClipboardCheck,
       items: [
         {
           title: "Delivery",
-          url: "/user/sales",
+          url: "/user/sales/delivery",
         },
-        // {
-        //   title: "Explorer",
-        //   url: "#",
-        // },
-        // {
-        //   title: "Quantum",
-        //   url: "#",
-        // },
+      
       ],
     },
     {
@@ -98,43 +84,21 @@ const data = {
       items: [
         {
           title: "Plant Load",
-          url: "/user/purchase",
+          url: "/user/purchase/plant-load",
         },
-        // {
-        //   title: "Get Started",
-        //   url: "#",
-        // },
-        // {
-        //   title: "Tutorials",
-        //   url: "#",
-        // },
-        // {
-        //   title: "Changelog",
-        //   url: "#",
-        // },
+       
       ],
     },
     {
       title: "Stock",
-      url: "#",
+      url: "/user/stock",
       icon: Settings2,
       items: [
         {
           title: "Load slip",
-          url: "/user/stock",
+          url: "/user/stock/load-slip",
         },
-        // {
-        //   title: "Team",
-        //   url: "#",
-        // },
-        // {
-        //   title: "Billing",
-        //   url: "#",
-        // },
-        // {
-        //   title: "Limits",
-        //   url: "#",
-        // },
+    
       ],
     },
   ],
