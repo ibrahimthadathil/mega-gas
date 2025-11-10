@@ -89,6 +89,7 @@ const data = {
        
       ],
     },
+   
     {
       title: "Stock",
       url: "/user/stock",
@@ -103,6 +104,17 @@ const data = {
           url: "/user/stock/transfer",
         },
     
+      ],
+    },
+     {
+      title: "Expenses",
+      url: "/user/expenses",
+      icon: BookOpen,
+      items: [
+        {
+          title: "Add Expense",
+          url: "/user/expenses/add-expense",
+        },
       ],
     },
   ],
