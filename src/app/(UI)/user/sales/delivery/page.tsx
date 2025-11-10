@@ -14,10 +14,14 @@ import ClosingStockSection from "@/app/(UI)/user/sales/_section/clossing-stock-s
 import CurrencyDenominationsSection from "@/app/(UI)/user/sales/_section/currency-denomination-section"
 import { Button } from "@/components/ui/button"
 
+interface DeliveryBoy {
+  id: string
+  name: string
+}
+
 export default function Home() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
-  const [deliveryPartner, setDeliveryPartner] = useState("")
-  const [helper, setHelper] = useState("")
+  const [selectedDeliveryBoys, setSelectedDeliveryBoys] = useState<DeliveryBoy[]>([])
   const [oldStock, setOldStock] = useState([
     { id: 1, name: "5kg Cylinder", quantity: 45 },
     { id: 2, name: "10kg Cylinder", quantity: 32 },
@@ -39,7 +43,6 @@ export default function Home() {
     }>
   >([])
   const [expenses, setExpenses] = useState<Array<{ id: string; name: string; amount: number }>>([])
-  const [cashReceived, setCashReceived] = useState(0)
   const [upiReceived, setUpiReceived] = useState(0)
   const [onlinePayments, setOnlinePayments] = useState<Array<{ id: string; consumerName: string; amount: number }>>([])
   const [isVerified, setIsVerified] = useState(false)
@@ -66,10 +69,13 @@ export default function Home() {
   }
 
   const handleSubmitReport = () => {
+    // Calculate cash for the report
+    const totalOnlinePayments = onlinePayments.reduce((sum, payment) => sum + payment.amount, 0)
+    const cashReceived = netSales - upiReceived - totalOnlinePayments
+
     const report = {
       date: selectedDate,
-      deliveryPartner,
-      helper,
+      deliveryBoys: selectedDeliveryBoys,
       oldStock,
       loads,
       officeStock,
@@ -104,10 +110,8 @@ export default function Home() {
             </div>
             
             <DeliveryPartnerSection
-              value={deliveryPartner}
-              onChange={setDeliveryPartner}
-              helper={helper}
-              onHelperChange={setHelper}
+              selectedDeliveryBoys={selectedDeliveryBoys}
+              onChange={setSelectedDeliveryBoys}
             />
             <OldStockSection items={oldStock} />
             <LoadSection loads={loads} onChange={setLoads} />
@@ -120,7 +124,7 @@ export default function Home() {
               netSales={netSales}
               upiReceived={upiReceived}
               onlinePayments={onlinePayments}
-                onUpiChange={setUpiReceived}
+              onUpiChange={setUpiReceived}
               onOnlinePaymentsChange={setOnlinePayments}
             />
 
@@ -137,7 +141,7 @@ export default function Home() {
               netSales={netSales}
             />
 
-            <Button onClick={handleSubmitReport} className="w-full h-12 text-base" disabled={false}>
+            <Button onClick={handleSubmitReport} className="w-full h-12 text-base">
               Submit Report
             </Button>
           </>
