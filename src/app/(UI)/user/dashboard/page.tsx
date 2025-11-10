@@ -1,18 +1,17 @@
 "use client";
-import { Rootstate } from '@/redux/store';
-import React from 'react'
-import { useSelector } from 'react-redux';
+import TaskGrid from "@/components/task-grid";
+import { Rootstate } from "@/redux/store";
+import React from "react";
+import { useSelector } from "react-redux";
 
 const page = () => {
-    const {user_name,role } = useSelector((state:Rootstate)=>state.user )
+  const { user_name, role } = useSelector((state: Rootstate) => state.user);
   return (
-    <div>
-      <h1 className='text-red-500'>{user_name || 'no user'} </h1>
-      <h2>{role}</h2>
+    <main className="px-4 py-6 md:px-6 md:py-8">
+      {/* <MainCard /> */}
+      <TaskGrid />
+    </main>
+  );
+};
 
-    </div>
-  )
-}
-
-export default page
-
+export default page;
