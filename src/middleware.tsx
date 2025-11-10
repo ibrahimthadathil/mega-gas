@@ -5,7 +5,7 @@ import { getAuthUser, getUserProfile } from "@/lib/auth/jwt";
 // Routes that require authentication
 const protectedRoutes = ["/user/dashboard", "/admin"];
 // Routes that should redirect to dashboard if already authenticated
-const authRoutes = ["/user/login", "/"];
+const authRoutes = ["/user/login",];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
