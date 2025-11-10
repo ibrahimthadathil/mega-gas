@@ -17,10 +17,8 @@ interface NetSalesSummarySectionProps {
   totalSales: number
   totalExpenses: number
   netSales: number
-  cashReceived: number
   upiReceived: number
   onlinePayments: OnlinePayment[]
-  onCashChange: (value: number) => void
   onUpiChange: (value: number) => void
   onOnlinePaymentsChange: (payments: OnlinePayment[]) => void
 }
@@ -29,10 +27,8 @@ export default function NetSalesSummarySection({
   totalSales,
   totalExpenses,
   netSales,
-  cashReceived,
   upiReceived,
   onlinePayments,
-  onCashChange,
   onUpiChange,
   onOnlinePaymentsChange,
 }: NetSalesSummarySectionProps) {
@@ -57,6 +53,9 @@ export default function NetSalesSummarySection({
   }
 
   const totalOnlinePayments = onlinePayments.reduce((sum, payment) => sum + payment.amount, 0)
+  
+  // Calculate cash as net sales minus UPI and online payments
+  const cashReceived = netSales - upiReceived - totalOnlinePayments
   const totalPayments = cashReceived + upiReceived + totalOnlinePayments
 
   return (
@@ -78,18 +77,6 @@ export default function NetSalesSummarySection({
       </div>
 
       <div className="space-y-3 mt-4">
-        <div>
-          <label className="text-sm font-medium">Cash Received (₹)</label>
-          <input
-            type="number"
-            value={cashReceived}
-            onChange={(e) => onCashChange(Number.parseFloat(e.target.value) || 0)}
-            placeholder="0"
-            className="w-full border border-input rounded-md px-3 py-2 bg-background outline-none text-sm font-medium"
-            style={{ WebkitAppearance: "none", MozAppearance: "textfield" }}
-          />
-        </div>
-
         <div>
           <label className="text-sm font-medium">UPI Received (₹)</label>
           <input
@@ -169,6 +156,17 @@ export default function NetSalesSummarySection({
             </div>
           )}
         </div>
+
+        {/* Auto-calculated Cash */}
+        <Card className="p-4 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
+          <p className="text-xs text-muted-foreground mb-1">Cash Received (Auto-calculated)</p>
+          <p className="text-2xl font-bold text-green-700 dark:text-green-400">
+            ₹{cashReceived.toLocaleString()}
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Net Sales - UPI - Online Payments
+          </p>
+        </Card>
       </div>
 
       <Card className="p-4 bg-muted/50 border-border">
@@ -179,7 +177,7 @@ export default function NetSalesSummarySection({
           </div>
           <div className="text-xs text-muted-foreground space-y-1">
             <div className="flex justify-between">
-              <span>Cash:</span>
+              <span>Cash (Auto):</span>
               <span>₹{cashReceived.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">

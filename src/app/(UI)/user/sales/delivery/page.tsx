@@ -118,11 +118,9 @@ export default function Home() {
               totalSales={totalSales}
               totalExpenses={totalExpenses}
               netSales={netSales}
-              cashReceived={cashReceived}
               upiReceived={upiReceived}
               onlinePayments={onlinePayments}
-              onCashChange={setCashReceived}
-              onUpiChange={setUpiReceived}
+                onUpiChange={setUpiReceived}
               onOnlinePaymentsChange={setOnlinePayments}
             />
 
