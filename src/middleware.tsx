@@ -26,7 +26,7 @@ export async function middleware(req: NextRequest) {
     }
 
     // Verify token and get user
-    const { user, error } = await getAuthUser(req);
+    const { user, error } = await getAuthUser();
 
     if (error || !user) {
       const loginUrl = new URL("/user/login", req.url);
@@ -57,7 +57,7 @@ export async function middleware(req: NextRequest) {
 
   // If already authenticated and trying to access auth routes, redirect to dashboard
   if (isAuthRoute && token) {
-    const { user } = await getAuthUser(req);
+    const { user } = await getAuthUser();
     if (user) {
       const { profile } = await getUserProfile(req, user.id);
       if (profile) {
