@@ -3,7 +3,7 @@ import { selectAuth } from "@/redux/store/selectors/authSelectors";
 import React from "react";
 import { useSelector } from "react-redux";
 
-const page = () => {
+const Page = () => {
   const admin = useSelector(selectAuth)
   return (
     <>
@@ -19,4 +19,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

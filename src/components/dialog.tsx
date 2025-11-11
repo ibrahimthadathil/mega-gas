@@ -66,7 +66,7 @@ const UserDialog: React.FC<UserDialogProps> = ({ user, onSave, trigger }) => {
       } else toast.error(data.message);
     } catch (error) {
       toast.error(
-        ((error as AxiosError).response?.data as Record<string, String>).message
+        ((error as AxiosError).response?.data as Record<string, string>).message
       );
     }
   };
