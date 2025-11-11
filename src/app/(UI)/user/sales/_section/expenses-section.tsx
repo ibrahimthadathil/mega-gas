@@ -25,7 +25,7 @@ const dummyExpense: Expense = {
   amount: 2500,
 }
 
-export default function ExpensesSection({ expenses, onChange }: ExpensesSectionProps) {
+export default function ExpensesSection({ expenses }: ExpensesSectionProps) {
   const displayExpenses = expenses.length === 0 ? [dummyExpense] : expenses
   const totalExpenses = displayExpenses.filter((e) => e.id !== "dummy-exp-1").reduce((sum, exp) => sum + exp.amount, 0)
 

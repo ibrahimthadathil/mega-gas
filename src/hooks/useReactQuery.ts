@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-export const useRQ = (key: string, executer: Function) => {
+export function UseRQ<T>(key: string, executer: ()=>Promise<{data:T}>) {
   return useQuery({ 
     queryKey: [key],
     queryFn: async ()=>{

@@ -22,7 +22,7 @@ interface DeliveryBoy {
 export default function Home() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedDeliveryBoys, setSelectedDeliveryBoys] = useState<DeliveryBoy[]>([])
-  const [oldStock, setOldStock] = useState([
+  const [oldStock] = useState([
     { id: 1, name: "5kg Cylinder", quantity: 45 },
     { id: 2, name: "10kg Cylinder", quantity: 32 },
     { id: 3, name: "15kg Cylinder", quantity: 28 },
@@ -47,7 +47,7 @@ export default function Home() {
   const [onlinePayments, setOnlinePayments] = useState<Array<{ id: string; consumerName: string; amount: number }>>([])
   const [isVerified, setIsVerified] = useState(false)
   const [closingStock, setClosingStock] = useState<Array<{ id: string; product: string; quantity: number }>>([])
-  const [currencyDenominations, setCurrencyDenominations] = useState({
+  const [currencyDenominations, setCurrencyDenominations] = useState<Record<string,number>>({
     "500": 0,
     "200": 0,
     "100": 0,

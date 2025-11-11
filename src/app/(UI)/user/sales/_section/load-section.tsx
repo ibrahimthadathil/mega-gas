@@ -25,7 +25,7 @@ const dummyLoad: Load = {
   quantity: 50,
 }
 
-export default function LoadSection({ loads, onChange }: LoadSectionProps) {
+export default function LoadSection({ loads, }: LoadSectionProps) {
   const displayLoads = loads.length === 0 ? [dummyLoad] : loads
 
   return (

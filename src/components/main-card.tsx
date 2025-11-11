@@ -1,5 +1,6 @@
 "use client";
 import { RotateCcw } from "lucide-react";
+import Image from "next/image";
 
 export default function MainCard() {
   return (
@@ -9,7 +10,7 @@ export default function MainCard() {
         <div className="md:col-span-1 flex flex-col items-center md:items-start">
           {/* Character Illustration */}
           <div className="w-40 h-40 md:w-48 md:h-48 rounded-xl flex items-center justify-center mb-6 overflow-hidden">
-            <img
+            <Image
               src="/image.png"
               alt="Delivery person"
               className="w-[90%] h-[90%] object-fit"
@@ -76,7 +77,7 @@ export default function MainCard() {
           <div className="mt-6 bg-orange-100 rounded-xl p-4 flex items-center gap-3">
             <RotateCcw size={20} className="text-[#FF8C42] flex-shrink-0" />
             <p className="text-sm text-gray-800">
-              Last Synced at 02:54 PM on 10 Nov'25
+              Last Synced at 02:54 PM on 10 Nov&apos;25
             </p>
           </div>
 

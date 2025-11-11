@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge"
 import { Trash2, Edit2, Camera, ImageIcon } from "lucide-react"
 import { formatDate } from "@/lib/utils"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 export interface Expense {
   id: string
@@ -24,6 +25,12 @@ export interface Expense {
   image?: string
   date: string
   settled: boolean
+}
+
+type ExpenseFormData = {
+  type: Expense["type"]
+  price: string
+  image?: string
 }
 
 export function ExpenseSection(): ReactElement {
@@ -35,9 +42,9 @@ export function ExpenseSection(): ReactElement {
   const cameraInputRef = React.createRef<HTMLInputElement>()
   const galleryInputRef = React.createRef<HTMLInputElement>()
 
-  const { register, handleSubmit, control, reset, watch, setValue } = useForm({
+  const { register, handleSubmit, reset, watch, setValue } = useForm<ExpenseFormData>({
     defaultValues: {
-      type: "",
+      type: "Recharge",
       price: "",
       image: undefined,
     },
@@ -82,9 +89,9 @@ export function ExpenseSection(): ReactElement {
     setIsImageSourceDialog(false)
   }
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: ExpenseFormData) => {
     const expenseType = data.type
-    const price = Number.parseFloat(data.price)
+    const price = Number.parseFloat(String(data.price))
 
     if (!expenseType || !price) {
       return
@@ -139,16 +146,16 @@ export function ExpenseSection(): ReactElement {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="type">Expense Type</Label>
-              <Select defaultValue={watch("type")} onValueChange={(value) => setValue("type", value)}>
+              <Select defaultValue={watch("type")} onValueChange={(value) => setValue("type", value as Expense["type"])}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select expense type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Recharge">Recharge</SelectItem>
                   <SelectItem value="Uniform">Uniform</SelectItem>
+                  <SelectItem value="Misc">Misc</SelectItem>
                   <SelectItem value="Vehicle">Vehicle</SelectItem>
                   <SelectItem value="Maintenance">Maintenance</SelectItem>
-                  <SelectItem value="Misc">Misc</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -168,7 +175,7 @@ export function ExpenseSection(): ReactElement {
               </div>
               {imagePreview && (
                 <div className="mt-2 relative w-full h-32 rounded-md overflow-hidden border">
-                  <img src={imagePreview || "/placeholder.svg"} alt="Preview" className="w-full h-full object-cover" />
+                  <Image src={imagePreview || "/placeholder.svg"} alt="Preview" className="w-full h-full object-cover" />
                   <button
                     type="button"
                     onClick={() => setImagePreview(null)}
@@ -241,7 +248,7 @@ export function ExpenseSection(): ReactElement {
 
       {expenses.length === 0 ? (
         <Card className="p-8 text-center">
-          <p className="text-muted-foreground">No expenses yet. Click "Add Expense" to get started.</p>
+          <p className="text-muted-foreground">No expenses yet. Click Add Expense to get started.</p>
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -252,7 +259,7 @@ export function ExpenseSection(): ReactElement {
             >
               {expense.image && (
                 <div className="mb-3 relative w-full h-32 rounded-md overflow-hidden border">
-                  <img
+                  <Image
                     src={expense.image || "/placeholder.svg"}
                     alt="Expense receipt"
                     className="w-full h-full object-cover"

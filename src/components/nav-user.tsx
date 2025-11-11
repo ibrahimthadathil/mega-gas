@@ -28,7 +28,7 @@ import {
 import { useDispatch } from "react-redux";
 import { logout } from "@/redux/slice/auth/authSlicer";
 import { toast } from "sonner";
-import { redirect, useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 import axios, { AxiosError } from "axios";
 import supabase from "@/lib/supabase/supabaseClient";
 
@@ -54,7 +54,7 @@ export function NavUser({
       router.replace("/user/login");
     } catch (error) {
       toast.error(
-        ((error as AxiosError).response?.data as Record<string, any>).message
+        ((error as AxiosError).response?.data as Record<string, string>).message
       );
     }
   };

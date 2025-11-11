@@ -19,7 +19,7 @@ interface TableProps<T>{
   columns:IColumns<T>[];
   itemsPerPage?:number
 }
-export default function DataTable<T extends Record<string ,any>>({data,columns,itemsPerPage=5}:TableProps<T>) {
+export default function DataTable<T extends Record<string ,string>>({data,columns,itemsPerPage=5}:TableProps<T>) {
   const [currentPage,setCurrentpage]=useState(1);
   const totalPages = Math.ceil(data.length /itemsPerPage)
   const currentData = useMemo(()=>{

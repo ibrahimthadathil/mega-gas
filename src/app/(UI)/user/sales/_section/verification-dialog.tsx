@@ -18,7 +18,7 @@ interface VerificationDialogProps {
   onCancel: () => void
 }
 
-export default function VerificationDialog({ isOpen, onVerify, onCancel }: VerificationDialogProps) {
+export default function VerificationDialog({  onVerify }: VerificationDialogProps) {
   const [showVerificationPrompt, setShowVerificationPrompt] = useState(false)
 
   return (

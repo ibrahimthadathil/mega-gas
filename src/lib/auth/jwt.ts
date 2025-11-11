@@ -15,7 +15,7 @@ type UserProfile = {
   phone?: string | null;
 };
 
-export async function getAuthUser(_req: Request): Promise<AuthUserResult> {
+export async function getAuthUser(): Promise<AuthUserResult> {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("access_token")?.value;
@@ -26,8 +26,8 @@ export async function getAuthUser(_req: Request): Promise<AuthUserResult> {
     if (error || !data?.user) return { user: null, error: error?.message ?? "INVALID_TOKEN" };
 
     return { user: { id: data.user.id, email: data.user.email }, error: null };
-  } catch (e: any) {
-    return { user: null, error: e?.message ?? "UNKNOWN_ERROR" };
+  } catch (e: unknown) {
+    return { user: null, error: (e as Error)?.message ?? "UNKNOWN_ERROR" };
   }
 }
 
@@ -41,13 +41,13 @@ export async function getUserProfile(_req: Request, authId: string): Promise<{ p
 
     if (error || !data) return { profile: null, error: error?.message ?? "PROFILE_NOT_FOUND" };
     return { profile: data as UserProfile, error: null };
-  } catch (e: any) {
-    return { profile: null, error: e?.message ?? "UNKNOWN_ERROR" };
+  } catch (e: unknown) {
+    return { profile: null, error: (e as Error)?.message ?? "UNKNOWN_ERROR" };
   }
 }
 
 export async function getAuthUserFromCookies(): Promise<AuthUserResult> {
-  return getAuthUser({} as unknown as Request);
+  return getAuthUser();
 }
 
 

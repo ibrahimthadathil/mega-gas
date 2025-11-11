@@ -26,7 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       toast.error("Login Required");
       redirect("/user/login");
     }
-  }, []);
+  }, [is_authenticated]);
   return (
     <SidebarProvider>
       <AppSidebar />

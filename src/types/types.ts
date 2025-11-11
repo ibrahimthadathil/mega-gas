@@ -4,6 +4,7 @@ export interface IUser {
     phone:string,
     password:string,
     role: userRole
+    createdAt?:Date
 }
 
 export enum userRole {

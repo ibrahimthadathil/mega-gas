@@ -32,7 +32,7 @@ const createUserProfile = async (user: IUser | { auth_id: string }) => {
   }
 };
 
-const existUserCheck = async (email:string) => {
+const existUserCheck = async () => {
   try {
   } catch (error) {
     throw new Error((error as Error).message);
@@ -49,7 +49,9 @@ const findByEmail = async (email: string) => {
       .single();
     if (error) throw error;
     return data;
-  } catch (error) {}
+  } catch (error) {    throw new Error((error as Error).message);
+}
+
 };
 
 export { creatUserAuth, createUserProfile, findByEmail, existUserCheck };

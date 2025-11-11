@@ -20,7 +20,7 @@ export const POST = async (req: Request) => {
   }
 };
 
-export const PUT = async (req:Request)=>{
+export const PUT = async ()=>{
 try {
   
 } catch (error) {
@@ -41,9 +41,9 @@ export const DELETE =async()=> {
       await supabaseAdmin.auth.admin.deleteUser(user.id);
     }
     return NextResponse.json({ message: "All auth users deleted ✅" });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { message: error.message || "Error deleting users" },
+      { message: (error as Error).message || "Error deleting users" },
       { status: 500 }
     );
   }

@@ -1,7 +1,6 @@
 "use client"
 import React, { useState } from 'react'
-import DataTable from '@/components/data-table'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -12,172 +11,109 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
-import { Search, Plus, Pencil } from 'lucide-react'
+import { Search, Plus,  } from 'lucide-react'
 import UserDialog from '@/components/dialog'
 
 const Page = () => {
-  const [users, setUsers] = useState([
-    {
-      _id: "u1",
-      firstName: "Ibrahim",
-      email: "ibrahim@gmail.com",
-      role: "Seller",
-      profile: "",
-      createdAt: new Date().toISOString(),
-      isActive: true,
-    },
-    {
-      _id: "u2",
-      firstName: "John",
-      email: "john@gmail.com",
-      role: "Buyer",
-      profile: "",
-      createdAt: new Date().toISOString(),
-      isActive: false,
-    },
-    {
-      _id: "u3",
-      firstName: "Meera",
-      email: "meera@gmail.com",
-      role: "Seller",
-      profile: "",
-      createdAt: new Date().toISOString(),
-      isActive: true,
-    },
-    {
-      _id: "u4",
-      firstName: "Anas",
-      email: "anas@gmail.com",
-      role: "Buyer",
-      profile: "",
-      createdAt: new Date().toISOString(),
-      isActive: true,
-    },
-    {
-      _id: "u5",
-      firstName: "Riya",
-      email: "riya@gmail.com",
-      role: "Buyer",
-      profile: "",
-      createdAt: new Date().toISOString(),
-      isActive: false,
-    }
-  ])
+  // const [users] = useState([
+  //   {
+  //     _id: "u1",
+  //     user_name: "Ibrahim",
+  //     email: "ibrahim@gmail.com",
+  //     role: "Seller",
+  //     createdAt: new Date().toISOString(),
+  //   },
+  //   {
+  //     _id: "u2",
+  //     user_name: "John",
+  //     email: "john@gmail.com",
+  //     role: "Buyer",
+  //     createdAt: new Date().toISOString(),
+  //   },
+  //   {
+  //     _id: "u3",
+  //     user_name: "Meera",
+  //     email: "meera@gmail.com",
+  //     role: "Seller",
+  //     createdAt: new Date().toISOString(),
+  //   },
+  //   {
+  //     _id: "u4",
+  //     user_name: "Anas",
+  //     email: "anas@gmail.com",
+  //     role: "Buyer",
+  //     createdAt: new Date().toISOString(),
+  //   },
+  //   {
+  //     _id: "u5",
+  //     user_name: "Riya",
+  //     email: "riya@gmail.com",
+  //     role: "Buyer",
+  //     createdAt: new Date().toISOString(),
+  //   }
+  // ])
 
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('name')
 
   // Handle save user (add or edit)
-  const handleSaveUser = (userData: any, userId?: string) => {
-    if (userId) {
-      // Edit existing user
-      setUsers(users.map(user => 
-        user._id === userId ? { ...user, ...userData } : user
-      ))
-    } else {
-      // Add new user
-      const newUser = {
-        _id: `u${users.length + 1}`,
-        ...userData,
-        profile: "",
-        createdAt: new Date().toISOString(),
-      }
-      setUsers([...users, newUser])
-    }
+  const handleSaveUser = () => {
+
   }
 
-  // // Filter and sort users
-  // const filteredAndSortedUsers = useMemo(() => {
-  //   let filtered = users.filter(user => {
-  //     const search = searchQuery.toLowerCase()
-  //     return (
-  //       user.firstName.toLowerCase().includes(search) ||
-  //       user.email.toLowerCase().includes(search) ||
-  //       user.role.toLowerCase().includes(search)
-  //     )
-  //   })
 
-  //   // // Sort based on selected option
-  //   // filtered.sort((a, b) => {
-  //   //   switch (sortBy) {
-  //   //     case 'name':
-  //   //       return a.firstName.localeCompare(b.firstName)
-  //   //     case 'email':
-  //   //       return a.email.localeCompare(b.email)
-  //   //     case 'role':
-  //   //       return a.role.localeCompare(b.role)
-  //   //     default:
-  //   //       return 0
-  //   //   }
-  //   // })
-
-  //   return filtered
-  // }, [users, searchQuery, sortBy])
-
-  const columns = [
-    {
-      header: "No",
-      render: (_e: any, i: number) => `LB${i + 101}`,
-    },
-    {
-      key: "firstName",
-      header: "User",
-      render: (user: any) => (
-        <div className="flex items-center gap-2">
-          <Avatar className="h-8 w-8 border rounded-full">
-            <AvatarImage
-              src={user?.profile}
-              alt={user?.firstName}
-              className="object-cover w-8 h-8 rounded-full"
-            />
-            <AvatarFallback>
-              {user.firstName
-                .split(" ")
-                .map((n: any) => n[0])
-                .join("")
-                .toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <span className="font-medium text-yellow-500">
-            {user.firstName}
-          </span>
-        </div>
-      ),
-    },
-    { key: "email", header: "Email" },
-    { key: "role", header: "Role" },
-    {
-      header: "Joined",
-      render: (user: any) =>
-        new Date(user.createdAt as Date).toLocaleDateString(),
-    },
-    {
-      header: "Status",
-      render: (user: any) => (
-        <span
-          className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-            user.isActive ? "text-green-700" : "text-red-700"
-          }`}
-        >
-          {user.isActive ? "Active" : "Blocked"}
-        </span>
-      ),
-    },
-    {
-      header: "Actions",
-      render: (user: any) => (
-        <UserDialog
-          user={user}
-          onSave={handleSaveUser}
-          trigger={
-            <Button variant="ghost" size="sm">
-              <Pencil className="h-4 w-4" />
-            </Button>
-          }
-        />
-      ),
-    },
-  ]
+  // const columns = [
+  //   {
+  //     header: "No",
+  //     render: (_e: IUser, i: number) => `LB${i + 101}`,
+  //   },
+  //   {
+  //     key: "user_name",
+  //     header: "User",
+  //     render: (user: IUser) => (
+  //       <div className="flex items-center gap-2">
+  //         <Avatar className="h-8 w-8 border rounded-full">
+  //           <AvatarImage
+  //             src={user?.user_name}
+  //             alt={user?.user_name}
+  //             className="object-cover w-8 h-8 rounded-full"
+  //           />
+  //           <AvatarFallback>
+  //             {user?.user_name
+  //               .split(" ")
+  //               .map((n: string) => n[0])
+  //               .join("")
+  //               .toUpperCase()}
+  //           </AvatarFallback>
+  //         </Avatar>
+  //         <span className="font-medium text-yellow-500">
+  //           {user?.user_name}
+  //         </span>
+  //       </div>
+  //     ),
+  //   },
+  //   { key: "email", header: "Email" },
+  //   { key: "role", header: "Role" },
+  //   {
+  //     header: "Joined",
+  //     render: (user: IUser) =>
+  //       new Date(user?.createdAt as Date).toLocaleDateString(),
+  //   },
+  //   {
+  //     header: "Actions",
+  //     render: (user: IUser) => (
+  //       <UserDialog
+  //         user={user}
+  //         onSave={handleSaveUser}
+  //         trigger={
+  //           <Button variant="ghost" size="sm">
+  //             <Pencil className="h-4 w-4" />
+  //           </Button>
+  //         }
+  //       />
+  //     ),
+  //   },
+  // ]
 
   return (
     <div className="space-y-4 p-6">
@@ -222,7 +158,7 @@ const Page = () => {
       </div>
 
       {/* Data Table */}
-      <DataTable data={users} columns={columns} />
+      {/* <DataTable data={users} columns={columns} /> */}
     </div>
   )
 }

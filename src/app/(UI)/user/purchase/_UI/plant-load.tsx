@@ -47,8 +47,6 @@ export default function PlantLoadSection() {
   const {
     register: registerMain,
     watch: watchMain,
-    handleSubmit: handleSubmitMain,
-    formState: { errors: errorsMain },
     setValue: setValueMain,
   } = useForm<PlantLoadFormData>({
     defaultValues: {
@@ -64,7 +62,6 @@ export default function PlantLoadSection() {
     handleSubmit: handleSubmitDialog,
     reset: resetDialog,
     setValue: setValueDialog,
-    formState: { errors: errorsDialog },
   } = useForm<DialogFormData>({
     defaultValues: {
       product: "",

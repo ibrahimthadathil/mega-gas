@@ -1,5 +1,6 @@
 "use Client";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
@@ -20,7 +21,7 @@ export default function Home() {
         <div className="flex flex-col items-center gap-6 text-center max-w-3xl">
           {/* Main Heading */}
           <div className="w-40 h-40 md:w-48 md:h-48 rounded-xl flex items-center justify-center mb-6 overflow-hidden">
-            <img
+            <Image
               src="/image.png"
               alt="Delivery person"
               className="w-[90%] h-[90%] object-fit"
@@ -35,7 +36,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-white text-black py-8 px-6 sm:px-12 text-center">
         <p className="text-sm">
-          © 2025 MEGA INDANE. All rights reserved. Powering India's Future.
+          © 2025 MEGA INDANE. All rights reserved. Powering India &apos;s Future.
         </p>
       </footer>
     </div>

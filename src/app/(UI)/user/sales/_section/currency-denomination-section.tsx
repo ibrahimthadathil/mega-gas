@@ -3,8 +3,8 @@
 import { Card } from "@/components/ui/card";
 
 interface CurrencyDenominationsSectionProps {
-  denominations: Record<string, number> | any;
-  onChange: (denominations: Record<string, number> | any) => void;
+  denominations?: Record<string, number>;
+  onChange: (denominations: Record<string, number> ) => void;
   netSales: number;
 }
 
@@ -12,7 +12,7 @@ export default function CurrencyDenominationsSection({
   denominations = {},
   onChange,
   netSales,
-}: CurrencyDenominationsSectionProps | any) {
+}: CurrencyDenominationsSectionProps ) {
   const denomList = ["500", "200", "100", "50", "20", "10"];
 
   const denominationDetails = denomList.map((denom) => {

@@ -29,7 +29,7 @@ export default function StockTransferSection() {
   const {
     register,
     handleSubmit,
-    watch,
+    
     formState: { errors },
   } = useForm<StockTransferFormData>({
     defaultValues: {

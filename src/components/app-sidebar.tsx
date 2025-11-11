@@ -4,7 +4,6 @@ import * as React from "react"
 import {
   AudioWaveform,
   BookOpen,
-  Bot,
   ClipboardCheck,
   Command,
   Frame,

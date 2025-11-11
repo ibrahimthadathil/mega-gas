@@ -43,7 +43,7 @@ interface UserDialogProps {
 
 type UserFormValues = z.infer<typeof userFormSchema>;
 
-const UserDialog: React.FC<UserDialogProps> = ({ user, onSave, trigger }) => {
+const UserDialog: React.FC<UserDialogProps> = ({ user, trigger }) => {
   const [open, setOpen] = useState(false);
 
   const form = useForm<UserFormValues>({
