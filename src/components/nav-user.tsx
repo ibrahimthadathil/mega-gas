@@ -47,10 +47,9 @@ export function NavUser({
 
   const logoutUser = async () => {
     try {
-      await supabase.auth.signOut(); // clear client session/localStorage
+      await supabase.auth.signOut(); 
       await axios.post("/api/user/auth/logout");
       dispatch(logout());
-      toast.warning("Logged Out");
       router.replace("/user/login");
     } catch (error) {
       toast.error(
