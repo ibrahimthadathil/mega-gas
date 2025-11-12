@@ -109,12 +109,7 @@ const data = {
       title: "Expenses",
       url: "/user/expenses",
       icon: BookOpen,
-      items: [
-        {
-          title: "Add Expense",
-          url: "/user/expenses/add-expense",
-        },
-      ],
+      
     },
   ],
   projects: [
