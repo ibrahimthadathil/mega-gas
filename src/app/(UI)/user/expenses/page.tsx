@@ -1,5 +1,6 @@
 "use client"
-import { ExpenseSection } from "@/app/(UI)/user/expenses/_UI/expence-section"
+import dynamic from "next/dynamic"
+const ExpenseSection = dynamic(()=>import('@/app/(UI)/user/expenses/_UI/expence-section'))
 
 export default function Page() {
   return (

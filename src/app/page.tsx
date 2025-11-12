@@ -24,6 +24,8 @@ export default function Home() {
             <Image
               src="/image.png"
               alt="Delivery person"
+              width={100}
+              height={100}
               className="w-[90%] h-[90%] object-fit"
             />
           </div>

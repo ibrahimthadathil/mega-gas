@@ -33,7 +33,7 @@ type ExpenseFormData = {
   image?: string
 }
 
-export function ExpenseSection(): ReactElement {
+ const ExpenseSection =(): ReactElement =>{
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isImageSourceDialog, setIsImageSourceDialog] = useState(false)
@@ -301,3 +301,5 @@ export function ExpenseSection(): ReactElement {
     </div>
   )
 }
+
+export default ExpenseSection

@@ -23,7 +23,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const is_authenticated = useSelector(selectIsAuthenticated);
   useEffect(() => {
     if (!is_authenticated) {
-      toast.error("Login Required");
       redirect("/user/login");
     }
   }, [is_authenticated]);

@@ -54,9 +54,9 @@ export function UserLoginForm() {
             email: data.profile.email,
           })
         );
-        toast.success(data.message);
         const isAdmin = String(data.profile.role).toLowerCase() === "admin";
         router.push(isAdmin ? "/admin/dashboard" : "/user/dashboard");
+        toast.success(data.message);
       } else toast.error(data.message);
     } catch (error) {
       toast.error(
