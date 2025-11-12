@@ -1,18 +1,27 @@
+import { LucideIcon } from "lucide-react";
+
+export type NavItem = {
+  title: string;
+  url: string;
+  icon?: LucideIcon;
+  roles: string[]; // list of allowed roles like ["admin", "manager"]
+  isActive?: boolean;
+  items?: NavItem[]; // for nested menus
+};
 export interface IUser {
-    user_name :string,
-    email:string,
-    phone:string,
-    password:string,
-    role: userRole
-    createdAt?:Date
+  user_name: string;
+  email: string;
+  phone: string;
+  password: string;
+  role: userRole;
+  createdAt?: Date;
 }
 
 export enum userRole {
-    Admin = "Admin",
-    Staff = "Staff",
-    Sriver= "Driver",
-
-} 
+  Admin = "Admin",
+  Staff = "Staff",
+  Sriver = "Driver",
+}
 
 export const STATUS = {
   SUCCESS: { code: 200, message: "Success" },
