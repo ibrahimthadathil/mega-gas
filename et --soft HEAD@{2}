@@ -1,0 +1,64 @@
+[33m993a12b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mstock[m[33m)[m HEAD@{0}: reset: moving to HEAD~1
+[33m47db7ca[m HEAD@{1}: reset: moving to HEAD~1
+[33m3f226ac[m[33m ([m[1;31morigin/stock[m[33m)[m HEAD@{2}: commit: feat: made some changes on the middle ware but it is not finalized
+[33m47db7ca[m HEAD@{3}: reset: moving to HEAD
+[33m47db7ca[m HEAD@{4}: reset: moving to HEAD
+[33m47db7ca[m HEAD@{5}: commit: feat: implement role-based navigation and user management updates
+[33m993a12b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mstock[m[33m)[m HEAD@{6}: commit: fix: remove toast notification for login requirement in layout and update ExpenseSection export style
+[33mf4730af[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{7}: merge main: Fast-forward
+[33m107a0cd[m HEAD@{8}: checkout: moving from main to stock
+[33mf4730af[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{9}: commit: fix: remove toast notifications for access denial and logout in layout and nav-user components
+[33me468455[m HEAD@{10}: commit: fix: remove redundant items array from Expenses section in sidebar
+[33m2919a6c[m HEAD@{11}: commit: fix: remove redundant request parameter from getAuthUser calls in middleware
+[33mf3bb3c7[m HEAD@{12}: commit: feat: enhance user management and improve UI components with various updates and optimizations
+[33ma19cf4d[m HEAD@{13}: commit: fix: correct component names to follow PascalCase convention and improve type consistency in error handling
+[33m107a0cd[m HEAD@{14}: merge stock: Fast-forward
+[33m3985203[m HEAD@{15}: checkout: moving from stock to main
+[33m107a0cd[m HEAD@{16}: commit: feat: implement ExpenseSection component for managing expenses with add/edit functionality
+[33m2fe57fd[m HEAD@{17}: commit: feat: add Stock and Expenses sections to the sidebar with navigation links
+[33m29ce56d[m HEAD@{18}: commit: feat: add expenses page and main components for task management
+[33ma6941db[m HEAD@{19}: commit: feat: Update authentication flow to redirect unauthenticated users to login and authenticated users to dashboard
+[33m3e2afd9[m HEAD@{20}: commit: feat: Refactor DeliveryPartnerSection to manage selected delivery boys and update report submission logic
+[33me20923d[m HEAD@{21}: commit: feat: Remove cashReceived prop and onCashChange handler from NetSalesSummarySection, auto-calculate cash in the component
+[33mc187497[m HEAD@{22}: commit: feat: Create Stock Transfer section with form handling and UI components
+[33m4d044ec[m HEAD@{23}: commit: feat: Add Stock Transfer link to sidebar and create Stock Transfer page
+[33m4ec908b[m HEAD@{24}: commit: feat: Refactor purchase and sales pages to remove unused components and update sidebar links
+[33m1a8b198[m HEAD@{25}: commit: feat: Integrate DatePicker component in Plant Load section and update date handling
+[33m3254374[m HEAD@{26}: commit: feat: Implement Trip Sheet component with trip load management and helpers
+[33m6395e4d[m[33m ([m[1;31morigin/purchase-section[m[33m, [m[1;32mpurchase-section[m[33m)[m HEAD@{27}: checkout: moving from purchase-section to stock
+[33m6395e4d[m[33m ([m[1;31morigin/purchase-section[m[33m, [m[1;32mpurchase-section[m[33m)[m HEAD@{28}: commit: feat: Add Plant Load section with product management and radio group component
+[33m0cac009[m[33m ([m[1;31morigin/driver-ui[m[33m, [m[1;32mdriver-ui[m[33m)[m HEAD@{29}: checkout: moving from driver-ui to purchase-section
+[33m0cac009[m[33m ([m[1;31morigin/driver-ui[m[33m, [m[1;32mdriver-ui[m[33m)[m HEAD@{30}: commit: feat: Update @tanstack/react-query to version 5.90.7 and implement custom hook for query management
+[33mfe4dc82[m HEAD@{31}: commit: feat: Update sidebar to rename "Models" to "Sales" and adjust icon for improved clarity
+[33mff44ade[m HEAD@{32}: commit: feat: Refactor currency denomination section for improved readability and error handling
+[33m8001a4b[m HEAD@{33}: commit: feat: Add old stock section and sales management components
+[33m9d87a9d[m[33m ([m[1;31morigin/redux[m[33m, [m[1;32mredux[m[33m)[m HEAD@{34}: checkout: moving from redux to driver-ui
+[33m9d87a9d[m[33m ([m[1;31morigin/redux[m[33m, [m[1;32mredux[m[33m)[m HEAD@{35}: commit: feat: update @tanstack/react-query and next-auth versions, add PUT handler in auth route
+[33m7a62929[m HEAD@{36}: commit: feat: implement user authentication flow with cookie management and role-based redirection
+[33m14909d4[m HEAD@{37}: commit: feat: update admin dashboard to display user information and enhance routing logic for authentication
+[33m716236d[m HEAD@{38}: commit: feat: implement authentication checks in layout and nav-user components, add global error handling and loading states
+[33m8dc0f87[m HEAD@{39}: commit: feat: add layout component and auth selectors for user state management
+[33m96657c5[m HEAD@{40}: commit: feat: implement axios instance with request interceptor for authentication
+[33mdaae2b6[m HEAD@{41}: commit: refactor: enhance user login service and update login form handling
+[33m3985203[m HEAD@{42}: checkout: moving from main to redux
+[33m3985203[m HEAD@{43}: merge redux: Fast-forward
+[33m85ab73b[m HEAD@{44}: checkout: moving from redux to main
+[33m3985203[m HEAD@{45}: commit: completed persister in redux
+[33m4e1ccbc[m HEAD@{46}: commit: completed redux state management
+[33m3d39fed[m HEAD@{47}: commit: add redux toolkit and auth slice for user authentication management
+[33m85ab73b[m HEAD@{48}: checkout: moving from main to redux
+[33m85ab73b[m HEAD@{49}: commit: logic changes in admin UMS
+[33m9daf0a6[m HEAD@{50}: commit: user login functionality implemented
+[33m63e6017[m HEAD@{51}: commit: complete user add by admin
+[33m05d2adb[m HEAD@{52}: commit: started admin sides of UMS
+[33mf2dd0bd[m HEAD@{53}: commit: updated folder structure into repository pattern
+[33m0ea90e1[m HEAD@{54}: commit: changeed the usermodal UI
+[33mc36ec80[m HEAD@{55}: commit: added zod validation and removed the otp option
+[33mfdba617[m HEAD@{56}: commit: complete auth provider
+[33m50040d0[m HEAD@{57}: commit: integrated supabase
+[33m1676272[m HEAD@{58}: commit: added UMS UI
+[33mf5f8329[m HEAD@{59}: commit: added data table
+[33m0072885[m HEAD@{60}: commit: updated app sidebar
+[33m679b5e0[m HEAD@{61}: commit: added sidebar
+[33m4da7542[m HEAD@{62}: commit: deleted the admin loggin page
+[33m7a8c484[m HEAD@{63}: clone: from https://github.com/ibrahimthadathil/mega-gas.git
