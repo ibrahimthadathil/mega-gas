@@ -1,10 +1,8 @@
-import { AuthRequest } from "@/middleware";
-import { addExpenses } from "@/services/serverside_api_service/user/expenses/expensesService";
+import { addExpenses, getExpensesByUser } from "@/services/serverside_api_service/user/expenses/expensesService";
 import { Expense, STATUS } from "@/types/types";
-import { STATUS_CODES } from "http";
 import { NextResponse } from "next/server";
 
-export const POST = async (req: AuthRequest) => {
+export const POST = async (req: NextResponse) => {
   try {
     const data = (await req.json()) as Expense;
     const userId = req.headers.get("x-user-id");
@@ -22,6 +20,26 @@ export const POST = async (req: AuthRequest) => {
         { message: STATUS.BAD_REQUEST.message },
         { status: STATUS.BAD_REQUEST.code }
       );
+  } catch (error) {
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: STATUS.SERVER_ERROR.code }
+    );
+  }
+};
+
+export const GET = async (req: NextResponse) => {
+  try {
+    const userId = req.headers.get("x-user-id") as string;
+    if(userId){
+      const { success,data} = await getExpensesByUser(userId)
+      if(success){
+        return NextResponse.json(
+          {data, success },
+          { status: STATUS.SUCCESS.code }
+        );
+      }
+    } else throw new Error('Un-authorized')
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },

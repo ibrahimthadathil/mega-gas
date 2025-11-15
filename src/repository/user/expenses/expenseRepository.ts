@@ -22,4 +22,18 @@ const add_Expense = async (datas: Expense) => {
   }
 };
 
-export { add_Expense };
+const getAllExpenses = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("expenses")
+      .select("*")
+      .eq("created_by", userId)
+      .order("created_time", { ascending: false });
+      if(error) throw error 
+      else return {data , success:true}
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { add_Expense, getAllExpenses };
