@@ -1,5 +1,5 @@
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin";
-import { add_User } from "@/services/admin/auth-service.ts/userService";
+import { add_User } from "@/services/serverside_api_service/admin/auth-service.ts/userService";
 import { NextResponse } from "next/server";
 
 export const POST = async (req: Request) => {

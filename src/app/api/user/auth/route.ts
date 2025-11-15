@@ -1,4 +1,4 @@
-import { userLoginService } from "@/services/user/authService/authService";
+import { userLoginService } from "@/services/serverside_api_service/user/authService/authService";
 import { STATUS } from "@/types/types";
 import { NextResponse } from "next/server";
 
