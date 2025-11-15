@@ -2,12 +2,16 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getAuthUser, getUserProfile } from "@/lib/auth/jwt";
 
+export interface AuthRequest extends NextRequest {
+  user?: string;
+}
+
 // Routes that require authentication
 const protectedRoutes = ["/user/dashboard", "/admin"];
 // Routes that should redirect to dashboard if already authenticated
-const authRoutes = ["/user/login",];
+const authRoutes = ["/user/login"];
 
-export async function middleware(req: NextRequest) {
+export async function middleware(req: AuthRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get("access_token")?.value;
 
@@ -15,6 +19,7 @@ export async function middleware(req: NextRequest) {
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route)
   );
+
   const isAuthRoute = authRoutes.includes(pathname);
 
   // If accessing protected route, verify authentication
@@ -24,9 +29,10 @@ export async function middleware(req: NextRequest) {
       // loginUrl.searchParams.set("from", pathname);
       return NextResponse.redirect(loginUrl);
     }
-
     // Verify token and get user
     const { user, error } = await getAuthUser();
+
+    console.log(user, "🐕🐕🐕");
 
     if (error || !user) {
       const loginUrl = new URL("/user/login", req.url);
@@ -40,7 +46,10 @@ export async function middleware(req: NextRequest) {
 
     // Check admin routes
     if (pathname.startsWith("/admin")) {
-      const { profile, error: profileError } = await getUserProfile(req, user.id);
+      const { profile, error: profileError } = await getUserProfile(
+        req,
+        user.id
+      );
 
       if (profileError || !profile) {
         const loginUrl = new URL("/user/login", req.url);
@@ -56,16 +65,23 @@ export async function middleware(req: NextRequest) {
   }
 
   // If already authenticated and trying to access auth routes, redirect to dashboard
+  const { user } = await getAuthUser();
   if (isAuthRoute && token) {
-    const { user } = await getAuthUser();
     if (user) {
       const { profile } = await getUserProfile(req, user.id);
       if (profile) {
         const redirectPath =
-          String(profile.role).toLowerCase() === "admin" ? "/admin/dashboard" : "/user/dashboard";
+          String(profile.role).toLowerCase() === "admin"
+            ? "/admin/dashboard"
+            : "/user/dashboard";
         return NextResponse.redirect(new URL(redirectPath, req.url));
       }
     }
+  }
+  if (user?.id) {
+    const response = NextResponse.next();
+    response.headers.set("x-user-id", user.id);
+    return response;
   }
 
   return NextResponse.next();
@@ -81,6 +97,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api/user/auth/login|_next/static|_next/image|favicon.ico).*)",
   ],
 };

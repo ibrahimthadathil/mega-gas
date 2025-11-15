@@ -33,3 +33,15 @@ export const STATUS = {
   CONFLICT: { code: 409, message: "Conflict occurred" },
   SERVER_ERROR: { code: 500, message: "Internal server error" },
 } as const;
+
+
+export interface Expense {
+  id: string
+  created_by?:string
+  type: "Recharge" | "Workshop" | "Other"
+  amount: number
+  image?: string
+  date: string
+  description?:string
+  settled?: boolean
+}

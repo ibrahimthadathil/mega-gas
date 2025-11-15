@@ -1,135 +1,128 @@
-"use client"
+"use client";
 
-import React from "react"
+import React from "react";
 
-import type { ReactElement } from "react"
+import type { ReactElement } from "react";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Card } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Trash2, Edit2, Camera, ImageIcon } from "lucide-react"
-import { formatDate } from "@/lib/utils"
-import { cn } from "@/lib/utils"
-import Image from "next/image"
-
-export interface Expense {
-  id: string
-  type: "Recharge" | "Uniform" | "Vehicle" | "Maintenance" | "Misc"
-  price: number
-  image?: string
-  date: string
-  settled: boolean
-}
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Trash2, Edit2, Camera, ImageIcon } from "lucide-react";
+import { formatDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
+import { add_expense } from "@/services/client_api-Service/user/user_api";
+import { Expense } from "@/types/types";
+import { toast } from "sonner";
 
 type ExpenseFormData = {
-  type: Expense["type"]
-  price: string
-  image?: string
-}
+  type: Expense["type"];
+  amount: string;
+  image?: string;
+};
 
- const ExpenseSection =(): ReactElement =>{
-  const [expenses, setExpenses] = useState<Expense[]>([])
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isImageSourceDialog, setIsImageSourceDialog] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const cameraInputRef = React.createRef<HTMLInputElement>()
-  const galleryInputRef = React.createRef<HTMLInputElement>()
+const ExpenseSection = (): ReactElement => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isImageSourceDialog, setIsImageSourceDialog] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const cameraInputRef = React.createRef<HTMLInputElement>();
+  const galleryInputRef = React.createRef<HTMLInputElement>();
 
-  const { register, handleSubmit, reset, watch, setValue } = useForm<ExpenseFormData>({
-    defaultValues: {
-      type: "Recharge",
-      price: "",
-      image: undefined,
-    },
-  })
+  const { register, handleSubmit, reset, watch, setValue } =
+    useForm<ExpenseFormData>({
+      defaultValues: {
+        type: "Recharge",
+        amount: "",
+        image: undefined,
+      },
+    });
 
   const handleAddClick = () => {
-    setEditingId(null)
-    setImagePreview(null)
-    reset()
-    setIsDialogOpen(true)
-  }
+    setEditingId(null);
+    setImagePreview(null);
+    reset();
+    setIsDialogOpen(true);
+  };
 
   const handleEditClick = (expense: Expense) => {
-    setEditingId(expense.id)
-    setValue("type", expense.type)
-    setValue("price", expense.price.toString())
-    setImagePreview(expense.image || null)
-    setIsDialogOpen(true)
-  }
+    setEditingId(expense.id);
+    setValue("type", expense.type);
+    setValue("amount", expense.amount.toString());
+    setImagePreview(expense.image || null);
+    setIsDialogOpen(true);
+  };
 
   const handleCameraCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onload = (event) => {
-        setImagePreview(event.target?.result as string)
-      }
-      reader.readAsDataURL(file)
+        setImagePreview(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-    setIsImageSourceDialog(false)
-  }
+    setIsImageSourceDialog(false);
+  };
 
   const handleGallerySelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onload = (event) => {
-        setImagePreview(event.target?.result as string)
-      }
-      reader.readAsDataURL(file)
+        setImagePreview(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-    setIsImageSourceDialog(false)
-  }
+    setIsImageSourceDialog(false);
+  };
 
-  const onSubmit = (data: ExpenseFormData) => {
-    const expenseType = data.type
-    const price = Number.parseFloat(String(data.price))
+  const onSubmit = async (form_data: ExpenseFormData) => {
+    const expenseType = form_data.type;
+    const price = Number.parseFloat(String(form_data.amount));
 
     if (!expenseType || !price) {
-      return
+      return;
     }
-
-    if (editingId) {
-      setExpenses(
-        expenses.map((exp) =>
-          exp.id === editingId
-            ? {
-                ...exp,
-                type: expenseType,
-                price,
-                image: imagePreview || exp.image,
-              }
-            : exp,
-        ),
-      )
-    } else {
-      const newExpense: Expense = {
-        id: Date.now().toString(),
-        type: expenseType,
-        price,
-        image: imagePreview || undefined,
-        date: new Date().toISOString(),
-        settled: false,
+    const newExpense = {
+      id: Date.now().toString(),
+      type: expenseType,
+      amount: price,
+      image: imagePreview || undefined,
+      date: new Date().toISOString(),
+    };
+    try {
+      const data = await add_expense(newExpense);
+      if (data.success) {
+        toast.success(data.message);
+        setIsDialogOpen(false);
+        setImagePreview(null);
+        reset();
       }
-      setExpenses([newExpense, ...expenses])
+    } catch (error) {
+      toast.error((error as Error).message);
     }
+  };
 
-    setIsDialogOpen(false)
-    setImagePreview(null)
-    reset()
-  }
-
-  const handleDelete = (id: string) => {
-    setExpenses(expenses.filter((exp) => exp.id !== id))
-  }
+  const handleDelete = (id: string) => {};
 
   return (
     <div className="w-full max-w-6xl mx-auto">
@@ -141,21 +134,26 @@ type ExpenseFormData = {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{editingId ? "Edit Expense" : "Add Expense"}</DialogTitle>
+            <DialogTitle>
+              {editingId ? "Edit Expense" : "Add Expense"}
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="type">Expense Type</Label>
-              <Select defaultValue={watch("type")} onValueChange={(value) => setValue("type", value as Expense["type"])}>
+              <Select
+                defaultValue={watch("type")}
+                onValueChange={(value) =>
+                  setValue("type", value as Expense["type"])
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select expense type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Recharge">Recharge</SelectItem>
-                  <SelectItem value="Uniform">Uniform</SelectItem>
-                  <SelectItem value="Misc">Misc</SelectItem>
-                  <SelectItem value="Vehicle">Vehicle</SelectItem>
-                  <SelectItem value="Maintenance">Maintenance</SelectItem>
+                  <SelectItem value="Workshop">Workshop</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -175,7 +173,11 @@ type ExpenseFormData = {
               </div>
               {imagePreview && (
                 <div className="mt-2 relative w-full h-32 rounded-md overflow-hidden border">
-                  <Image src={imagePreview || "/placeholder.svg"} alt="Preview" className="w-full h-full object-cover" />
+                  <Image
+                    src={imagePreview || "/placeholder.svg"}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
                   <button
                     type="button"
                     onClick={() => setImagePreview(null)}
@@ -194,15 +196,21 @@ type ExpenseFormData = {
                 type="number"
                 step="0.01"
                 placeholder="0.00"
-                {...register("price", { required: true })}
+                {...register("amount", { required: true })}
               />
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button type="submit">{editingId ? "Update Expense" : "Add Expense"}</Button>
+              <Button type="submit">
+                {editingId ? "Update Expense" : "Add Expense"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -242,16 +250,23 @@ type ExpenseFormData = {
             onChange={handleCameraCapture}
             className="hidden"
           />
-          <input ref={galleryInputRef} type="file" accept="image/*" onChange={handleGallerySelect} className="hidden" />
+          <input
+            ref={galleryInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleGallerySelect}
+            className="hidden"
+          />
         </DialogContent>
       </Dialog>
 
-      {expenses.length === 0 ? (
-        <Card className="p-8 text-center">
-          <p className="text-muted-foreground">No expenses yet. Click Add Expense to get started.</p>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <Card className="p-8 text-center">
+        <p className="text-muted-foreground">
+          No expenses yet. Click Add Expense to get started.
+        </p>
+      </Card>
+      {/* {optional rendering if there is cards} */}
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {expenses.map((expense) => (
             <Card
               key={expense.id}
@@ -269,7 +284,7 @@ type ExpenseFormData = {
 
               <div className="mb-3 flex-1">
                 <h3 className="font-bold text-lg mb-1">{expense.type}</h3>
-                <p className="text-lg font-semibold text-primary mb-1">₹{expense.price.toFixed(2)}</p>
+                <p className="text-lg font-semibold text-primary mb-1">₹{expense.amount.toFixed(2)}</p>
                 <p className="text-sm text-muted-foreground">{formatDate(new Date(expense.date))}</p>
               </div>
 
@@ -296,10 +311,9 @@ type ExpenseFormData = {
               )}
             </Card>
           ))}
-        </div>
-      )}
+        </div> */}
     </div>
-  )
-}
+  );
+};
 
-export default ExpenseSection
+export default ExpenseSection;
