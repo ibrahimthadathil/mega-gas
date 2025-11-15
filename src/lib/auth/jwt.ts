@@ -1,16 +1,12 @@
 import { cookies } from "next/headers";
-import { NextRequest } from "next/server";
-import { Session } from "@supabase/supabase-js";
-
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin";
-import { normalizeRole as edgeNormalizeRole } from "./edgeAuth";
 
 type AuthUserResult = {
   user: { id: string; email?: string | null } | null;
   error?: string | null;
 };
 
-export type UserProfile = {
+type UserProfile = {
   id: string;
   auth_id: string;
   user_name: string;
@@ -18,9 +14,6 @@ export type UserProfile = {
   role: string;
   phone?: string | null;
 };
-
-// Re-export normalizeRole from edgeAuth for backward compatibility
-export const normalizeRole = edgeNormalizeRole;
 
 export async function getAuthUser(): Promise<AuthUserResult> {
   try {
@@ -38,10 +31,7 @@ export async function getAuthUser(): Promise<AuthUserResult> {
   }
 }
 
-export async function getUserProfile(
-  _req: NextRequest | null,
-  authId: string
-): Promise<{ profile: UserProfile | null; error?: string | null }> {
+export async function getUserProfile(_req: Request, authId: string): Promise<{ profile: UserProfile | null; error?: string | null }> {
   try {
     const { data, error } = await supabaseAdmin
       .from("users")
@@ -54,42 +44,6 @@ export async function getUserProfile(
   } catch (e: unknown) {
     return { profile: null, error: (e as Error)?.message ?? "UNKNOWN_ERROR" };
   }
-}
-
-export async function refreshAccessToken(
-  refreshToken?: string
-): Promise<{ session: Session | null; error?: string | null }> {
-  try {
-    let token = refreshToken;
-    if (!token) {
-      const cookieStore = await cookies();
-      token = cookieStore.get("refresh_token")?.value;
-    }
-
-    if (!token) return { session: null, error: "NO_REFRESH_TOKEN" };
-
-    const { data, error } = await supabaseAdmin.auth.refreshSession({
-      refresh_token: token,
-    });
-
-    if (error || !data?.session) {
-      return { session: null, error: error?.message ?? "REFRESH_FAILED" };
-    }
-
-    return { session: data.session, error: null };
-  } catch (e: unknown) {
-    return { session: null, error: (e as Error)?.message ?? "UNKNOWN_ERROR" };
-  }
-}
-
-export async function getAuthenticatedProfile(req?: NextRequest | null) {
-  const { user, error } = await getAuthUser();
-  if (error || !user) {
-    return { user: null, profile: null, error };
-  }
-
-  const { profile, error: profileError } = await getUserProfile(req ?? null, user.id);
-  return { user, profile, error: profileError ?? null };
 }
 
 export async function getAuthUserFromCookies(): Promise<AuthUserResult> {

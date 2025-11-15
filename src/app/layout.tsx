@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body suppressHydrationWarning>
+      <body>
         <QueryClientProvider client={queryClient}>
           <Provider store={store}>
             <PersistGate loading={<Loading />} persistor={persister}>

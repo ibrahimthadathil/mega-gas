@@ -1,195 +1,86 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getAuthUser, getUserProfile } from "@/lib/auth/jwt";
 
-import supabaseAdmin from "@/lib/supabase/supabaseAdmin";
-import { getUserProfileByAuthId, normalizeRole } from "@/lib/auth/edgeAuth";
-import { getAllowedRolesForRoute } from "@/lib/auth/routePermissions";
-
-const AUTH_ROUTES = ["/user/login"];
-const PROTECTED_PREFIXES = ["/admin", "/user"];
-const ADMIN_DEFAULT_ROLES = ["admin", "manager", "accountant"];
-const USER_DEFAULT_ROLES = [
-  "admin",
-  "manager",
-  "accountant",
-  "driver",
-  "godown_keeper",
-  "plant_driver",
-  "staff",
-];
-const ROLE_DEFAULT_ROUTES: Record<string, string> = {
-  admin: "/admin/dashboard",
-  manager: "/admin/dashboard",
-  accountant: "/admin/dashboard",
-  driver: "/user/dashboard",
-  godown_keeper: "/user/dashboard",
-  plant_driver: "/user/dashboard",
-  staff: "/user/dashboard",
-};
-
-const isProd = process.env.NODE_ENV === "production";
+// Routes that require authentication
+const protectedRoutes = ["/user/dashboard", "/admin"];
+// Routes that should redirect to dashboard if already authenticated
+const authRoutes = ["/user/login",];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const sanitizedPath =
-    pathname === "/" ? pathname : pathname.replace(/\/+$/, "") || "/";
+  const token = req.cookies.get("access_token")?.value;
 
-  const isAuthRoute = AUTH_ROUTES.includes(sanitizedPath);
-  let allowedRoles = getAllowedRolesForRoute(sanitizedPath);
+  // Check if route is protected
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+  const isAuthRoute = authRoutes.includes(pathname);
 
-  if (!allowedRoles && sanitizedPath.startsWith("/admin")) {
-    allowedRoles = ADMIN_DEFAULT_ROLES;
-  } else if (!allowedRoles && sanitizedPath.startsWith("/user") && !isAuthRoute) {
-    allowedRoles = USER_DEFAULT_ROLES;
-  }
+  // If accessing protected route, verify authentication
+  if (isProtectedRoute) {
+    if (!token) {
+      const loginUrl = new URL("/user/login", req.url);
+      // loginUrl.searchParams.set("from", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
 
-  const needsAuth =
-    !isAuthRoute &&
-    (allowedRoles !== null ||
-      PROTECTED_PREFIXES.some((prefix) => sanitizedPath.startsWith(prefix)));
+    // Verify token and get user
+    const { user, error } = await getAuthUser();
 
-  const accessToken = req.cookies.get("access_token")?.value;
-  const refreshToken = req.cookies.get("refresh_token")?.value;
+    if (error || !user) {
+      const loginUrl = new URL("/user/login", req.url);
+      loginUrl.searchParams.set("from", pathname);
+      // Clear invalid token
+      const response = NextResponse.redirect(loginUrl);
+      response.cookies.delete("access_token");
+      response.cookies.delete("refresh_token");
+      return response;
+    }
 
-  const {
-    user,
-    tokensToSet,
-    shouldClearCookies,
-  } = await resolveUser(accessToken, refreshToken);
+    // Check admin routes
+    if (pathname.startsWith("/admin")) {
+      const { profile, error: profileError } = await getUserProfile(req, user.id);
 
-  if (isAuthRoute) {
-    if (user) {
-      const { profile } = await getUserProfileByAuthId(user.id);
-      if (profile) {
-        return attachCookieHeaders(
-          NextResponse.redirect(new URL(getDefaultRouteForRole(profile.role), req.url)),
-          tokensToSet,
-          shouldClearCookies
-        );
+      if (profileError || !profile) {
+        const loginUrl = new URL("/user/login", req.url);
+        loginUrl.searchParams.set("from", pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+
+      if (String(profile.role).toLowerCase() !== "admin") {
+        // Redirect non-admin users to user dashboard
+        return NextResponse.redirect(new URL("/user/dashboard", req.url));
       }
     }
-    return NextResponse.next();
   }
 
-  if (!needsAuth) {
-    return attachCookieHeaders(NextResponse.next(), tokensToSet, shouldClearCookies);
-  }
-
-  if (!user) {
-    return redirectToLogin(req, tokensToSet, shouldClearCookies);
-  }
-
-  const { profile } = await getUserProfileByAuthId(user.id);
-  if (!profile) {
-    return redirectToLogin(req, tokensToSet, true);
-  }
-
-  const normalizedRole = normalizeRole(profile.role);
-
-  if (allowedRoles && allowedRoles.length && !allowedRoles.includes(normalizedRole)) {
-    return attachCookieHeaders(
-      NextResponse.redirect(new URL(getDefaultRouteForRole(profile.role), req.url)),
-      tokensToSet,
-      shouldClearCookies
-    );
-  }
-
-  return attachCookieHeaders(NextResponse.next(), tokensToSet, shouldClearCookies);
-}
-
-async function resolveUser(
-  accessToken?: string,
-  refreshToken?: string
-) {
-  const result = {
-    user: null as { id: string; email?: string | null } | null,
-    tokensToSet: null as { access_token: string; refresh_token: string } | null,
-    shouldClearCookies: false,
-  };
-
-  if (accessToken) {
-    const { data, error } = await supabaseAdmin.auth.getUser(accessToken);
-    if (!error && data?.user) {
-      result.user = { id: data.user.id, email: data.user.email };
-      return result;
+  // If already authenticated and trying to access auth routes, redirect to dashboard
+  if (isAuthRoute && token) {
+    const { user } = await getAuthUser();
+    if (user) {
+      const { profile } = await getUserProfile(req, user.id);
+      if (profile) {
+        const redirectPath =
+          String(profile.role).toLowerCase() === "admin" ? "/admin/dashboard" : "/user/dashboard";
+        return NextResponse.redirect(new URL(redirectPath, req.url));
+      }
     }
   }
 
-  if (refreshToken) {
-    const { data, error } = await supabaseAdmin.auth.refreshSession({
-      refresh_token: refreshToken,
-    });
-
-    if (!error && data?.session && data.user) {
-      result.user = { id: data.user.id, email: data.user.email };
-      result.tokensToSet = {
-        access_token: data.session.access_token,
-        refresh_token: data.session.refresh_token,
-      };
-      return result;
-    }
-  }
-
-  result.shouldClearCookies = Boolean(accessToken || refreshToken);
-  return result;
+  return NextResponse.next();
 }
 
-function getDefaultRouteForRole(role?: string | null) {
-  const normalized = normalizeRole(role);
-  return ROLE_DEFAULT_ROUTES[normalized] ?? "/user/dashboard";
-}
-
-function attachCookieHeaders(
-  res: NextResponse,
-  tokensToSet: { access_token: string; refresh_token: string } | null,
-  shouldClearCookies: boolean
-) {
-  if (tokensToSet) {
-    res.cookies.set("access_token", tokensToSet.access_token, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: "strict",
-      maxAge: 60 * 60,
-      path: "/",
-    });
-    res.cookies.set("refresh_token", tokensToSet.refresh_token, {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/",
-    });
-  } else if (shouldClearCookies) {
-    res.cookies.set("access_token", "", {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: "strict",
-      maxAge: 0,
-      path: "/",
-    });
-    res.cookies.set("refresh_token", "", {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: "strict",
-      maxAge: 0,
-      path: "/",
-    });
-  }
-  return res;
-}
-
-function redirectToLogin(
-  req: NextRequest,
-  tokensToSet: { access_token: string; refresh_token: string } | null,
-  shouldClearCookies: boolean
-) {
-  const loginUrl = new URL("/user/login", req.url);
-  loginUrl.searchParams.set("from", req.nextUrl.pathname);
-  return attachCookieHeaders(NextResponse.redirect(loginUrl), tokensToSet, shouldClearCookies);
-}
-
+// Configure which routes should trigger middleware
 export const config = {
   matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };
