@@ -38,4 +38,17 @@ const getAllExpenses = async (userId: string) => {
   }
 };
 
-export { add_Expense, getAllExpenses };
+const delete_Expense = async (expenseId:string)=>{
+  try {
+    const {error} = await supabase.from('expenses').delete().eq('id',expenseId)
+    if(error) throw error
+    return true
+  } catch (error) {
+        console.log((error as Error).message);
+
+    throw error
+  }
+}
+
+
+export { add_Expense, getAllExpenses, delete_Expense };

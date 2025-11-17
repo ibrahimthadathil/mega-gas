@@ -29,6 +29,7 @@ import { Camera, Edit2, ImageIcon, Trash2 } from "lucide-react";
 import Image from "next/image";
 import {
   add_expense,
+  delete_expense,
   get_expenses,
 } from "@/services/client_api-Service/user/user_api";
 import { Expense } from "@/types/types";
@@ -48,6 +49,7 @@ type ExpenseFormData = {
 const ExpenseSection = (): ReactElement => {
   const { data, isLoading } = UseRQ("expenses", get_expenses);
   const queryClient = useQueryClient();
+  const [submit, setSubmit] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isImageSourceDialog, setIsImageSourceDialog] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -118,8 +120,10 @@ const ExpenseSection = (): ReactElement => {
       date: new Date().toISOString(),
     };
     try {
+      setSubmit(true);
       const data = await add_expense(newExpense);
       if (data.success) {
+        setSubmit(false);
         queryClient.invalidateQueries({ queryKey: ["expenses"] });
         toast.success(data.message);
         setIsDialogOpen(false);
@@ -131,7 +135,17 @@ const ExpenseSection = (): ReactElement => {
     }
   };
 
-  const handleDelete = (id: string) => {};
+  const handleDelete = async (id: string) => {
+    try {
+      const data = await delete_expense(id);
+      if (data.success) {
+        toast.success("Deleted");
+        queryClient.invalidateQueries({ queryKey: ["expenses"] });
+      }
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto">
@@ -217,7 +231,7 @@ const ExpenseSection = (): ReactElement => {
               >
                 Cancel
               </Button>
-              <Button type="submit">
+              <Button disabled={submit} type="submit">
                 {editingId ? "Update Expense" : "Add Expense"}
               </Button>
             </DialogFooter>
@@ -280,14 +294,11 @@ const ExpenseSection = (): ReactElement => {
               <Skeleton className="h-4 w-2/3 sm:w-1/2 md:w-3/4" />
             </div>
           </div>
-        ) : data ? (
+        ) : (data as Expense[]).length ? (
           (data as Expense[]).map((expense: Expense) => (
             <Card
               key={expense.id}
-              className={cn(
-                "p-4 flex flex-col",
-                "opacity-60 pointer-events-none"
-              )}
+              className={cn("p-4 flex flex-col", "opacity-60 ")}
             >
               {expense?.image && (
                 <div className="mb-3 relative w-full h-32 rounded-md overflow-hidden border">
@@ -337,7 +348,7 @@ const ExpenseSection = (): ReactElement => {
                 <Button
                   size="sm"
                   variant="destructive"
-                  onClick={() => handleDelete("")}
+                  onClick={() => handleDelete(expense.id)}
                   className="flex-1"
                 >
                   <Trash2 className="w-4 h-4 mr-1" />
@@ -347,7 +358,7 @@ const ExpenseSection = (): ReactElement => {
             </Card>
           ))
         ) : (
-          <Card className="p-8 text-center">
+          <Card className="p-8 text-center md:w-75 lg:w-100 sm:w-1/3">
             <p className="text-muted-foreground">
               No expenses yet. Click Add Expense to get started.
             </p>

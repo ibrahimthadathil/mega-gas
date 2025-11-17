@@ -1,8 +1,14 @@
-import { addExpenses, getExpensesByUser } from "@/services/serverside_api_service/user/expenses/expensesService";
+export const dynamic = "force-dynamic";
+import {
+  addExpenses,
+  clear_Expense,
+  getExpensesByUser,
+} from "@/services/serverside_api_service/user/expenses/expensesService";
 import { Expense, STATUS } from "@/types/types";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export const POST = async (req: NextResponse) => {
+
+export const POST = async (req: NextRequest) => {
   try {
     const data = (await req.json()) as Expense;
     const userId = req.headers.get("x-user-id");
@@ -28,18 +34,18 @@ export const POST = async (req: NextResponse) => {
   }
 };
 
-export const GET = async (req: NextResponse) => {
+export const GET = async (req: NextRequest) => {
   try {
     const userId = req.headers.get("x-user-id") as string;
-    if(userId){
-      const { success,data} = await getExpensesByUser(userId)
-      if(success){
+    if (userId) {
+      const { success, data } = await getExpensesByUser(userId);
+      if (success) {
         return NextResponse.json(
-          {data, success },
+          { data, success },
           { status: STATUS.SUCCESS.code }
         );
       }
-    } else throw new Error('Un-authorized')
+    } else throw new Error("Un-authorized");
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },
@@ -47,3 +53,5 @@ export const GET = async (req: NextResponse) => {
     );
   }
 };
+
+
