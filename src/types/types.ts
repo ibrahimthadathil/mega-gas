@@ -38,10 +38,10 @@ export const STATUS = {
 export interface Expense {
   id: string
   created_by?:string
-  type: "Recharge" | "Workshop" | "Other"
+  expenses_type: "Recharge" | "Workshop" | "Other"
   amount: number
   image?: string
-  date: string
+  created_time?: string
   description?:string
   settled?: boolean
 }

@@ -2,15 +2,16 @@ import supabase from "@/lib/supabase/supabaseClient";
 import { Expense } from "@/types/types";
 
 const add_Expense = async (datas: Expense) => {
-  const { type, amount, created_by, image } = datas;
+  const { expenses_type, amount, created_by, image } = datas;
   try {
     const { data, error } = await supabase
       .from("expenses")
       .insert([
         {
           created_by,
-          expenses_type: type,
-          photo: image,
+          expenses_type: expenses_type,
+          image,
+          amount,
           description: "test expenses",
         },
       ])
@@ -18,6 +19,7 @@ const add_Expense = async (datas: Expense) => {
     if (error) throw error;
     else return { data, success: true };
   } catch (error) {
+    console.log((error as Error).message);
     throw new Error((error as Error).message);
   }
 };
@@ -29,8 +31,8 @@ const getAllExpenses = async (userId: string) => {
       .select("*")
       .eq("created_by", userId)
       .order("created_time", { ascending: false });
-      if(error) throw error 
-      else return {data , success:true}
+    if (error) throw error;
+    else return { data, success: true };
   } catch (error) {
     throw error;
   }

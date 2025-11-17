@@ -24,22 +24,30 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit2, Camera, ImageIcon } from "lucide-react";
-import { formatDate } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { Camera, Edit2, ImageIcon, Trash2 } from "lucide-react";
+
 import Image from "next/image";
-import { add_expense } from "@/services/client_api-Service/user/user_api";
+import {
+  add_expense,
+  get_expenses,
+} from "@/services/client_api-Service/user/user_api";
 import { Expense } from "@/types/types";
 import { toast } from "sonner";
+import { UseRQ } from "@/hooks/useReactQuery";
+import { Badge } from "@/components/ui/badge";
+import { cn, formatDate } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useQueryClient } from "@tanstack/react-query";
 
 type ExpenseFormData = {
-  type: Expense["type"];
+  type: Expense["expenses_type"];
   amount: string;
   image?: string;
 };
 
 const ExpenseSection = (): ReactElement => {
+  const { data, isLoading } = UseRQ("expenses", get_expenses);
+  const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isImageSourceDialog, setIsImageSourceDialog] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -65,7 +73,7 @@ const ExpenseSection = (): ReactElement => {
 
   const handleEditClick = (expense: Expense) => {
     setEditingId(expense.id);
-    setValue("type", expense.type);
+    setValue("type", expense.expenses_type);
     setValue("amount", expense.amount.toString());
     setImagePreview(expense.image || null);
     setIsDialogOpen(true);
@@ -104,7 +112,7 @@ const ExpenseSection = (): ReactElement => {
     }
     const newExpense = {
       id: Date.now().toString(),
-      type: expenseType,
+      expenses_type: expenseType,
       amount: price,
       image: imagePreview || undefined,
       date: new Date().toISOString(),
@@ -112,6 +120,7 @@ const ExpenseSection = (): ReactElement => {
     try {
       const data = await add_expense(newExpense);
       if (data.success) {
+        queryClient.invalidateQueries({ queryKey: ["expenses"] });
         toast.success(data.message);
         setIsDialogOpen(false);
         setImagePreview(null);
@@ -130,7 +139,7 @@ const ExpenseSection = (): ReactElement => {
         <h1 className="xl:text-3xl sm:text-lg font-bold">Expenses</h1>
         <Button onClick={handleAddClick}>Add Expense</Button>
       </div>
-
+      {/* {Dialog section for add esxpense} */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -144,7 +153,7 @@ const ExpenseSection = (): ReactElement => {
               <Select
                 defaultValue={watch("type")}
                 onValueChange={(value) =>
-                  setValue("type", value as Expense["type"])
+                  setValue("type", value as Expense["expenses_type"])
                 }
               >
                 <SelectTrigger>
@@ -260,22 +269,30 @@ const ExpenseSection = (): ReactElement => {
         </DialogContent>
       </Dialog>
 
-      <Card className="p-8 text-center">
-        <p className="text-muted-foreground">
-          No expenses yet. Click Add Expense to get started.
-        </p>
-      </Card>
       {/* {optional rendering if there is cards} */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {expenses.map((expense) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {isLoading ? (
+          <div className="flex flex-col space-y-3 w-full max-w-xs sm:max-w-sm md:max-w-md">
+            <Skeleton className="h-[125px] w-full rounded-xl" />
+
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3 sm:w-1/2 md:w-3/4" />
+            </div>
+          </div>
+        ) : data ? (
+          (data as Expense[]).map((expense: Expense) => (
             <Card
               key={expense.id}
-              className={cn("p-4 flex flex-col", expense.settled && "opacity-60 pointer-events-none")}
+              className={cn(
+                "p-4 flex flex-col",
+                "opacity-60 pointer-events-none"
+              )}
             >
-              {expense.image && (
+              {expense?.image && (
                 <div className="mb-3 relative w-full h-32 rounded-md overflow-hidden border">
                   <Image
-                    src={expense.image || "/placeholder.svg"}
+                    src={expense.image}
                     alt="Expense receipt"
                     className="w-full h-full object-cover"
                   />
@@ -283,35 +300,60 @@ const ExpenseSection = (): ReactElement => {
               )}
 
               <div className="mb-3 flex-1">
-                <h3 className="font-bold text-lg mb-1">{expense.type}</h3>
-                <p className="text-lg font-semibold text-primary mb-1">₹{expense.amount.toFixed(2)}</p>
-                <p className="text-sm text-muted-foreground">{formatDate(new Date(expense.date))}</p>
+                <h3 className="font-bold text-lg mb-1">
+                  {expense.expenses_type}
+                </h3>
+                <p className="text-lg font-semibold text-primary mb-1">
+                  ₹{expense.amount}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {formatDate(new Date(expense?.created_time as string))}
+                </p>
               </div>
 
               <div className="mb-3">
                 <Badge
-                  variant={expense.settled ? "secondary" : "default"}
-                  className={expense.settled ? "bg-muted text-muted-foreground" : ""}
+                  variant={"default"}
+                  className={
+                    !expense.settled
+                      ? "bg-amber-300 text-black"
+                      : "bg-green-400"
+                  }
                 >
-                  {expense.settled ? "Settled" : "Pending"}
+                  {expense.settled ? " Settled " : " Pending "}
                 </Badge>
               </div>
 
-              {!expense.settled && (
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => handleEditClick(expense)} className="flex-1">
-                    <Edit2 className="w-4 h-4 mr-1" />
-                    Edit
-                  </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleDelete(expense.id)} className="flex-1">
-                    <Trash2 className="w-4 h-4 mr-1" />
-                    Delete
-                  </Button>
-                </div>
-              )}
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleEditClick("sds" as any)}
+                  className="flex-1"
+                >
+                  <Edit2 className="w-4 h-4 mr-1" />
+                  Edit
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleDelete("")}
+                  className="flex-1"
+                >
+                  <Trash2 className="w-4 h-4 mr-1" />
+                  Delete
+                </Button>
+              </div>
             </Card>
-          ))}
-        </div> */}
+          ))
+        ) : (
+          <Card className="p-8 text-center">
+            <p className="text-muted-foreground">
+              No expenses yet. Click Add Expense to get started.
+            </p>
+          </Card>
+        )}
+      </div>
     </div>
   );
 };

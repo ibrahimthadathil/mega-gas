@@ -11,10 +11,12 @@ const addExpenses = async (expenseData: Expense) => {
       expenseData?.created_by as string
     );
     expenseData.created_by = checkUser.id;
-    const { data, success } = await add_Expense(expenseData);
+    const { success } = await add_Expense(expenseData);    
     if (success) return success;
     else success;
   } catch (error) {
+    console.log('hhh');
+    
     throw new Error((error as Error).message);
   }
 };
