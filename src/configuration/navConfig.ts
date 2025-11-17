@@ -14,6 +14,7 @@ export const navItems = [
     roles: ["admin", "manager", "accountant"], 
     items: [
       { title: "User Management", url: "/admin/ums", roles: ["admin", "manager"] },
+      { title: "Product Management", url: "/admin/product", roles: ["admin", "manager"] },
     ],
   },
   {
