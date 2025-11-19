@@ -19,7 +19,7 @@ interface ProductDetailsFormProps {
   errors: FieldErrors<ProductFormData>
 }
 
-const productTypes = ['Electronics', 'Clothing', 'Food', 'Bundle', 'Other']
+const productTypes = ['service','inventory']
 
 export default function ProductDetailsForm({ control, errors }: ProductDetailsFormProps) {
   return (

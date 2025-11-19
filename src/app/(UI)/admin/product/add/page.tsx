@@ -83,8 +83,8 @@ export default function AddProductPage() {
     console.log('Final submission:', formData)
     // Reset and redirect
     reset()
-    setShowVerification(false)
-    router.push('/product')
+    // setShowVerification(false)
+    // router.push('/product')
   }
 
   const handleBack = () => {

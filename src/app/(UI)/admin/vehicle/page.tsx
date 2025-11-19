@@ -12,6 +12,7 @@ import {
 import { toast } from "sonner";
 import { UseRQ } from "@/hooks/useReactQuery";
 import { Skeleton } from "@/components/ui/skeleton";
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
 
 interface Vehicle {
   id: string;
@@ -27,6 +28,7 @@ interface Vehicle {
 
 export default function VehiclesPage() {
   const { data, isLoading } = UseRQ("vehicles" , getAllVehicles);
+  const quryClient = useQueryClient()
 
   const [vehicles, setVehicles] = useState<Vehicle[]>([
     {
@@ -75,6 +77,7 @@ export default function VehiclesPage() {
     try {
       const data = await addVehicle(vehicleData);
       if (data.success) {
+        quryClient.invalidateQueries({queryKey:['vehicles']})
         setOpenDialog(false);
         toast.success("Added new Truck");
       }
