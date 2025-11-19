@@ -45,3 +45,15 @@ export interface Expense {
   description?:string
   settled?: boolean
 }
+
+export interface Vehicle {
+  id: string
+  vehicle_no: string
+  vehicle_type: string
+  registration_date: string
+  fitness_validity_date: string
+  tax_validity_date: string
+  insurance_validity_date: string
+  pucc_validity_date: string
+  permit_validity_date: string
+}
