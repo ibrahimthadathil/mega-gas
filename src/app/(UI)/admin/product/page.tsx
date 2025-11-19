@@ -60,7 +60,7 @@ export default function ProductListPage() {
             <h1 className="text-3xl font-bold text-foreground">Products</h1>
             <p className="text-muted-foreground mt-1">Manage your product inventory</p>
           </div>
-          <Link href="/product/add">
+          <Link href="/admin/product/add">
             <Button className="gap-2">
               <Plus className="w-4 h-4" />
               Add Product
