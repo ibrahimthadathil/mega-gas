@@ -28,7 +28,7 @@ export const GET = async (req:NextRequest) => {
     const userId = req.headers.get("x-user-id");
     if(!userId) throw Error('Un-authorized')
       const {result,success} = await show_vehicles()
-    if(success) return NextResponse.json({success,result},{status:STATUS.SUCCESS.code})
+    if(success) return NextResponse.json({success,data:result},{status:STATUS.SUCCESS.code})
   } catch (error) {
      return NextResponse.json(
       { error: (error as Error).message },

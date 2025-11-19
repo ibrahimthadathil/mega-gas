@@ -9,3 +9,13 @@ export const addVehicle = async (data: Vehicle) => {
     throw error;
   }
 };
+
+
+export const getAllVehicles = async()=>{
+  try {
+    const result = await axios.get('/api/admin/vehicle')    
+    return result.data
+  } catch (error) {
+    throw error
+  }
+}
