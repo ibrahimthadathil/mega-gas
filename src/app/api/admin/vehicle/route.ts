@@ -1,4 +1,4 @@
-import { addVehicle } from "@/services/serverside_api_service/admin/vehicle/vehicle-service";
+import { addVehicle, show_vehicles } from "@/services/serverside_api_service/admin/vehicle/vehicle-service";
 import { STATUS } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -21,3 +21,18 @@ export const POST = async (req: NextRequest) => {
     );
   }
 };
+
+
+export const GET = async (req:NextRequest) => {
+  try {
+    const userId = req.headers.get("x-user-id");
+    if(!userId) throw Error('Un-authorized')
+      const {result,success} = await show_vehicles()
+    if(success) return NextResponse.json({success,result},{status:STATUS.SUCCESS.code})
+  } catch (error) {
+     return NextResponse.json(
+      { error: (error as Error).message },
+      { status: STATUS.UNAUTHORIZED.code }
+    );
+  }
+}
