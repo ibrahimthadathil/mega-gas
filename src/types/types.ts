@@ -47,7 +47,7 @@ export interface Expense {
 }
 
 export interface Vehicle {
-  id: string
+  id?: string
   vehicle_no: string
   vehicle_type: string
   registration_date: string
@@ -56,4 +56,7 @@ export interface Vehicle {
   insurance_validity_date: string
   pucc_validity_date: string
   permit_validity_date: string
+  created_by?: string
+  created_at?: string 
+
 }
