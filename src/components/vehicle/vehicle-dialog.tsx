@@ -205,6 +205,7 @@ export function VehicleDialog({
               <Label htmlFor="fitness_validity_date">Fitness Validity *</Label>
               <DatePicker
                 date={formData.fitness_validity_date}
+                allowFutureDates={true}
                 onDateChange={(date) =>
                   setFormData({ ...formData, fitness_validity_date: date })
                 }
@@ -222,6 +223,7 @@ export function VehicleDialog({
                 onDateChange={(date) =>
                   setFormData({ ...formData, tax_validity_date: date })
                 }
+                allowFutureDates={true}
               />
               {errors.tax_validity_date && (
                 <p className="text-sm text-destructive">{errors.tax_validity_date}</p>
@@ -236,6 +238,7 @@ export function VehicleDialog({
                 onDateChange={(date) =>
                   setFormData({ ...formData, insurance_validity_date: date })
                 }
+                allowFutureDates={true}
               />
               {errors.insurance_validity_date && (
                 <p className="text-sm text-destructive">{errors.insurance_validity_date}</p>
@@ -247,6 +250,7 @@ export function VehicleDialog({
               <Label htmlFor="pucc_validity_date">PUCC Validity *</Label>
               <DatePicker
                 date={formData.pucc_validity_date}
+                allowFutureDates={true}
                 onDateChange={(date) =>
                   setFormData({ ...formData, pucc_validity_date: date })
                 }
@@ -261,6 +265,7 @@ export function VehicleDialog({
               <Label htmlFor="permit_validity_date">Permit Validity *</Label>
               <DatePicker
                 date={formData.permit_validity_date}
+                allowFutureDates={true}
                 onDateChange={(date) =>
                   setFormData({ ...formData, permit_validity_date: date })
                 }
