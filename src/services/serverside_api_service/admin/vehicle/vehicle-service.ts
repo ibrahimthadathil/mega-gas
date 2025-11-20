@@ -1,5 +1,6 @@
 import {
   add_vehicle,
+  delete_vehicle,
   display_vehicle,
 } from "@/repository/admin/vehicle/vehicle-repository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
@@ -22,10 +23,19 @@ const show_vehicles = async () => {
   try {
     const result = await display_vehicle();
     if (result) return { success: true, result };
-    else throw new Error('failed to fetch')
+    else throw new Error("failed to fetch");
   } catch (error) {
     throw (error as Error).message;
   }
 };
 
-export { addVehicle, show_vehicles };
+const delete_Vehicle = async (id: string) => {
+  try {
+    const deleted = await delete_vehicle(id);
+    if (deleted) return { success: true };
+    else throw new Error("Failed to delete");
+  } catch (error) {
+    throw (error as Error).message;
+  }
+};
+export { addVehicle, show_vehicles, delete_Vehicle };

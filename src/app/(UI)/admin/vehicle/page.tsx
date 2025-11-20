@@ -7,6 +7,7 @@ import { VehicleCard } from "@/components/vehicle/vehicle-card";
 import { Plus } from "lucide-react";
 import {
   addVehicle,
+  deleteVehicle,
   getAllVehicles,
 } from "@/services/client_api-Service/admin/vehicle/vehicle-api";
 import { toast } from "sonner";
@@ -30,30 +31,7 @@ export default function VehiclesPage() {
   const { data, isLoading } = UseRQ("vehicles" , getAllVehicles);
   const quryClient = useQueryClient()
 
-  const [vehicles, setVehicles] = useState<Vehicle[]>([
-    {
-      id: "1",
-      vehicle_no: "DL01AB1234",
-      vehicle_type: "Car",
-      registration_date: "2020-05-15",
-      fitness_validity_date: "2026-05-15",
-      tax_validity_date: "2025-12-31",
-      insurance_validity_date: "2025-06-15",
-      pucc_validity_date: "2025-08-20",
-      permit_validity_date: "2025-10-10",
-    },
-    {
-      id: "2",
-      vehicle_no: "DL02CD5678",
-      vehicle_type: "Truck",
-      registration_date: "2019-03-20",
-      fitness_validity_date: "2025-03-20",
-      tax_validity_date: "2025-09-15",
-      insurance_validity_date: "2025-07-20",
-      pucc_validity_date: "2025-09-25",
-      permit_validity_date: "2026-01-15",
-    },
-  ]);
+
 
   const [openDialog, setOpenDialog] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
@@ -69,8 +47,16 @@ export default function VehiclesPage() {
     setOpenDialog(true);
   };
 
-  const handleDeleteClick = (id: string) => {
-    setVehicles(vehicles.filter((v) => v.id !== id));
+  const handleDeleteClick = async(id: string) => {
+    try {
+      const data = await deleteVehicle(id)
+      if(data.success){
+        toast.success('Deleted')
+        quryClient.invalidateQueries({queryKey:['vehicles']})
+      }
+    } catch (error) {
+      toast.error((error as Error).message)
+    }
   };
 
   const handleSaveVehicle = async (vehicleData: Vehicle) => {

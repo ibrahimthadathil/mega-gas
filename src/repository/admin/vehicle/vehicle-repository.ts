@@ -22,4 +22,14 @@ const display_vehicle = async () => {
   }
 };
 
-export { add_vehicle, display_vehicle };
+const delete_vehicle = async (id:string) => {
+  try {
+    const {error} = await supabaseAdmin.from("vehicles").delete().eq('id',id)
+    if(error) throw error
+    return true
+  } catch (error) {
+    throw (error as Error).message
+  }
+}
+
+export { add_vehicle, display_vehicle, delete_vehicle };
