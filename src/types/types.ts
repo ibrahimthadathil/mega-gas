@@ -70,8 +70,11 @@ export interface Vehicle {
   cost_price: number
   available_qty: number
   is_composite: boolean
+  is_empty:boolean;
   visibility: boolean
   price_edit_enabled: boolean
+  composition: CompositionItem[];
+  
 }
 
 export interface CompositionItem {

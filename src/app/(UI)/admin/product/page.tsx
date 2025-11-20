@@ -40,7 +40,7 @@ const mockProducts: IProduct[] = [
 
 export default function ProductListPage() {
   const [products] = useState<IProduct[]>(mockProducts)
-
+  
   return (
     <main className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
