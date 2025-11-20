@@ -44,4 +44,38 @@ export interface Expense {
   created_time?: string
   description?:string
   settled?: boolean
+
+}
+
+export interface Vehicle {
+  id?: string
+  vehicle_no: string
+  vehicle_type: string
+  registration_date: string
+  fitness_validity_date: string
+  tax_validity_date: string
+  insurance_validity_date: string
+  pucc_validity_date: string
+  permit_validity_date: string
+  created_by?: string
+  created_at?: string 
+
+}
+
+export interface IProduct {
+  id: string
+  product_code: string
+  product_name: string
+  product_type: string
+  sale_price: number
+  cost_price: number
+  available_qty: number
+  is_composite: boolean
+  visibility: boolean
+  price_edit_enabled: boolean
+}
+
+export interface CompositionItem {
+  childProductId: string
+  qty: number
 }

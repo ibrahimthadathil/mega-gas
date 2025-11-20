@@ -74,7 +74,8 @@ export default function AddProductPage() {
   const isComposite = watch('is_composite')
 
   const onSubmit = (data: ProductFormData) => {
-    setFormData(data)
+    console.log("💀💀",data);
+    
     setShowVerification(true)
   }
 

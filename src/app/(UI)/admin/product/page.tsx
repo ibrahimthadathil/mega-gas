@@ -6,22 +6,12 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Edit } from 'lucide-react'
+import { IProduct } from '@/types/types'
 
-interface Product {
-  id: string
-  product_code: string
-  product_name: string
-  product_type: string
-  sale_price: number
-  cost_price: number
-  available_qty: number
-  is_composite: boolean
-  visibility: boolean
-  price_edit_enabled: boolean
-}
+
 
 // Mock product data - replace with API call
-const mockProducts: Product[] = [
+const mockProducts: IProduct[] = [
   {
     id: '1',
     product_code: 'PROD-001',
@@ -49,7 +39,7 @@ const mockProducts: Product[] = [
 ]
 
 export default function ProductListPage() {
-  const [products] = useState<Product[]>(mockProducts)
+  const [products] = useState<IProduct[]>(mockProducts)
 
   return (
     <main className="min-h-screen bg-background p-6">
