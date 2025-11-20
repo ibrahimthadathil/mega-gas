@@ -59,10 +59,9 @@ export interface Vehicle {
   permit_validity_date: string
   created_by?: string
   created_at?: string 
-
 }
 
-export interface IProduct {
+ export interface IProduct {
   id: string
   product_code: string
   product_name: string
@@ -78,4 +77,5 @@ export interface IProduct {
 export interface CompositionItem {
   childProductId: string
   qty: number
+ 
 }
