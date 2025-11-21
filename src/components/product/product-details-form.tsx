@@ -12,51 +12,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import type { ProductFormData } from "@/app/(UI)/admin/product/add/page";
 
-import { Check, ChevronsUpDown } from "lucide-react";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
+import type { ProductFormData } from "@/app/(UI)/admin/product/add/page";
 
 interface ProductDetailsFormProps {
   control: Control<ProductFormData>;
   errors: FieldErrors<ProductFormData>;
 }
 
-const productTypes = ["Electronics", "Clothing", "Food", "Bundle", "Other"];
-const presetProductNames = [
-  "Laptop",
-  "Desktop Computer",
-  "Smartphone",
-  "Tablet",
-  "Headphones",
-  "Monitor",
-  "Keyboard",
-  "Mouse",
-  "USB Cable",
-  "Power Bank",
-];
+const productTypes = ["service", "inventory"];
 
 export default function ProductDetailsForm({
   control,
   errors,
 }: ProductDetailsFormProps) {
-  const [openProductName, setOpenProductName] = useState(false);
-
   return (
     <Card>
       <CardHeader>
@@ -67,14 +36,27 @@ export default function ProductDetailsForm({
           {/* Product Code */}
           <div className="space-y-2">
             <Label htmlFor="product_code">Product Code</Label>
-            <Input
-              id="product_code"
-              placeholder="e.g., PROD-001"
-              value={"P1"}
-              className={errors.product_code ? "border-destructive" : ""}
+            <Controller
+              name="product_code"
+              control={control}
+              rules={{ required: "Product code is required" }}
+              render={({ field }) => (
+                <Input
+                  id="product_code"
+                  placeholder="e.g., PROD-001"
+                  {...field}
+                  className={errors.product_code ? "border-destructive" : ""}
+                />
+              )}
             />
+            {errors.product_code && (
+              <p className="text-sm text-destructive">
+                {errors.product_code.message}
+              </p>
+            )}
           </div>
 
+          {/* Product Name */}
           <div className="space-y-2">
             <Label htmlFor="product_name">Product Name</Label>
             <Controller
@@ -82,64 +64,12 @@ export default function ProductDetailsForm({
               control={control}
               rules={{ required: "Product name is required" }}
               render={({ field }) => (
-                <Popover
-                  open={openProductName}
-                  onOpenChange={setOpenProductName}
-                >
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={openProductName}
-                      className={cn(
-                        "w-full justify-between",
-                        errors.product_name ? "border-destructive" : ""
-                      )}
-                    >
-                      {field.value || "Select product..."}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    className="p-0"
-                    style={{ width: "var(--radix-popover-trigger-width)" }}
-                    align="start"
-                  >
-                    {" "}
-                    <Command>
-                      <CommandInput placeholder="Search product..." />
-                      <CommandEmpty>No product found.</CommandEmpty>
-                      <CommandList>
-                        <CommandGroup>
-                          {presetProductNames.map((product) => (
-                            <CommandItem
-                              key={product}
-                              value={product}
-                              onSelect={(currentValue: string) => {
-                                field.onChange(
-                                  currentValue === field.value
-                                    ? ""
-                                    : currentValue
-                                );
-                                setOpenProductName(false);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  field.value === product
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                              {product}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <Input
+                  id="product_name"
+                  placeholder="e.g., Laptop"
+                  {...field}
+                  className={errors.product_name ? "border-destructive" : ""}
+                />
               )}
             />
             {errors.product_name && (

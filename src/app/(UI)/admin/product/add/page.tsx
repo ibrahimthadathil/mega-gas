@@ -1,33 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Trash2, ArrowLeft } from "lucide-react";
 import ProductDetailsForm from "@/components/product/product-details-form";
 import CompositionSection from "@/components/product/composition-section";
 import VerificationModal from "@/components/product/verification-modal";
 import { toast } from "sonner";
-import { addNew_product } from "@/services/client_api-Service/admin/product/product_api";
+import {
+  addNew_product,
+  getAllProducts,
+} from "@/services/client_api-Service/admin/product/product_api";
 import { IProduct } from "@/types/types";
+import { useQueryClient } from "@tanstack/react-query";
+import { UseRQ } from "@/hooks/useReactQuery";
+import { AxiosError } from "axios";
 
 export interface CompositionItem {
   childProductId: string;
@@ -44,21 +33,24 @@ export interface ProductFormData {
   price_edit_enabled: boolean;
   visibility: boolean;
   is_composite: boolean;
-  is_empty:boolean;
+  is_empty: boolean;
   composition: CompositionItem[];
 }
 
-// Mock product list for composition selection
-const availableProducts = [
-  { id: "prod1", name: "Component A" },
-  { id: "prod2", name: "Component B" },
-  { id: "prod3", name: "Component C" },
-];
-
 export default function AddProductPage() {
+  const { data, isLoading } = UseRQ("products", getAllProducts);
+  const queryClient = useQueryClient();
   const router = useRouter();
   const [showVerification, setShowVerification] = useState(false);
   const [formData, setFormData] = useState<ProductFormData | null>(null);
+    const [pendingData, setPendingData] = useState<ProductFormData | null>(null);
+
+  const compositeProduct = useMemo(() => {
+    if (!data) return [];
+    return (data as IProduct[])
+      .filter((product) => !product.is_composite)
+      .map((product) => ({ id: product.id, name: product.product_name }));
+  }, [data]);
 
   const {
     control,
@@ -68,6 +60,7 @@ export default function AddProductPage() {
     reset,
   } = useForm<ProductFormData>({
     defaultValues: {
+      product_code: "",
       product_name: "",
       product_type: "",
       available_qty: 0,
@@ -82,22 +75,23 @@ export default function AddProductPage() {
 
   const isComposite = watch("is_composite");
 
-  const onSubmit = (data: ProductFormData) => {
-    setFormData(data);
+ const onSubmit = useCallback((data: ProductFormData) => {
+    setPendingData(data);
     setShowVerification(true);
-  };
+  }, []);
 
   const handleConfirmSubmit = async () => {
     try {
       const data = await addNew_product(formData as IProduct);
       if (data.success) {
-        reset();
-        setShowVerification(false);
+        // reset();
+        // setShowVerification(false);
         toast.success("Product Added");
         router.push("/admin/product");
+        queryClient.invalidateQueries({ queryKey: ["products"] });
       }
     } catch (error) {
-      toast.error((error as Error).message);
+      ((error as AxiosError).response?.data as Record<string, string>).message;
     }
   };
 
@@ -130,7 +124,8 @@ export default function AddProductPage() {
           {isComposite && (
             <CompositionSection
               control={control}
-              availableProducts={availableProducts}
+              availableProducts={compositeProduct}
+              loading={isLoading}
             />
           )}
 
@@ -147,7 +142,7 @@ export default function AddProductPage() {
         {showVerification && formData && (
           <VerificationModal
             formData={formData}
-            availableProducts={availableProducts}
+            availableProducts={compositeProduct}
             onConfirm={handleConfirmSubmit}
             onBack={() => setShowVerification(false)}
           />

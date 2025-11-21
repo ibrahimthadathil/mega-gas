@@ -32,8 +32,6 @@ export async function middleware(req: AuthRequest) {
     // Verify token and get user
     const { user, error } = await getAuthUser();
 
-    console.log(user, "🐕🐕🐕");
-
     if (error || !user) {
       const loginUrl = new URL("/user/login", req.url);
       loginUrl.searchParams.set("from", pathname);

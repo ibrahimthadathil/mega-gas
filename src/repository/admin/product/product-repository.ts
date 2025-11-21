@@ -14,4 +14,15 @@ const add_product = async (payload: any) => {
   }
 };
 
-export { add_product };
+const getAll_products = async () => {
+  try {
+    const { data, error } = await supabaseAdmin.from("products").select("*");
+    if (error) return error;
+    return data;
+  } catch (error) {
+    console.log((error as Error).message);
+    throw (error as Error).message;
+  }
+};
+
+export { add_product, getAll_products };

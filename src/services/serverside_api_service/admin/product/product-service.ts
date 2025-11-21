@@ -1,4 +1,4 @@
-import { add_product } from "@/repository/admin/product/product-repository";
+import { add_product, getAll_products } from "@/repository/admin/product/product-repository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
 import { IProduct } from "@/types/types";
 
@@ -16,12 +16,22 @@ const addNewProduct = async (payloads: IProduct, userId: string) => {
           : [],
       };
       const result = await add_product(payload);
-      if(result) return {success:true}
-      else return {success:false}
+      if (result) return { success: true };
+      else return { success: false };
     } else throw new Error("un-authorized");
   } catch (error) {
     throw (error as Error).message;
   }
 };
 
-export { addNewProduct };
+const getAllProducts = async () => {
+  try {
+    const data = await getAll_products()
+    if(data) return {success:true,data}
+    else return {success:false}
+  } catch (error) {
+    throw (error as Error).message;
+  }
+};
+
+export { addNewProduct, getAllProducts };
