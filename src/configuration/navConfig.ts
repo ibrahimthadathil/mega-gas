@@ -4,6 +4,7 @@ import {
   BookOpen,
   Settings2,
   LayoutDashboardIcon,
+  Warehouse,
 } from "lucide-react";
 
 export const navItems = [
@@ -41,6 +42,12 @@ export const navItems = [
     items: [
       { title: "Plant Load", url: "/user/purchase/plant-load", roles: ["admin", "manager", "accountant", "plant_driver"] },
     ],
+  },
+  {
+    title:'Warehouse',
+    url:'/user/warehouses',
+    icon: Warehouse,
+    roles : ["admin","manager","accountant","godown_keeper",]
   },
   {
     title: "Stock",
