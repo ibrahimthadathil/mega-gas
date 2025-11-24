@@ -43,7 +43,6 @@ export default function AddProductPage() {
   const router = useRouter();
   const [showVerification, setShowVerification] = useState(false);
   const [formData, setFormData] = useState<ProductFormData | null>(null);
-    const [pendingData, setPendingData] = useState<ProductFormData | null>(null);
 
   const compositeProduct = useMemo(() => {
     if (!data) return [];
@@ -75,10 +74,10 @@ export default function AddProductPage() {
 
   const isComposite = watch("is_composite");
 
- const onSubmit = useCallback((data: ProductFormData) => {
-    setPendingData(data);
+ const onSubmit = (data: ProductFormData) => {
+    setFormData(data);
     setShowVerification(true);
-  }, []);
+  }
 
   const handleConfirmSubmit = async () => {
     try {

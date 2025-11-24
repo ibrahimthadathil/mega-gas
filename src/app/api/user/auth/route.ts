@@ -37,6 +37,8 @@ export const POST = async (req: Request) => {
 
     return NextResponse.json({ message }, { status: STATUS.NOT_FOUND.code });
   } catch (error) {
+    console.log(error);
+    
     return NextResponse.json(
       { error: (error as Error).message },
       { status: STATUS.UNAUTHORIZED.code }

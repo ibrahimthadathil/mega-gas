@@ -23,6 +23,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/ui/date-picker";
 import { useState } from "react";
+import { Warehouse } from "../../warehouses/page";
 
 interface Product {
   id: string;
@@ -35,15 +36,24 @@ interface PlantLoadFormData {
   invoiceNumber: string;
   sapNumber: string;
   date: Date | undefined;
+  warehouse: string;
 }
 
 interface DialogFormData {
+  id?: string;
   product: string;
   tripType: "one-way" | "two-way";
   quantity: string;
 }
+const warehouseOptions = [
+  "Warehouse A",
+  "Warehouse B",
+  "Warehouse C",
+  "Warehouse D",
+];
 
 export default function PlantLoadSection() {
+  
   const {
     register: registerMain,
     watch: watchMain,
@@ -81,6 +91,8 @@ export default function PlantLoadSection() {
   ];
 
   const handleAddProduct = (data: DialogFormData) => {
+    console.log("actual data", data);
+
     if (!data.product || !data.quantity) {
       return;
     }
@@ -95,6 +107,12 @@ export default function PlantLoadSection() {
     setProducts([...products, newProduct]);
     resetDialog();
     setIsDialogOpen(false);
+  };
+
+  const handlePurchase = async (data: any) => {
+    try {
+      console.log(data);
+    } catch (error) {}
   };
 
   const handleDeleteProduct = (id: string) => {
@@ -121,7 +139,7 @@ export default function PlantLoadSection() {
       <Card className="bg-card ">
         <CardContent className="pt-1">
           <form>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
               <div className="space-y-2">
                 <Label htmlFor="invoice" className="text-sm font-medium">
                   TAX Invoice Number
@@ -150,10 +168,31 @@ export default function PlantLoadSection() {
                 <Label htmlFor="date" className="text-sm font-medium">
                   Date
                 </Label>
-                <DatePicker 
-                  date={watchMain("date")} 
-                  onDateChange={handleDateChange} 
+                <DatePicker
+                  date={watchMain("date")}
+                  onDateChange={handleDateChange}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="warehouse" className="text-sm font-medium">
+                  Warehouse
+                </Label>
+                <Select
+                  value={watchMain("warehouse")}
+                  onValueChange={(value) => setValueMain("warehouse", value)}
+                >
+                  <SelectTrigger id="warehouse">
+                    <SelectValue placeholder="Select warehouse" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {warehouseOptions.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </form>
@@ -316,12 +355,12 @@ export default function PlantLoadSection() {
 
       {/* Proceed Button */}
       <Button
-        onClick={() => {
-          console.log({
+        onClick={() =>
+          handlePurchase({
             ...mainFormData,
             products,
-          });
-        }}
+          })
+        }
         disabled={isProceedDisabled}
         size="lg"
         className="w-full md:w-full"
