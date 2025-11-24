@@ -8,6 +8,7 @@ import AddWarehouseDialog from "@/app/(UI)/user/warehouses/_UI/warehouse-dialog"
 import { Trash2, Edit2 } from "lucide-react";
 import {
   addNew_wareHouse,
+  editWarehouse,
   getWarehouse,
 } from "@/services/client_api-Service/user/warehouse/wareHouse_api";
 import { toast } from "sonner";
@@ -17,10 +18,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 
 export interface Warehouse {
-  id: string;
+  id?: string;
   name: string;
   type: "Vehicle" | "Purchase" | "Location" | "Sale";
-  created_by: string;
+  created_by?: string;
 }
 
 export default function WarehousePage() {
@@ -31,17 +32,7 @@ export default function WarehousePage() {
     null
   );
 
-  const handleAddWarehouse = async (newWarehouse: {
-    name: string;
-    type: "Vehicle" | "Purchase" | "Location" | "Sale";
-  }) => {
-    // if (editingWarehouse) {
-    //   setWarehouses(
-    //     warehouses.map((w) => (w.id === editingWarehouse.id ? { ...w, name: data.name, type: data.type } : w)),
-    //   )
-    //   setEditingWarehouse(null)
-    // } else {
-    // }
+  const handleAddWarehouse = async (newWarehouse:Warehouse) => {
     try {
       const data = await addNew_wareHouse(newWarehouse);
       if (data.success) {
@@ -55,10 +46,24 @@ export default function WarehousePage() {
       );
     }
   };
+  const handleAddressEdit = async()=>{
+    try {
+      
+    } catch (error) {
+      
+    }
+  }
 
-  const handleEditWarehouse = (warehouse: Warehouse) => {
+  const handleEditWarehouse = async(warehouse: Warehouse) => {
     setEditingWarehouse(warehouse);
     setIsDialogOpen(true);
+    console.log(warehouse);
+    try {
+      
+    } catch (error) {
+      
+    }
+    //  await editWarehouse(warehouse)
   };
 
   const handleDeleteWarehouse = (id: string) => {};
@@ -96,6 +101,7 @@ export default function WarehousePage() {
         <AddWarehouseDialog
           isOpen={isDialogOpen}
           onOpenChange={setIsDialogOpen}
+          onEdit={handleEditWarehouse}
           onSubmit={handleAddWarehouse}
           initialData={editingWarehouse || undefined}
         />
@@ -135,7 +141,7 @@ export default function WarehousePage() {
                       <Edit2 className="w-4 h-4 text-muted-foreground hover:text-foreground" />
                     </button>
                     <button
-                      onClick={() => handleDeleteWarehouse(warehouse.id)}
+                      onClick={() => handleDeleteWarehouse(warehouse.id as string)}
                       className="p-1 hover:bg-destructive/10 rounded-md transition-colors"
                       aria-label="Delete warehouse"
                     >

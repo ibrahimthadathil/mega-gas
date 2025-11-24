@@ -27,10 +27,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Warehouse } from "../page";
 
 interface AddWarehouseDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onEdit:(data:Warehouse)=>void;
   onSubmit: (data: {
     name: string;
     type: "Vehicle" | "Purchase" | "Location" | "Sale";
@@ -45,6 +47,7 @@ export default function AddWarehouseDialog({
   isOpen,
   onOpenChange,
   onSubmit,
+  onEdit,
   initialData,
 }: AddWarehouseDialogProps) {
   const form = useForm<{
@@ -68,8 +71,7 @@ export default function AddWarehouseDialog({
   }, [isOpen, initialData, form]);
 
   const handleSubmit = form.handleSubmit((data) => {
-    onSubmit(data);
-    form.reset();
+    initialData ? onEdit(data) : onSubmit(data)
   });
 
   return (
@@ -136,7 +138,7 @@ export default function AddWarehouseDialog({
                     </FormControl>
                     <SelectContent className="bg-popover text-popover-foreground">
                       <SelectItem value="Vehicle">Vehicle</SelectItem>
-                      <SelectItem value="Location">Office</SelectItem>
+                      <SelectItem value="Location">Location</SelectItem>
                       <SelectItem value="Purchase">Purchase</SelectItem>
                       <SelectItem value="Sale">Sale</SelectItem>
                     </SelectContent>
