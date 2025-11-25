@@ -9,7 +9,7 @@ export const POST = async (req: NextRequest) => {
     if (userId) {
       const {success} = await addPurchase_Register(data,userId);
       return NextResponse.json({ success }, { status: STATUS.CREATED.code });
-    } else NextResponse.json({}, { status: STATUS.UNAUTHORIZED.code });
+    } else return NextResponse.json({}, { status: STATUS.UNAUTHORIZED.code });
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },
