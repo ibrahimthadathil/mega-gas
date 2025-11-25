@@ -120,7 +120,7 @@ export default function WarehousePage() {
         ) : (data as Warehouse[]).length === 0 ? (
           <div className="flex items-center justify-center py-16">
             <p className="text-muted-foreground text-lg">
-              No warehouses yet. Click "Add Warehouse" to create one.
+             { `No warehouses yet. Click "Add Warehouse" to create one.`}
             </p>
           </div>
         ) : (

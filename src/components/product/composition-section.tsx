@@ -48,7 +48,7 @@ export default function CompositionSection({
         <div className="space-y-3">
           {fields.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4">
-              No composition items added yet. Click "Add Composition Row" to add items.
+              {`No composition items added yet. Click "Add Composition Row" to add items.`}
             </p>
           ) : (
             fields.map((field, index) => (
