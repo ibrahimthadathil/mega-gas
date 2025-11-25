@@ -4,10 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const DELETE = async (
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) => {
   try {
-    const { id } = await params;
+    const { id } = await context.params;
     console.log(id);
     
     const userId = req.headers.get("x-user-id") as string;
