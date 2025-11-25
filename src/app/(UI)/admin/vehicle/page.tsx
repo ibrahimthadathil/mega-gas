@@ -14,18 +14,8 @@ import { toast } from "sonner";
 import { UseRQ } from "@/hooks/useReactQuery";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
+import { Vehicle } from "@/types/types";
 
-interface Vehicle {
-  id: string;
-  vehicle_no: string;
-  vehicle_type: string;
-  registration_date: string;
-  fitness_validity_date: string;
-  tax_validity_date: string;
-  insurance_validity_date: string;
-  pucc_validity_date: string;
-  permit_validity_date: string;
-}
 
 export default function VehiclesPage() {
   const { data, isLoading } = UseRQ("vehicles" , getAllVehicles);
@@ -99,12 +89,12 @@ export default function VehiclesPage() {
               key={vehicle.id}
               vehicle={vehicle}
               onEdit={() => handleEditClick(vehicle)}
-              onDelete={() => handleDeleteClick(vehicle.id)}
+              onDelete={() => handleDeleteClick(vehicle.id as string)}
             />
           ))}
         </div>}
 
-        {(data as Vehicle[])?.length === 0 && (
+        {(data as Vehicle[])?.length === 0&& (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
               No vehicles found. Click "Add Vehicle" to get started.

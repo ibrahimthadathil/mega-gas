@@ -74,6 +74,7 @@ export interface Vehicle {
   visibility: boolean
   price_edit_enabled: boolean
   composition: CompositionItem[];
+  tags?:string[]
   
 }
 

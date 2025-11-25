@@ -15,7 +15,7 @@ export const POST = async (req: NextRequest) => {
     else return NextResponse.json({success}, { status: STATUS.BAD_REQUEST.code });
   } catch (error) {
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: error},
       { status: STATUS.UNAUTHORIZED.code }
     );
   }

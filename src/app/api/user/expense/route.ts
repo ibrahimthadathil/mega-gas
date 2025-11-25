@@ -1,18 +1,16 @@
 export const dynamic = "force-dynamic";
 import {
   addExpenses,
-  clear_Expense,
   getExpensesByUser,
 } from "@/services/serverside_api_service/user/expenses/expensesService";
 import { Expense, STATUS } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
 
-
 export const POST = async (req: NextRequest) => {
   try {
     const data = (await req.json()) as Expense;
-      const userId = req.headers.get("x-user-id");
-      data.created_by = userId as string;
+    const userId = req.headers.get("x-user-id");
+    data.created_by = userId as string;
 
     if (data.created_by) {
       const success = await addExpenses(data);
@@ -53,5 +51,3 @@ export const GET = async (req: NextRequest) => {
     );
   }
 };
-
-

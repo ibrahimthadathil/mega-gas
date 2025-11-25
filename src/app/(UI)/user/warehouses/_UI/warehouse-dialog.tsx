@@ -32,7 +32,7 @@ import { Warehouse } from "../page";
 interface AddWarehouseDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onEdit:(data:Warehouse)=>void;
+  onEdit: (data: Warehouse) => void;
   onSubmit: (data: {
     name: string;
     type: "Vehicle" | "Purchase" | "Location" | "Sale";
@@ -71,7 +71,7 @@ export default function AddWarehouseDialog({
   }, [isOpen, initialData, form]);
 
   const handleSubmit = form.handleSubmit((data) => {
-    initialData ? onEdit(data) : onSubmit(data);
+    void (initialData ? onEdit(data) : onSubmit(data));
   });
 
   return (

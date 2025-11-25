@@ -1,6 +1,6 @@
 import { getPlantLoadCredential } from "@/services/serverside_api_service/user/purchase/purchaseService";
 import { STATUS } from "@/types/types";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 export const GET = async () => {
   try {
