@@ -82,3 +82,45 @@ export interface CompositionItem {
   qty: number
  
 }
+
+
+export interface ProductComponent {
+  qty: number;
+  child_product_id: string;
+  child_product_code: string;
+  child_product_name: string;
+}
+
+export interface MaterializedProduct {
+  id: string;
+  product_code: string;
+  product_name: string;
+  product_type: string;
+  is_composite: boolean;
+  is_empty: boolean | null;
+  sale_price: number;
+  price_edit_enabled: boolean;
+  visibility: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  components: ProductComponent[] | null;
+  total_components_qty_required: number | null;
+  last_refreshed_at: string;
+}
+
+export interface PlantLoadFormData {
+  invoiceNumber: string;
+  sapNumber: string;
+  date: Date | undefined;
+  warehouse: string;
+}
+
+export interface PurchaseProduct extends MaterializedProduct {
+  tripType: string;
+  quantity: number;
+}
+
+export interface PurchaseRegisterPayload extends PlantLoadFormData {
+  products: PurchaseProduct[];
+}
