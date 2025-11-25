@@ -33,6 +33,7 @@ export interface ProductFormData {
   price_edit_enabled: boolean;
   visibility: boolean;
   is_composite: boolean;
+  tags: string[];
   is_empty: boolean;
   composition: CompositionItem[];
 }
@@ -68,28 +69,29 @@ export default function AddProductPage() {
       visibility: true,
       is_composite: false,
       composition: [],
+      tags: [],
     },
   });
 
   const isComposite = watch("is_composite");
 
- const onSubmit = (data: ProductFormData) => {
+  const onSubmit = (data: ProductFormData) => {
     setFormData(data);
     setShowVerification(true);
-  }
+  };
 
   const handleConfirmSubmit = async () => {
     try {
       const data = await addNew_product(formData as IProduct);
       if (data.success) {
-        // reset();
-        // setShowVerification(false);
         toast.success("Product Added");
         router.push("/admin/product");
         queryClient.invalidateQueries({ queryKey: ["products"] });
       }
     } catch (error) {
-      toast.error(((error as AxiosError).response?.data as Record<string, string>).message)
+      toast.error(
+        ((error as AxiosError).response?.data as Record<string, string>).message
+      );
     }
   };
 

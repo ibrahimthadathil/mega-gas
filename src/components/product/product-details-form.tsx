@@ -202,6 +202,52 @@ export default function ProductDetailsForm({
               </p>
             )}
           </div>
+          {/* Tags Multi-Select with Checkboxes */}
+          <div className="space-y-2 md:col-span-2">
+            <Label>Tags</Label>
+            <Controller
+              name="tags"
+              control={control}
+              render={({ field }) => {
+                const availableTags = [
+                  "electronics",
+                  "furniture",
+                  "clothing",
+                  "food",
+                  "books",
+                ];
+                return (
+                  <div className="border rounded-md p-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {availableTags.map((tag) => (
+                        <div key={tag} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`tag-${tag}`}
+                            checked={field.value?.includes(tag)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                field.onChange([...(field.value || []), tag]);
+                              } else {
+                                field.onChange(
+                                  field.value?.filter((t) => t !== tag) || []
+                                );
+                              }
+                            }}
+                          />
+                          <Label
+                            htmlFor={`tag-${tag}`}
+                            className="cursor-pointer font-normal capitalize"
+                          >
+                            {tag}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }}
+            />
+          </div>
 
           {/* Price Edit Enabled */}
           <div className="flex items-center space-x-2 pt-6">
