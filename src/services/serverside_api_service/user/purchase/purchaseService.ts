@@ -34,6 +34,7 @@ const addPurchase_Register = async (
           bill_date: data.date,
           total_qty: totalQuantity,
           tax_invoice_number: data.invoiceNumber,
+          warehouse_id : data.warehouse,
           created_by: existUser.id,
         },
         p_line_items,
