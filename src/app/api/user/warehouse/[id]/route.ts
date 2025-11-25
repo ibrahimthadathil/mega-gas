@@ -8,6 +8,8 @@ export const PUT = async (
   try {
     const { id } = await context.params;
     const data = await req.json();
+    console.log(id, data);
+
     return NextResponse.json({}, { status: 200 });
   } catch (error) {
     return NextResponse.json(
