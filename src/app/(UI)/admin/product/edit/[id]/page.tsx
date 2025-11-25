@@ -9,16 +9,18 @@ import { ArrowLeft } from 'lucide-react'
 import ProductDetailsForm from '@/components/product/product-details-form'
 import CompositionSection from '@/components/product/composition-section'
 import VerificationModal from '@/components/product/verification-modal'
-import type { ProductFormData, CompositionItem } from '@/app/(UI)/admin/product/add/page'
+import type { ProductFormData } from '@/app/(UI)/admin/product/add/page'
+import { IProduct } from '@/types/types'
 
 // Mock product data - replace with API call
-const mockProducts: Record<string, any> = {
+const mockProducts: Record<string,IProduct> = {
   '1': {
     id: '1',
     product_code: 'PROD-001',
     product_name: 'Laptop',
     product_type: 'Electronics',
     sale_price: 1200,
+    is_empty:false,
     cost_price: 800,
     available_qty: 15,
     is_composite: false,
@@ -35,6 +37,7 @@ const mockProducts: Record<string, any> = {
     cost_price: 300,
     available_qty: 8,
     is_composite: true,
+    is_empty:true,
     visibility: true,
     price_edit_enabled: false,
     composition: [
@@ -66,7 +69,7 @@ export default function EditProductPage() {
     watch,
     handleSubmit,
     formState: { errors },
-    reset,
+    
   } = useForm<ProductFormData>({
     defaultValues: product
       ? {

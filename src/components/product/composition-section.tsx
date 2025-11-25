@@ -18,13 +18,13 @@ import { ProductFormData } from '@/app/(UI)/admin/product/add/page'
 interface CompositionSectionProps {
   control: Control<ProductFormData>
   availableProducts: Array<{ id: string; name: string }>
-  loading:boolean;
+  loading?:boolean;
 }
 
 export default function CompositionSection({
   control,
   availableProducts,
-  loading
+  
 }: CompositionSectionProps) {
   const { fields, append, remove } = useFieldArray({
     control,

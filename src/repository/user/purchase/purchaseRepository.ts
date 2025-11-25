@@ -1,8 +1,8 @@
 import supabase from "@/lib/supabase/supabaseClient";
 
-const addPurchaseRegister = async (payload : Record<string,Object>) => {
+const addPurchaseRegister = async (payload : Record<string,unknown>) => {
   try {
-    const { data, error } = await supabase.rpc(
+    const { error } = await supabase.rpc(
       "create_plant_load_with_lines",
       payload
     );

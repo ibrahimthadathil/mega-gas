@@ -71,7 +71,7 @@ export default function AddWarehouseDialog({
   }, [isOpen, initialData, form]);
 
   const handleSubmit = form.handleSubmit((data) => {
-    initialData ? onEdit(data) : onSubmit(data)
+    initialData ? onEdit(data) : onSubmit(data);
   });
 
   return (

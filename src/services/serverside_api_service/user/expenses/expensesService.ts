@@ -14,7 +14,7 @@ const addExpenses = async (expenseData: Expense) => {
     expenseData.created_by = checkUser.id;
     const { success } = await add_Expense(expenseData);
     if (success) return success;
-    else success;
+    else return success;
   } catch (error) {
     console.log("hhh");
 

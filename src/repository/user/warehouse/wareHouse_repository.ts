@@ -3,7 +3,7 @@ import supabase from "@/lib/supabase/supabaseClient";
 
 const addNew_WareHouse = async (newWarehouse: Omit<Warehouse, "id">) => {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("warehouses")
       .insert(newWarehouse);
     if (error) throw error;

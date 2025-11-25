@@ -1,5 +1,5 @@
 import { IProduct } from "@/types/types";
-import axios, { Axios } from "axios";
+import axios from "axios";
 
 export const addNew_product = async (data: IProduct) => {
   try {

@@ -29,7 +29,7 @@ import {
   getPurchaseCredentials,
 } from "@/services/client_api-Service/user/purchase/purchase_api";
 import { Warehouse } from "../../warehouses/page";
-import { IProduct, MaterializedProduct, PlantLoadFormData } from "@/types/types";
+import { MaterializedProduct, PlantLoadFormData } from "@/types/types";
 import Loading from "@/loading";
 import { toast } from "sonner";
 
@@ -160,7 +160,7 @@ export default function PlantLoadSection() {
         toast.success("Purchase Registered");
       }
     } catch (error) {
-      toast.error("error in add purchase");
+      toast.error((error as Error).message+"error in add purchase");
     }
   };
 

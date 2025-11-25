@@ -35,8 +35,8 @@ interface Vehicle {
 interface VehicleDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  vehicle: Vehicle | null | any
-  onSave: (data: any) => void
+  vehicle: Vehicle | null 
+  onSave: <T>(data:T ) => void
 }
 
 const VEHICLE_TYPES = ['Car', 'Truck', 'Bike', 'Bus', 'Auto-Rickshaw', 'Tempo']

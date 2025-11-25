@@ -13,7 +13,7 @@ import {
 import { toast } from "sonner";
 import { UseRQ } from "@/hooks/useReactQuery";
 import { Skeleton } from "@/components/ui/skeleton";
-import { QueryClient, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface Vehicle {
   id: string;
@@ -41,7 +41,6 @@ export default function VehiclesPage() {
     setOpenDialog(true);
   };
 
-  data&&console.log(data);
   const handleEditClick = (vehicle: Vehicle) => {
     setEditingVehicle(vehicle);
     setOpenDialog(true);
@@ -68,7 +67,7 @@ export default function VehiclesPage() {
         toast.success("Added new Truck");
       }
     } catch (error) {
-      toast.error("failed to add, Try later");
+      toast.error((error as Error).message+"failed to add, Try later");
     }
   };
 

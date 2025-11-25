@@ -8,7 +8,6 @@ import AddWarehouseDialog from "@/app/(UI)/user/warehouses/_UI/warehouse-dialog"
 import { Trash2, Edit2 } from "lucide-react";
 import {
   addNew_wareHouse,
-  editWarehouse,
   getWarehouse,
 } from "@/services/client_api-Service/user/warehouse/wareHouse_api";
 import { toast } from "sonner";
@@ -46,27 +45,30 @@ export default function WarehousePage() {
       );
     }
   };
-  const handleAddressEdit = async()=>{
-    try {
+  // const handleAddressEdit = async()=>{
+  //   try {
       
-    } catch (error) {
+  //   } catch (error) {
       
-    }
-  }
+  //   }
+  // }
 
   const handleEditWarehouse = async(warehouse: Warehouse) => {
     setEditingWarehouse(warehouse);
     setIsDialogOpen(true);
     console.log(warehouse);
-    try {
+    // try {
       
-    } catch (error) {
+    // } catch (error) {
       
-    }
+    // }
     //  await editWarehouse(warehouse)
   };
 
-  const handleDeleteWarehouse = (id: string) => {};
+  const handleDeleteWarehouse = (id:string) => {
+    console.log(id);
+    
+  };
 
   const typeColors: Record<
     "Vehicle" | "Purchase" | "Location" | "Sale",

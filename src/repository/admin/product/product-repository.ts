@@ -1,6 +1,6 @@
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin";
 
-const add_product = async (payload: any) => {
+const add_product = async (payload: Record<string,unknown>) => {
   try {
     const { error } = await supabaseAdmin.rpc(
       "create_product_with_components",

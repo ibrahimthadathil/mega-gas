@@ -75,7 +75,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useSelector((state: Rootstate) => state.user);
   const filterdNav = React.useMemo(
     () => filterByRole(navItems, user.role as string),
-    []
+    [user.role]
   );
   return (
     <Sidebar collapsible="icon" {...props}>

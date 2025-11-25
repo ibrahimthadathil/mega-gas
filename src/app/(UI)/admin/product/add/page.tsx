@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Trash2, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import ProductDetailsForm from "@/components/product/product-details-form";
 import CompositionSection from "@/components/product/composition-section";
 import VerificationModal from "@/components/product/verification-modal";
@@ -56,7 +56,6 @@ export default function AddProductPage() {
     watch,
     handleSubmit,
     formState: { errors },
-    reset,
   } = useForm<ProductFormData>({
     defaultValues: {
       product_code: "",
@@ -90,7 +89,7 @@ export default function AddProductPage() {
         queryClient.invalidateQueries({ queryKey: ["products"] });
       }
     } catch (error) {
-      ((error as AxiosError).response?.data as Record<string, string>).message;
+      toast.error(((error as AxiosError).response?.data as Record<string, string>).message)
     }
   };
 

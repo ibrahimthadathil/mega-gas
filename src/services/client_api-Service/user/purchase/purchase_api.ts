@@ -9,7 +9,7 @@ export const getPurchaseCredentials = async () => {
   }
 };
 
-export const addPurchaseRegister = async (data:any) => {
+export const addPurchaseRegister = async (data:Record<string,unknown>) => {
   try {
     const result = await axios.post('/api/user/purchase',data)
     return result.data

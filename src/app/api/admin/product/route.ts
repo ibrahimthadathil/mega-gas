@@ -21,7 +21,7 @@ export const POST = async (req: NextRequest) => {
   }
 };
 
-export const GET = async (req: NextRequest) => {
+export const GET = async () => {
   try {
     const { success, data } = await getAllProducts();    
     if (success)

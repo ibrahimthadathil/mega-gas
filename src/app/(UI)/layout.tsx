@@ -18,7 +18,6 @@ import { useSelector } from "react-redux";
 import { selectIsAuthenticated } from "@/redux/store/selectors/authSelectors";
 import { useEffect } from "react";
 import { redirect } from "next/navigation";
-import { toast } from "sonner";
 export default function Layout({ children }: { children: React.ReactNode }) {
   const is_authenticated = useSelector(selectIsAuthenticated);
   useEffect(() => {
