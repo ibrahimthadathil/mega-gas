@@ -77,6 +77,9 @@ export interface Vehicle {
   tags?:string[]
   
 }
+export interface IProduct{
+  components?:{child_product_id:string,qty:number,child_product_name:string}
+}
 
 export interface CompositionItem {
   childProductId: string

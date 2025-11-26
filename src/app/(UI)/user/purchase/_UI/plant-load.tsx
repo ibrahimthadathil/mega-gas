@@ -151,6 +151,8 @@ export default function PlantLoadSection() {
         quantity: p.quantity,
       })),
     };
+    console.log(purchaseData);
+    
     try {
       const result = await addPurchaseRegister(purchaseData);
       if (result.success) {

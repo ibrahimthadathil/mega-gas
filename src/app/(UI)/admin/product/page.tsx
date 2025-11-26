@@ -14,9 +14,26 @@ import { IProduct } from "@/types/types";
 import { UseRQ } from "@/hooks/useReactQuery";
 import { getAllProducts } from "@/services/client_api-Service/admin/product/product_api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 export default function ProductListPage() {
-  const { data, isLoading } = UseRQ("products", getAllProducts);  
+  const { data, isLoading } = UseRQ("products", getAllProducts);
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const compositeProduct = useMemo(() => {
+    if (!data) return [];
+    return (data as IProduct[])
+      .filter((product) => !product.is_composite)
+      .map((product) => ({ id: product.id, name: product.product_name }));
+  }, [data]);
+  const handleEdit = (product: IProduct) => {
+    queryClient.setQueryData(["product", product.product_code], product.id);
+    queryClient.setQueryData(["composite", "composite"], compositeProduct);
+    router.push(`/admin/product/edit/${product.product_code}`);
+  };
   return (
     <main className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
@@ -103,15 +120,14 @@ export default function ProductListPage() {
                       </div>
                     </div>
                   </div>
-                  <Link
-                    href={`/product/edit/${product.id}`}
-                    className="mt-4 w-full"
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={() => handleEdit(product)}
                   >
-                    <Button variant="outline" className="w-full gap-2">
-                      <Edit className="w-4 h-4" />
-                      Edit
-                    </Button>
-                  </Link>
+                    <Edit className="w-4 h-4" />
+                    Edit
+                  </Button>
                 </CardContent>
               </Card>
             ))}

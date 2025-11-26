@@ -18,3 +18,21 @@ export const getAllProducts = async () => {
     throw error;
   }
 };
+
+export const editProduct = async (data:any,productId:string) => {
+  try {
+    const result = await axios.put(`/api/admin/product/${productId}`, data);
+    return result.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getEditData = async (id: string) => {
+  try {
+    const result = await axios.get(`/api/admin/product/${id}`);
+    return result.data;
+  } catch (error) {
+    throw error;
+  }
+};
