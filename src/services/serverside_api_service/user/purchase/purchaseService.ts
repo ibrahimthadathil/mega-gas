@@ -16,10 +16,12 @@ const addPurchase_Register = async (
       );
       const p_line_items = data.products.map((product) => ({
         product_id: product.id,
-        qty: product.quantity,
+        full_qty: product.quantity,
         trip_type: product.tripType,
+        return_qty:product.quantity,
         warehouse_id: data.warehouse,
         composite: product.is_composite,
+        return_product_id:product.return_product_id,
         created_by: existUser.id,
         product_component: product.is_composite
           ? product.components?.map((child) => ({

@@ -40,18 +40,18 @@ export interface Product {
   quantity: number;
 }
 
-
-
 type ResponseData = [product: MaterializedProduct[], warehouses: Warehouse[]];
 
 interface DialogFormData {
   product: string;
   tripType: "oneway" | "two_way";
   quantity: string;
+  return_product_id?: string;
 }
 
 export default function PlantLoadSection() {
   const { data, isLoading } = UseRQ("credential", getPurchaseCredentials);
+  console.log(data);
 
   const {
     register: registerMain,
@@ -78,6 +78,7 @@ export default function PlantLoadSection() {
       product: "",
       tripType: "oneway",
       quantity: "",
+      return_product_id: "",
     },
   });
 
@@ -113,7 +114,6 @@ export default function PlantLoadSection() {
 
   const handleProceed = async () => {
     const formData = watchMain();
-
     // Validate required fields
     if (!formData.invoiceNumber) {
       toast.error("Please enter TAX Invoice Number");
@@ -151,8 +151,6 @@ export default function PlantLoadSection() {
         quantity: p.quantity,
       })),
     };
-    console.log(purchaseData);
-    
     try {
       const result = await addPurchaseRegister(purchaseData);
       if (result.success) {
@@ -162,7 +160,7 @@ export default function PlantLoadSection() {
         toast.success("Purchase Registered");
       }
     } catch (error) {
-      toast.error((error as Error).message+"error in add purchase");
+      toast.error((error as Error).message + "error in add purchase");
     }
   };
 
@@ -340,6 +338,7 @@ export default function PlantLoadSection() {
                 min="1"
                 className="w-full"
               />
+              <Input type="hidden" {...registerDialog("return_product_id")} />
             </div>
 
             {/* Dialog Add Button */}

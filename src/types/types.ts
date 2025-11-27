@@ -113,6 +113,8 @@ export interface MaterializedProduct {
   components: ProductComponent[] | null;
   total_components_qty_required: number | null;
   last_refreshed_at: string;
+  return_product_id?:string;
+  empty_warehouse_id?:string;
 }
 
 export interface PlantLoadFormData {
