@@ -61,25 +61,27 @@ export interface Vehicle {
   created_at?: string 
 }
 
- export interface IProduct {
-  id: string
-  product_code: string
-  product_name: string
-  product_type: string
-  sale_price: number
-  cost_price: number
-  available_qty: number
-  is_composite: boolean
-  is_empty:boolean;
-  visibility: boolean
-  price_edit_enabled: boolean
+export interface IProduct {
+  id: string;
+  product_code: string;
+  product_name: string;
+  product_type: string;
+  sale_price: number;
+  cost_price: number;
+  available_qty: number;
+  is_composite: boolean;
+  is_empty: boolean;
+  visibility: boolean;
+  price_edit_enabled: boolean;
   composition: CompositionItem[];
-  tags?:string[]
-  
+  tags?: string[];
+  components?: {
+    child_product_id: string;
+    qty: number;
+    child_product_name: string;
+  }[];
 }
-export interface IProduct{
-  components?:{child_product_id:string,qty:number,child_product_name:string}
-}
+
 
 export interface CompositionItem {
   childProductId: string

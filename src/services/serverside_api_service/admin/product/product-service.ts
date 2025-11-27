@@ -57,9 +57,7 @@ const getEditProduct = async (id: string, authId: string) => {
 };
 
 const editProduct = async (id: string, authId: string, data: IProduct) => {
-  try {
-    console.log('parent id :- ',id,'data....:-' ,data);
-    
+  try {    
     const checkUser = await await checkUserByAuthId(authId);
     if (checkUser) {
       const payload = {
@@ -83,9 +81,7 @@ const editProduct = async (id: string, authId: string, data: IProduct) => {
               qty: c.qty ?? 1,
             }))
           : [],
-      };
-      console.log('payload :- ',payload);
-      
+      };      
       const result = await edit_Product(payload);
       if (result) return { success: true };
       else return { success: false };

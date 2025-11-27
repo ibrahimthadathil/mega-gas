@@ -194,8 +194,7 @@ export default function EditProductPage() {
   const [showVerification, setShowVerification] = useState(false);
   const [formData, setFormData] = useState<ProductFormData | null>();
 
-  // Transform product data to form data
-  const getDefaultValues = (): ProductFormData => {
+  const getDefaultValues = () => {
     if (!data || !Array.isArray(data) || data.length === 0) {
       return {
         product_code: "",
@@ -213,20 +212,19 @@ export default function EditProductPage() {
 
     const product = data[0] as IProduct;
 
-    // Map components to composition format
     const composition =
       product.components?.map((component) => ({
         childProductId: component.child_product_id,
-        qty: component.qty, // Use absolute value for quantity
+        qty: component.qty,
       })) || [];
 
     return {
       product_code: product.product_code || "",
       product_name: product.product_name || "",
       product_type: product.product_type || "",
-      available_qty: 0, // Adjust if you have this field
+      available_qty: 0,
       sale_price: product.sale_price || 0,
-      cost_price: 0, // Adjust if you have this field
+      cost_price: 0,
       price_edit_enabled: product.price_edit_enabled || false,
       visibility: product.visibility ?? true,
       is_composite: product.is_composite || false,
