@@ -56,4 +56,18 @@ const getMaterializedProduct = async () => {
   }
 };
 
-export { addPurchaseRegister, getMaterializedProduct };
+const getPurchaseRegister = async (userId:string)=>{
+  try {    
+    const { data, error } = await supabase
+  .from("plant_load_register_view")
+  .select("*")
+  .eq("created_by", userId)
+  .order("created_at", { ascending: false });
+    if(error) throw error    
+    return data
+  } catch (error) {
+    throw (error as Error).message
+  }
+}
+
+export { addPurchaseRegister, getMaterializedProduct, getPurchaseRegister };
