@@ -2,6 +2,7 @@ import {
   add_vehicle,
   delete_vehicle,
   display_vehicle,
+  update_vehicle,
 } from "@/repository/admin/vehicle/vehicle-repository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
 import { Vehicle } from "@/types/types";
@@ -29,6 +30,15 @@ const show_vehicles = async () => {
   }
 };
 
+const updateVehicle = async (vehicleId: string, data: Partial<Vehicle>) => {
+  try {
+    const result = await update_vehicle(vehicleId, data);
+    return result ? { success: true } : { success: false };
+  } catch (error) {
+    throw (error as Error).message;
+  }
+};
+
 const delete_Vehicle = async (id: string) => {
   try {
     const deleted = await delete_vehicle(id);
@@ -38,4 +48,4 @@ const delete_Vehicle = async (id: string) => {
     throw (error as Error).message;
   }
 };
-export { addVehicle, show_vehicles, delete_Vehicle };
+export { addVehicle, show_vehicles, delete_Vehicle, updateVehicle };

@@ -22,6 +22,25 @@ const display_vehicle = async () => {
   }
 };
 
+const update_vehicle = async (
+  vehicleId: string,
+  updatedData: Partial<Vehicle>
+) => {
+  try {
+    const { error } = await supabaseAdmin
+      .from("vehicles")
+      .update(updatedData)
+      .eq("id", vehicleId);
+
+    if (error) throw error;
+
+    return true;
+  } catch (error) {
+    console.log((error as Error).message);
+    throw error;
+  }
+};
+
 const delete_vehicle = async (id:string) => {
   try {
     const {error} = await supabaseAdmin.from("vehicles").delete().eq('id',id)
@@ -32,4 +51,4 @@ const delete_vehicle = async (id:string) => {
   }
 }
 
-export { add_vehicle, display_vehicle, delete_vehicle };
+export { add_vehicle, display_vehicle, delete_vehicle, update_vehicle };

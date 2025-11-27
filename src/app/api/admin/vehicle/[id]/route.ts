@@ -18,11 +18,20 @@ export const DELETE = async (
       }
     } else throw new Error("Un-authorized");
   } catch (error) {
-    console.log((error as Error).message, "ererer");
-
     return NextResponse.json(
       { error: (error as Error).message },
       { status: STATUS.SERVER_ERROR.code }
     );
   }
 };
+
+export const PUT = async (req:NextRequest,context:{params:Promise<{id:string}>})=>{
+  try {
+    
+  } catch (error) {
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: STATUS.SERVER_ERROR.code }
+    );  
+  }
+}
