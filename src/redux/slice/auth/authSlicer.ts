@@ -33,6 +33,7 @@ const userSlice = createSlice({
       state.role = null;
       state.is_authenticated = false;
     },
+    
   },
 });
 

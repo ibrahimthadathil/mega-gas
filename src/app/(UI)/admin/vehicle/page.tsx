@@ -8,6 +8,7 @@ import { Plus } from "lucide-react";
 import {
   addVehicle,
   deleteVehicle,
+  editvehicle,
   getAllVehicles,
 } from "@/services/client_api-Service/admin/vehicle/vehicle-api";
 import { toast } from "sonner";
@@ -16,13 +17,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { Vehicle } from "@/types/types";
 
-
 export default function VehiclesPage() {
-  const { data, isLoading } = UseRQ("vehicles" , getAllVehicles);
-  const quryClient = useQueryClient()
-
-
-
+  const { data, isLoading } = UseRQ("vehicles", getAllVehicles);
+  const quryClient = useQueryClient();
   const [openDialog, setOpenDialog] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
 
@@ -36,28 +33,32 @@ export default function VehiclesPage() {
     setOpenDialog(true);
   };
 
-  const handleDeleteClick = async(id: string) => {
+  const handleDeleteClick = async (id: string) => {
     try {
-      const data = await deleteVehicle(id)
-      if(data.success){
-        toast.success('Deleted')
-        quryClient.invalidateQueries({queryKey:['vehicles']})
+      const data = await deleteVehicle(id);
+      if (data.success) {
+        toast.success("Deleted");
+        quryClient.invalidateQueries({ queryKey: ["vehicles"] });
       }
     } catch (error) {
-      toast.error((error as Error).message)
+      toast.error((error as Error).message);
     }
   };
 
   const handleSaveVehicle = async (vehicleData: Vehicle) => {
     try {
-      const data = await addVehicle(vehicleData);
+      const isEdit = !!vehicleData.id;
+      const apiCall = isEdit
+        ? editvehicle(vehicleData.id!, vehicleData)
+        : addVehicle(vehicleData);
+      const data = await apiCall;
       if (data.success) {
-        quryClient.invalidateQueries({queryKey:['vehicles']})
+        quryClient.invalidateQueries({ queryKey: ["vehicles"] });
         setOpenDialog(false);
-        toast.success("Added new Truck");
+        toast.success(isEdit ? "Vehicle updateed" : "Added new Vehicle");
       }
     } catch (error) {
-      toast.error((error as Error).message+"failed to add, Try later");
+      toast.error((error as Error).message + " failed to add, Try later");
     }
   };
 
@@ -74,8 +75,8 @@ export default function VehiclesPage() {
         </div>
 
         {/* Vehicle Grid */}
-        {isLoading? 
-        <div className="flex flex-col space-y-3 w-full max-w-xs sm:max-w-sm md:max-w-md">
+        {isLoading ? (
+          <div className="flex flex-col space-y-3 w-full max-w-xs sm:max-w-sm md:max-w-md">
             <Skeleton className="h-[125px] w-full rounded-xl" />
 
             <div className="space-y-2">
@@ -83,21 +84,23 @@ export default function VehiclesPage() {
               <Skeleton className="h-4 w-2/3 sm:w-1/2 md:w-3/4" />
             </div>
           </div>
-        :<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {(data as Vehicle[]).map((vehicle:Vehicle) => (
-            <VehicleCard
-              key={vehicle.id}
-              vehicle={vehicle}
-              onEdit={() => handleEditClick(vehicle)}
-              onDelete={() => handleDeleteClick(vehicle.id as string)}
-            />
-          ))}
-        </div>}
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {(data as Vehicle[]).map((vehicle: Vehicle) => (
+              <VehicleCard
+                key={vehicle.id}
+                vehicle={vehicle}
+                onEdit={() => handleEditClick(vehicle)}
+                onDelete={() => handleDeleteClick(vehicle.id as string)}
+              />
+            ))}
+          </div>
+        )}
 
-        {(data as Vehicle[])?.length === 0&& (
+        {(data as Vehicle[])?.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
-             { `No vehicles found. Click "Add Vehicle" to get started.`}
+              {`No vehicles found. Click "Add Vehicle" to get started.`}
             </p>
           </div>
         )}

@@ -27,3 +27,12 @@ export const deleteVehicle = async (id: string) => {
     throw error;
   }
 };
+
+export const editvehicle = async (id: string, data: Partial<Vehicle>) => {
+  try {
+    const result = await axios.put(`/api/admin/vehicle/${id}`, data);
+    return result.data;
+  } catch (error) {
+    throw error;
+  }
+};
