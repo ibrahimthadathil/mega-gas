@@ -37,6 +37,7 @@ interface VehicleDialogProps {
   onOpenChange: (open: boolean) => void;
   vehicle: Vehicle | null;
   onSave: (data: Vehicle) => void;
+  submit?:boolean
 }
 
 const VEHICLE_TYPES = ["Car", "Truck", "Bike", "Bus", "Auto-Rickshaw", "Tempo"];
@@ -46,6 +47,7 @@ export function VehicleDialog({
   onOpenChange,
   vehicle,
   onSave,
+  submit
 }: VehicleDialogProps) {
   const [formData, setFormData] = useState<VehicleFormData>({
     vehicle_no: "",
@@ -326,7 +328,7 @@ export function VehicleDialog({
             >
               Cancel
             </Button>
-            <Button type="submit">
+            <Button type="submit" disabled={submit}>
               {vehicle ? "Update Vehicle" : "Add Vehicle"}
             </Button>
           </div>

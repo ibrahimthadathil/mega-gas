@@ -20,6 +20,7 @@ import { Vehicle } from "@/types/types";
 export default function VehiclesPage() {
   const { data, isLoading } = UseRQ("vehicles", getAllVehicles);
   const quryClient = useQueryClient();
+  const [submit, setSubmit] = useState<boolean>(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
 
@@ -47,12 +48,14 @@ export default function VehiclesPage() {
 
   const handleSaveVehicle = async (vehicleData: Vehicle) => {
     try {
+      setSubmit(true);
       const isEdit = !!vehicleData.id;
       const apiCall = isEdit
         ? editvehicle(vehicleData.id!, vehicleData)
         : addVehicle(vehicleData);
       const data = await apiCall;
       if (data.success) {
+        setSubmit(false);
         quryClient.invalidateQueries({ queryKey: ["vehicles"] });
         setOpenDialog(false);
         toast.success(isEdit ? "Vehicle updateed" : "Added new Vehicle");
@@ -112,6 +115,7 @@ export default function VehiclesPage() {
         onOpenChange={setOpenDialog}
         vehicle={editingVehicle}
         onSave={handleSaveVehicle}
+        submit={submit}
       />
     </main>
   );
