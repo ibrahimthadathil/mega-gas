@@ -339,7 +339,7 @@ const ExpenseSection = (): ReactElement => {
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => handleEditClick("sds" as any)}
+                  onClick={() => handleEditClick({amount:10,expenses_type:'Recharge',id:''})}
                   className="flex-1"
                 >
                   <Edit2 className="w-4 h-4 mr-1" />

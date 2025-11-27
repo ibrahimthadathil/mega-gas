@@ -1,6 +1,6 @@
-export default function Loading() {
+export default function Loading({height}:{height?:string}) {
   return (
-    <div className="flex justify-center text-indigo-400 items-center h-screen">
+    <div className={`flex justify-center text-indigo-400 items-center ${height ? height:"h-screen"} `}>
       <p>Loading...</p>
     </div>
   );

@@ -1,12 +1,10 @@
 export const dynamic = "force-dynamic";
 import {
   addExpenses,
-  clear_Expense,
   getExpensesByUser,
 } from "@/services/serverside_api_service/user/expenses/expensesService";
 import { Expense, STATUS } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
-
 
 export const POST = async (req: NextRequest) => {
   try {
@@ -53,5 +51,3 @@ export const GET = async (req: NextRequest) => {
     );
   }
 };
-
-

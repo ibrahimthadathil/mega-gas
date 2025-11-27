@@ -18,11 +18,13 @@ import { ProductFormData } from '@/app/(UI)/admin/product/add/page'
 interface CompositionSectionProps {
   control: Control<ProductFormData>
   availableProducts: Array<{ id: string; name: string }>
+  loading?:boolean;
 }
 
 export default function CompositionSection({
   control,
   availableProducts,
+  
 }: CompositionSectionProps) {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -46,7 +48,7 @@ export default function CompositionSection({
         <div className="space-y-3">
           {fields.length === 0 ? (
             <p className="text-sm text-muted-foreground py-4">
-              No composition items added yet. Click "Add Composition Row" to add items.
+              {`No composition items added yet. Click "Add Composition Row" to add items.`}
             </p>
           ) : (
             fields.map((field, index) => (
@@ -86,15 +88,13 @@ export default function CompositionSection({
                     control={control}
                     rules={{
                       required: 'Quantity is required',
-                      min: { value: 1, message: 'Quantity must be at least 1' },
                     }}
                     render={({ field }) => (
                       <Input
                         id={`composition.${index}.qty`}
                         type="number"
-                        min="1"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                       />
                     )}
                   />

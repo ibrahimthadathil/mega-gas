@@ -1,151 +1,292 @@
-'use client'
+// "use client";
 
-import { useState, useEffect } from 'react'
-import { useRouter, useParams } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { ArrowLeft } from 'lucide-react'
-import ProductDetailsForm from '@/components/product/product-details-form'
-import CompositionSection from '@/components/product/composition-section'
-import VerificationModal from '@/components/product/verification-modal'
-import type { ProductFormData, CompositionItem } from '@/app/(UI)/admin/product/add/page'
+// import { useState } from "react";
+// import { useRouter, useParams } from "next/navigation";
+// import { useForm } from "react-hook-form";
+// import { Button } from "@/components/ui/button";
+// import { Card, CardContent } from "@/components/ui/card";
+// import { ArrowLeft } from "lucide-react";
+// import ProductDetailsForm from "@/components/product/product-details-form";
+// import CompositionSection from "@/components/product/composition-section";
+// import VerificationModal from "@/components/product/verification-modal";
+// import type { ProductFormData } from "@/app/(UI)/admin/product/add/page";
+// import { IProduct } from "@/types/types";
+// import { useQueryClient } from "@tanstack/react-query";
+// import Link from "next/link";
+// import { UseRQ } from "@/hooks/useReactQuery";
+// import { getEditData } from "@/services/client_api-Service/admin/product/product_api";
+// import Loading from "@/loading";
 
-// Mock product data - replace with API call
-const mockProducts: Record<string, any> = {
-  '1': {
-    id: '1',
-    product_code: 'PROD-001',
-    product_name: 'Laptop',
-    product_type: 'Electronics',
-    sale_price: 1200,
-    cost_price: 800,
-    available_qty: 15,
-    is_composite: false,
-    visibility: true,
-    price_edit_enabled: true,
-    composition: [],
-  },
-  '2': {
-    id: '2',
-    product_code: 'PROD-002',
-    product_name: 'Bundle Kit',
-    product_type: 'Bundle',
-    sale_price: 500,
-    cost_price: 300,
-    available_qty: 8,
-    is_composite: true,
-    visibility: true,
-    price_edit_enabled: false,
-    composition: [
-      { childProductId: 'prod1', qty: 2 },
-      { childProductId: 'prod2', qty: 1 },
-    ],
-  },
-}
+// export default function EditProductPage() {
+//   const queryClient = useQueryClient();
+//   const router = useRouter();
+//   const params = useParams();
+//   const productCode = params.id as string;
+//   const cachedProduct = queryClient.getQueryData([
+//     "product",
+//     productCode,
+//   ]) as string;
+//   const { data, isLoading } = UseRQ("editProduct", () =>
+//     getEditData(cachedProduct)
+//   );
+//   console.log(data);
 
-// Mock product list for composition selection
-const availableProducts = [
-  { id: 'prod1', name: 'Component A' },
-  { id: 'prod2', name: 'Component B' },
-  { id: 'prod3', name: 'Component C' },
-]
+//   const availableProducts = queryClient.getQueryData([
+//     "composite",
+//     "composite",
+//   ]) as { id: string; name: string }[];
+//   const [showVerification, setShowVerification] = useState(false);
+//   const [formData, setFormData] = useState<ProductFormData | null>(null);
+//   const {
+//     control,
+//     watch,
+//     handleSubmit,
+//     formState: { errors },
+//   } = useForm<ProductFormData>({
+//     defaultValues: (data as IProduct)
+//       ? {
+//           ... (data as IProduct[])[0] as IProduct,
+//           composition: data.components ?? [],
+//         }
+//       : {
+//           product_code: "",
+//           product_name: "",
+//           product_type: "",
+//           available_qty: 0,
+//           sale_price: 0,
+//           cost_price: 0,
+//           price_edit_enabled: false,
+//           visibility: true,
+//           is_composite: false,
+//           composition: [],
+//         },
+//   });
+
+//   const isComposite = watch("is_composite");
+
+//   const onSubmit = (data: ProductFormData) => {
+//     setFormData(data);
+//     setShowVerification(true);
+//   };
+
+//   const handleConfirmSubmit = () => {
+//     console.log("Updated product:", formData);
+//     setShowVerification(false);
+//     router.push("/product");
+//   };
+
+//   if (!cachedProduct) {
+//     return (
+//       <main className="min-h-screen bg-background p-6">
+//         <div className="max-w-4xl mx-auto">
+//           <Card>
+//             <CardContent className="pt-6 text-center">
+//               <p className="text-muted-foreground mb-4">Product not found</p>
+//               <Link href={"/admin/product"}>
+//                 <Button>Go Back</Button>
+//               </Link>
+//             </CardContent>
+//           </Card>
+//         </div>
+//       </main>
+//     );
+//   }
+
+//   return (
+//     <main className="min-h-screen bg-background p-6">
+//       <div className="max-w-4xl mx-auto">
+//         {/* Header */}
+//         <div className="flex items-center gap-4 mb-8">
+//           <Link href={"/admin/product"}>
+//             <Button variant="outline" size="icon">
+//               <ArrowLeft className="w-4 h-4" />
+//             </Button>
+//           </Link>
+//           <div>
+//             <h1 className="text-3xl font-bold text-foreground">Edit Product</h1>
+//             <p className="text-muted-foreground mt-1">Update product details</p>
+//           </div>
+//         </div>
+//         {/* Form */}
+//         {isLoading ? (
+//           <Loading height="h-screen" />
+//         ) : (
+//           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+//             {/* Product Details Section */}
+//             <ProductDetailsForm control={control} errors={errors} />
+
+//             {/* Composition Section - Only visible if is_composite is true */}
+//             {isComposite && (
+//               <CompositionSection
+//                 control={control}
+//                 availableProducts={availableProducts}
+//               />
+//             )}
+
+//             {/* Action Buttons */}
+//             <div className="flex gap-3 justify-end pt-6 border-t">
+//               <Link href={"/admin/product"}>
+//                 <Button type="button" variant="outline">
+//                   Cancel
+//                 </Button>
+//               </Link>
+//               <Button type="submit">Review & Submit</Button>
+//             </div>
+//           </form>
+//         )}
+
+//         {/* Verification Modal */}
+//         {showVerification && formData && (
+//           <VerificationModal
+//             formData={formData}
+//             availableProducts={availableProducts}
+//             onConfirm={handleConfirmSubmit}
+//             onBack={() => setShowVerification(false)}
+//           />
+//         )}
+//       </div>
+//     </main>
+//   );
+// }
+
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
+import ProductDetailsForm from "@/components/product/product-details-form";
+import CompositionSection from "@/components/product/composition-section";
+import VerificationModal from "@/components/product/verification-modal";
+import type { ProductFormData } from "@/app/(UI)/admin/product/add/page";
+import { IProduct } from "@/types/types";
+import { useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
+import { UseRQ } from "@/hooks/useReactQuery";
+import {
+  editProduct,
+  getEditData,
+} from "@/services/client_api-Service/admin/product/product_api";
+import Loading from "@/loading";
+import { toast } from "sonner";
 
 export default function EditProductPage() {
-  const router = useRouter()
-  const params = useParams()
-  const productId = params.id as string
-  const [showVerification, setShowVerification] = useState(false)
-  const [formData, setFormData] = useState<ProductFormData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const params = useParams();
+  const productCode = params.id as string;
+  const cachedProduct = queryClient.getQueryData([
+    "product",
+    productCode,
+  ]) as string;
 
-  const product = mockProducts[productId]
+  const { data, isLoading } = UseRQ("editProduct", () =>
+    getEditData(cachedProduct)
+  );
+
+  const availableProducts = queryClient.getQueryData([
+    "composite",
+    "composite",
+  ]) as { id: string; name: string }[];
+
+  const [showVerification, setShowVerification] = useState(false);
+  const [formData, setFormData] = useState<ProductFormData | null>();
+
+  const getDefaultValues = () => {
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      return {
+        product_code: "",
+        product_name: "",
+        product_type: "",
+        available_qty: 0,
+        sale_price: 0,
+        cost_price: 0,
+        price_edit_enabled: false,
+        visibility: true,
+        is_composite: false,
+        composition: [],
+      };
+    }
+
+    const product = data[0] as IProduct;
+
+    const composition =
+      product.components?.map((component) => ({
+        childProductId: component.child_product_id,
+        qty: component.qty,
+      })) || [];
+
+    return {
+      product_code: product.product_code || "",
+      product_name: product.product_name || "",
+      product_type: product.product_type || "",
+      available_qty: 0,
+      sale_price: product.sale_price || 0,
+      cost_price: 0,
+      price_edit_enabled: product.price_edit_enabled || false,
+      visibility: product.visibility ?? true,
+      is_composite: product.is_composite || false,
+      composition: composition,
+    };
+  };
 
   const {
     control,
     watch,
     handleSubmit,
-    formState: { errors },
     reset,
+    formState: { errors },
   } = useForm<ProductFormData>({
-    defaultValues: product
-      ? {
-          product_code: product.product_code,
-          product_name: product.product_name,
-          product_type: product.product_type,
-          available_qty: product.available_qty,
-          sale_price: product.sale_price,
-          cost_price: product.cost_price,
-          price_edit_enabled: product.price_edit_enabled,
-          visibility: product.visibility,
-          is_composite: product.is_composite,
-          composition: product.composition || [],
-        }
-      : {
-          product_code: '',
-          product_name: '',
-          product_type: '',
-          available_qty: 0,
-          sale_price: 0,
-          cost_price: 0,
-          price_edit_enabled: false,
-          visibility: true,
-          is_composite: false,
-          composition: [],
-        },
-  })
+    defaultValues: getDefaultValues(),
+  });
 
+  // Reset form when data loads
   useEffect(() => {
-    // Simulate API call delay
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [])
+    if (data && !isLoading) {
+      reset(getDefaultValues());
+    }
+  }, [data, isLoading]);
 
-  const isComposite = watch('is_composite')
+  const isComposite = watch("is_composite");
 
   const onSubmit = (data: ProductFormData) => {
-    setFormData(data)
-    setShowVerification(true)
-  }
+    setFormData(data);
+    setShowVerification(true);
+  };
 
-  const handleConfirmSubmit = () => {
-    // Submit to API
-    console.log('Updated product:', formData)
-    setShowVerification(false)
-    router.push('/product')
-  }
+  const handleConfirmSubmit = async () => {
+    console.log("Updated product:", formData);
+    setShowVerification(false);
+    try {
+      if (cachedProduct) {
+        const data = await editProduct(formData, cachedProduct);
+        if (data.success) {
+          router.push("/admin/product");
+          toast.success("Product Updated");
+        }
+      } else toast.warning("go back to the product page and Try again");
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  };
 
-  const handleBack = () => {
-    router.back()
-  }
-
-  if (isLoading) {
-    return (
-      <main className="min-h-screen bg-background p-6">
-        <div className="max-w-4xl mx-auto">
-          <Card>
-            <CardContent className="pt-6">Loading...</CardContent>
-          </Card>
-        </div>
-      </main>
-    )
-  }
-
-  if (!product) {
+  if (!cachedProduct) {
     return (
       <main className="min-h-screen bg-background p-6">
         <div className="max-w-4xl mx-auto">
           <Card>
             <CardContent className="pt-6 text-center">
               <p className="text-muted-foreground mb-4">Product not found</p>
-              <Button onClick={handleBack}>Go Back</Button>
+              <Link href={"/admin/product"}>
+                <Button>Go Back</Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
       </main>
-    )
+    );
   }
 
   return (
@@ -153,9 +294,11 @@ export default function EditProductPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <Button variant="outline" size="icon" onClick={handleBack}>
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
+          <Link href={"/admin/product"}>
+            <Button variant="outline" size="icon">
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+          </Link>
           <div>
             <h1 className="text-3xl font-bold text-foreground">Edit Product</h1>
             <p className="text-muted-foreground mt-1">Update product details</p>
@@ -163,34 +306,43 @@ export default function EditProductPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Product Details Section */}
-          <ProductDetailsForm control={control} errors={errors} />
+        {isLoading ? (
+          <Loading height="h-screen" />
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Product Details Section */}
+            <ProductDetailsForm control={control} errors={errors} />
 
-          {/* Composition Section - Only visible if is_composite is true */}
-          {isComposite && (
-            <CompositionSection control={control} availableProducts={availableProducts} />
-          )}
+            {/* Composition Section - Only visible if is_composite is true */}
+            {isComposite && (
+              <CompositionSection
+                control={control}
+                availableProducts={availableProducts || []}
+              />
+            )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 justify-end pt-6 border-t">
-            <Button type="button" variant="outline" onClick={handleBack}>
-              Cancel
-            </Button>
-            <Button type="submit">Review & Submit</Button>
-          </div>
-        </form>
+            {/* Action Buttons */}
+            <div className="flex gap-3 justify-end pt-6 border-t">
+              <Link href={"/admin/product"}>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </Link>
+              <Button type="submit">Review & Submit</Button>
+            </div>
+          </form>
+        )}
 
         {/* Verification Modal */}
         {showVerification && formData && (
           <VerificationModal
             formData={formData}
-            availableProducts={availableProducts}
+            availableProducts={availableProducts || []}
             onConfirm={handleConfirmSubmit}
             onBack={() => setShowVerification(false)}
           />
         )}
       </div>
     </main>
-  )
+  );
 }

@@ -8,7 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 interface DatePickerProps {
   date?: Date
   onDateChange: (date: Date | undefined) => void
-  allowFutureDates?: boolean // ✅ New optional prop
+  allowFutureDates?: boolean 
 }
 
 export function DatePicker({ date, onDateChange, allowFutureDates = false }: DatePickerProps) {
@@ -29,12 +29,9 @@ export function DatePicker({ date, onDateChange, allowFutureDates = false }: Dat
           selected={date}
           onSelect={onDateChange}
           disabled={(date) => {
-            // ✅ Conditional logic based on allowFutureDates prop
             if (allowFutureDates) {
-              // Only disable dates before 1900
               return date < new Date("1900-01-01")
             } else {
-              // Disable future dates and dates before 1900
               return date > new Date() || date < new Date("1900-01-01")
             }
           }}

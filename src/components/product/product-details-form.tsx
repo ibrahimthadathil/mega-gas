@@ -1,27 +1,31 @@
-'use client'
+"use client";
 
-import { Controller, FieldErrors, Control } from 'react-hook-form'
-import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Controller, type FieldErrors, type Control } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { ProductFormData } from '@/app/(UI)/admin/product/add/page'
+} from "@/components/ui/select";
+
+import type { ProductFormData } from "@/app/(UI)/admin/product/add/page";
 
 interface ProductDetailsFormProps {
-  control: Control<ProductFormData>
-  errors: FieldErrors<ProductFormData>
+  control: Control<ProductFormData>;
+  errors: FieldErrors<ProductFormData>;
 }
 
-const productTypes = ['service','inventory']
+const productTypes = ["service", "inventory"];
 
-export default function ProductDetailsForm({ control, errors }: ProductDetailsFormProps) {
+export default function ProductDetailsForm({
+  control,
+  errors,
+}: ProductDetailsFormProps) {
   return (
     <Card>
       <CardHeader>
@@ -35,18 +39,20 @@ export default function ProductDetailsForm({ control, errors }: ProductDetailsFo
             <Controller
               name="product_code"
               control={control}
-              rules={{ required: 'Product code is required' }}
+              rules={{ required: "Product code is required" }}
               render={({ field }) => (
                 <Input
                   id="product_code"
                   placeholder="e.g., PROD-001"
                   {...field}
-                  className={errors.product_code ? 'border-destructive' : ''}
+                  className={errors.product_code ? "border-destructive" : ""}
                 />
               )}
             />
             {errors.product_code && (
-              <p className="text-sm text-destructive">{errors.product_code.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.product_code.message}
+              </p>
             )}
           </div>
 
@@ -56,18 +62,20 @@ export default function ProductDetailsForm({ control, errors }: ProductDetailsFo
             <Controller
               name="product_name"
               control={control}
-              rules={{ required: 'Product name is required' }}
+              rules={{ required: "Product name is required" }}
               render={({ field }) => (
                 <Input
                   id="product_name"
                   placeholder="e.g., Laptop"
                   {...field}
-                  className={errors.product_name ? 'border-destructive' : ''}
+                  className={errors.product_name ? "border-destructive" : ""}
                 />
               )}
             />
             {errors.product_name && (
-              <p className="text-sm text-destructive">{errors.product_name.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.product_name.message}
+              </p>
             )}
           </div>
 
@@ -77,12 +85,12 @@ export default function ProductDetailsForm({ control, errors }: ProductDetailsFo
             <Controller
               name="product_type"
               control={control}
-              rules={{ required: 'Product type is required' }}
+              rules={{ required: "Product type is required" }}
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger
                     id="product_type"
-                    className={errors.product_type ? 'border-destructive' : ''}
+                    className={errors.product_type ? "border-destructive" : ""}
                   >
                     <SelectValue placeholder="Select a type" />
                   </SelectTrigger>
@@ -97,7 +105,9 @@ export default function ProductDetailsForm({ control, errors }: ProductDetailsFo
               )}
             />
             {errors.product_type && (
-              <p className="text-sm text-destructive">{errors.product_type.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.product_type.message}
+              </p>
             )}
           </div>
 
@@ -108,8 +118,8 @@ export default function ProductDetailsForm({ control, errors }: ProductDetailsFo
               name="available_qty"
               control={control}
               rules={{
-                required: 'Quantity is required',
-                min: { value: 0, message: 'Quantity must be positive' },
+                required: "Quantity is required",
+                min: { value: 0, message: "Quantity must be positive" },
               }}
               render={({ field }) => (
                 <Input
@@ -117,13 +127,17 @@ export default function ProductDetailsForm({ control, errors }: ProductDetailsFo
                   type="number"
                   placeholder="0"
                   {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                  className={errors.available_qty ? 'border-destructive' : ''}
+                  onChange={(e) =>
+                    field.onChange(Number.parseInt(e.target.value) || 0)
+                  }
+                  className={errors.available_qty ? "border-destructive" : ""}
                 />
               )}
             />
             {errors.available_qty && (
-              <p className="text-sm text-destructive">{errors.available_qty.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.available_qty.message}
+              </p>
             )}
           </div>
 
@@ -134,8 +148,8 @@ export default function ProductDetailsForm({ control, errors }: ProductDetailsFo
               name="sale_price"
               control={control}
               rules={{
-                required: 'Sale price is required',
-                min: { value: 0, message: 'Price must be positive' },
+                required: "Sale price is required",
+                min: { value: 0, message: "Price must be positive" },
               }}
               render={({ field }) => (
                 <Input
@@ -144,13 +158,17 @@ export default function ProductDetailsForm({ control, errors }: ProductDetailsFo
                   step="0.01"
                   placeholder="0.00"
                   {...field}
-                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                  className={errors.sale_price ? 'border-destructive' : ''}
+                  onChange={(e) =>
+                    field.onChange(Number.parseFloat(e.target.value) || 0)
+                  }
+                  className={errors.sale_price ? "border-destructive" : ""}
                 />
               )}
             />
             {errors.sale_price && (
-              <p className="text-sm text-destructive">{errors.sale_price.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.sale_price.message}
+              </p>
             )}
           </div>
 
@@ -161,8 +179,8 @@ export default function ProductDetailsForm({ control, errors }: ProductDetailsFo
               name="cost_price"
               control={control}
               rules={{
-                required: 'Cost price is required',
-                min: { value: 0, message: 'Price must be positive' },
+                required: "Cost price is required",
+                min: { value: 0, message: "Price must be positive" },
               }}
               render={({ field }) => (
                 <Input
@@ -171,14 +189,64 @@ export default function ProductDetailsForm({ control, errors }: ProductDetailsFo
                   step="0.01"
                   placeholder="0.00"
                   {...field}
-                  onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
-                  className={errors.cost_price ? 'border-destructive' : ''}
+                  onChange={(e) =>
+                    field.onChange(Number.parseFloat(e.target.value) || 0)
+                  }
+                  className={errors.cost_price ? "border-destructive" : ""}
                 />
               )}
             />
             {errors.cost_price && (
-              <p className="text-sm text-destructive">{errors.cost_price.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.cost_price.message}
+              </p>
             )}
+          </div>
+          {/* Tags Multi-Select with Checkboxes */}
+          <div className="space-y-2 md:col-span-2">
+            <Label>Tags</Label>
+            <Controller
+              name="tags"
+              control={control}
+              render={({ field }) => {
+                const availableTags = [
+                  "electronics",
+                  "furniture",
+                  "clothing",
+                  "food",
+                  "books",
+                ];
+                return (
+                  <div className="border rounded-md p-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {availableTags.map((tag) => (
+                        <div key={tag} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`tag-${tag}`}
+                            checked={field.value?.includes(tag)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                field.onChange([...(field.value || []), tag]);
+                              } else {
+                                field.onChange(
+                                  field.value?.filter((t) => t !== tag) || []
+                                );
+                              }
+                            }}
+                          />
+                          <Label
+                            htmlFor={`tag-${tag}`}
+                            className="cursor-pointer font-normal capitalize"
+                          >
+                            {tag}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }}
+            />
           </div>
 
           {/* Price Edit Enabled */}
@@ -193,7 +261,10 @@ export default function ProductDetailsForm({ control, errors }: ProductDetailsFo
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
-                  <Label htmlFor="price_edit_enabled" className="cursor-pointer font-normal">
+                  <Label
+                    htmlFor="price_edit_enabled"
+                    className="cursor-pointer font-normal"
+                  >
                     Price Edit Enabled
                   </Label>
                 </>
@@ -213,7 +284,10 @@ export default function ProductDetailsForm({ control, errors }: ProductDetailsFo
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
-                  <Label htmlFor="visibility" className="cursor-pointer font-normal">
+                  <Label
+                    htmlFor="visibility"
+                    className="cursor-pointer font-normal"
+                  >
                     Visibility
                   </Label>
                 </>
@@ -233,8 +307,31 @@ export default function ProductDetailsForm({ control, errors }: ProductDetailsFo
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
-                  <Label htmlFor="is_composite" className="cursor-pointer font-normal">
+                  <Label
+                    htmlFor="is_composite"
+                    className="cursor-pointer font-normal"
+                  >
                     Is Composite
+                  </Label>
+                </>
+              )}
+            />
+          </div>
+
+          {/* Empty Checkbox Field */}
+          <div className="flex items-center space-x-2 pt-6">
+            <Controller
+              name="is_empty"
+              control={control}
+              render={({ field }) => (
+                <>
+                  <Checkbox
+                    id="empty"
+                    checked={field.value || false}
+                    onCheckedChange={field.onChange}
+                  />
+                  <Label htmlFor="empty" className="cursor-pointer font-normal">
+                    Empty
                   </Label>
                 </>
               )}
@@ -243,5 +340,5 @@ export default function ProductDetailsForm({ control, errors }: ProductDetailsFo
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

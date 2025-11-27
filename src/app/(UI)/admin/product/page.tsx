@@ -1,56 +1,39 @@
-'use client'
-
-import { useState } from 'react'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Plus, Edit } from 'lucide-react'
-
-interface Product {
-  id: string
-  product_code: string
-  product_name: string
-  product_type: string
-  sale_price: number
-  cost_price: number
-  available_qty: number
-  is_composite: boolean
-  visibility: boolean
-  price_edit_enabled: boolean
-}
-
-// Mock product data - replace with API call
-const mockProducts: Product[] = [
-  {
-    id: '1',
-    product_code: 'PROD-001',
-    product_name: 'Laptop',
-    product_type: 'Electronics',
-    sale_price: 1200,
-    cost_price: 800,
-    available_qty: 15,
-    is_composite: false,
-    visibility: true,
-    price_edit_enabled: true,
-  },
-  {
-    id: '2',
-    product_code: 'PROD-002',
-    product_name: 'Bundle Kit',
-    product_type: 'Bundle',
-    sale_price: 500,
-    cost_price: 300,
-    available_qty: 8,
-    is_composite: true,
-    visibility: true,
-    price_edit_enabled: false,
-  },
-]
+"use client";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Edit } from "lucide-react";
+import { IProduct } from "@/types/types";
+import { UseRQ } from "@/hooks/useReactQuery";
+import { getAllProducts } from "@/services/client_api-Service/admin/product/product_api";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 export default function ProductListPage() {
-  const [products] = useState<Product[]>(mockProducts)
+  const { data, isLoading } = UseRQ("products", getAllProducts);
+  const queryClient = useQueryClient();
+  const router = useRouter();
 
+  const compositeProduct = useMemo(() => {
+    if (!data) return [];
+    return (data as IProduct[])
+      .filter((product) => !product.is_composite)
+      .map((product) => ({ id: product.id, name: product.product_name }));
+  }, [data]);
+  const handleEdit = (product: IProduct) => {
+    queryClient.setQueryData(["product", product.product_code], product.id);
+    queryClient.setQueryData(["composite", "composite"], compositeProduct);
+    router.push(`/admin/product/edit/${product.product_code}`);
+  };
   return (
     <main className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
@@ -58,76 +41,104 @@ export default function ProductListPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Products</h1>
-            <p className="text-muted-foreground mt-1">Manage your product inventory</p>
+            <p className="text-muted-foreground mt-1">
+              Manage your product inventory
+            </p>
           </div>
-          <Link href="/admin/product/add">
-            <Button className="gap-2">
-              <Plus className="w-4 h-4" />
-              Add Product
-            </Button>
-          </Link>
+          {(data as IProduct[])?.length > 0 && (
+            <Link href="/admin/product/add">
+              <Button className="gap-2">
+                <Plus className="w-4 h-4" />
+                Add Product
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {products.map((product) => (
-            <Card key={product.id} className="flex flex-col">
-              <CardHeader>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg">{product.product_name}</CardTitle>
-                    <CardDescription className="text-sm">{product.product_code}</CardDescription>
-                  </div>
-                  {product.is_composite && (
-                    <Badge variant="outline" className="whitespace-nowrap">
-                      Composite
-                    </Badge>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col">
-                <div className="space-y-3 flex-1">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Type:</span>
-                    <span className="font-medium">{product.product_type}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Sale Price:</span>
-                    <span className="font-medium">${product.sale_price}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Cost Price:</span>
-                    <span className="font-medium">${product.cost_price}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Available:</span>
-                    <span className="font-medium">{product.available_qty} units</span>
-                  </div>
-                  <div className="pt-2 border-t">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Visibility:</span>
-                      <Badge variant={product.visibility ? 'default' : 'secondary'}>
-                        {product.visibility ? 'Visible' : 'Hidden'}
+        {isLoading ? (
+          <div className="flex flex-col space-y-3 w-full max-w-xs sm:max-w-sm md:max-w-md">
+            <Skeleton className="h-[125px] w-full rounded-xl" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3 sm:w-1/2 md:w-3/4" />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {(data as IProduct[])?.map((product) => (
+              <Card key={product.id} className="flex flex-col">
+                <CardHeader>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">
+                        {product.product_name}
+                      </CardTitle>
+                      <CardDescription className="text-sm">
+                        {product.product_code}
+                      </CardDescription>
+                    </div>
+                    {product.is_composite && (
+                      <Badge variant="outline" className="whitespace-nowrap">
+                        Composite
                       </Badge>
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col">
+                  <div className="space-y-3 flex-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Type:</span>
+                      <span className="font-medium">
+                        {product.product_type}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Sale Price:</span>
+                      <span className="font-medium">${product.sale_price}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Cost Price:</span>
+                      <span className="font-medium">${product.cost_price}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Available:</span>
+                      <span className="font-medium">
+                        {product.available_qty} units
+                      </span>
+                    </div>
+                    <div className="pt-2 border-t">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          Visibility:
+                        </span>
+                        <Badge
+                          variant={product.visibility ? "default" : "secondary"}
+                        >
+                          {product.visibility ? "Visible" : "Hidden"}
+                        </Badge>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <Link href={`/product/edit/${product.id}`} className="mt-4 w-full">
-                  <Button variant="outline" className="w-full gap-2">
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2"
+                    onClick={() => handleEdit(product)}
+                  >
                     <Edit className="w-4 h-4" />
                     Edit
                   </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
 
-        {products.length === 0 && (
+        {(data as IProduct[])?.length === 0 && (
           <Card className="text-center py-12">
             <CardContent>
               <p className="text-muted-foreground mb-4">No products found</p>
-              <Link href="/product/add">
+              <Link href="/admin/product/add">
                 <Button>Create First Product</Button>
               </Link>
             </CardContent>
@@ -135,5 +146,5 @@ export default function ProductListPage() {
         )}
       </div>
     </main>
-  )
+  );
 }
