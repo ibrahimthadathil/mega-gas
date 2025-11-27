@@ -1,6 +1,4 @@
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin";
-import { IProduct } from "@/types/types";
-import { log } from "util";
 
 const add_product = async (payload: Record<string, unknown>) => {
   try {
