@@ -34,31 +34,29 @@ export const STATUS = {
   SERVER_ERROR: { code: 500, message: "Internal server error" },
 } as const;
 
-
 export interface Expense {
-  id: string
-  created_by?:string
-  expenses_type: "Recharge" | "Workshop" | "Other"
-  amount: number
-  image?: string
-  created_time?: string
-  description?:string
-  settled?: boolean
-
+  id: string;
+  created_by?: string;
+  expenses_type: "Recharge" | "Workshop" | "Other";
+  amount: number;
+  image?: string;
+  created_time?: string;
+  description?: string;
+  settled?: boolean;
 }
 
 export interface Vehicle {
-  id?: string
-  vehicle_no: string
-  vehicle_type: string
-  registration_date: string
-  fitness_validity_date: string
-  tax_validity_date: string
-  insurance_validity_date: string
-  pucc_validity_date: string
-  permit_validity_date: string
-  created_by?: string
-  created_at?: string 
+  id?: string;
+  vehicle_no: string;
+  vehicle_type: string;
+  registration_date: string;
+  fitness_validity_date: string;
+  tax_validity_date: string;
+  insurance_validity_date: string;
+  pucc_validity_date: string;
+  permit_validity_date: string;
+  created_by?: string;
+  created_at?: string;
 }
 
 export interface IProduct {
@@ -82,13 +80,10 @@ export interface IProduct {
   }[];
 }
 
-
 export interface CompositionItem {
-  childProductId: string
-  qty: number
- 
+  childProductId: string;
+  qty: number;
 }
-
 
 export interface ProductComponent {
   qty: number;
@@ -113,8 +108,8 @@ export interface MaterializedProduct {
   components: ProductComponent[] | null;
   total_components_qty_required: number | null;
   last_refreshed_at: string;
-  return_product_id?:string;
-  empty_warehouse_id?:string;
+  return_product_id?: string;
+  empty_warehouse_id?: string;
 }
 
 export interface PlantLoadFormData {
@@ -131,4 +126,27 @@ export interface PurchaseProduct extends MaterializedProduct {
 
 export interface PurchaseRegisterPayload extends PlantLoadFormData {
   products: PurchaseProduct[];
+}
+
+interface LineItem {
+  qty: number;
+  trip_type: string;
+  product_name: string;
+}
+
+export interface PlantLoadRecord {
+  id: string;
+  sap_number: string;
+  bill_date: string;
+  unloading_date: string | null;
+  total_full_qty: number;
+  unloaded_qty: number;
+  balance: number;
+  created_by: string;
+  created_at: string;
+  tax_invoice_number: string;
+  warehouse_id: string;
+  total_return_qty: number;
+  warehouse_name: string;
+  line_items: LineItem[];
 }
