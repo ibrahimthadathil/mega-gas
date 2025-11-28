@@ -9,11 +9,20 @@ export const getPurchaseCredentials = async () => {
   }
 };
 
-export const addPurchaseRegister = async (data:Record<string,unknown>) => {
+export const addPurchaseRegister = async (data: Record<string, unknown>) => {
   try {
-    const result = await axios.post('/api/user/purchase',data)
-    return result.data
+    const result = await axios.post("/api/user/purchase", data);
+    return result.data;
   } catch (error) {
     throw (error as Error).message;
+  }
+};
+
+export const getPlantLoadRegister = async () => {
+  try {
+    const result = await axios.get("/api/user/purchase");
+    return result.data;
+  } catch (error) {
+    throw error;
   }
 };
