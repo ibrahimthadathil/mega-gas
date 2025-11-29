@@ -1,4 +1,4 @@
-import { TripSheet } from "@/app/(UI)/user/stock/_UI/trip-sheet"
+import TripSheet from "@/app/(UI)/user/stock/_UI/trip-sheet"
 
 export default function Home() {
   return (
@@ -7,3 +7,5 @@ export default function Home() {
     </main>
   )
 }
+
+

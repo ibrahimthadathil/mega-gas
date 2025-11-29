@@ -1,18 +1,24 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UseRQ } from "@/hooks/useReactQuery";
 import { getPlantLoadRegister } from "@/services/client_api-Service/user/purchase/purchase_api";
 import { PlantLoadRecord } from "@/types/types";
+import { useQueryClient } from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function PlantLoadPage() {
   const { data, isLoading } = UseRQ("register", getPlantLoadRegister);
+  const queryClient = useQueryClient()
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
-
+  const router = useRouter()
+  console.log(data);
+  
   const toggleExpanded = (id: string) => {
     setExpandedIds((prev) => {
       const newSet = new Set(prev);
@@ -24,7 +30,10 @@ export default function PlantLoadPage() {
       return newSet;
     });
   };
-
+  const handleUnload = (Record: PlantLoadRecord) => {
+    queryClient.setQueryData(["plant_load",Record.sap_number],Record)
+    router.push(`/user/stock/load-slip/${Record.sap_number}`)
+  };
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-8 space-y-6">
       {/* Header */}
@@ -48,57 +57,68 @@ export default function PlantLoadPage() {
           ) : (
             (data as PlantLoadRecord[]).map((record) => {
               const isExpanded = expandedIds.has(record.id);
-              
+
               return (
                 <Card key={record.id} className="bg-card w-full">
                   <CardContent className="pt-2">
                     <div className="space-y-4">
                       {/* Record Header */}
-                      <button
-                        onClick={() => toggleExpanded(record.id)}
-                        className="w-full text-left hover:opacity-75 transition-opacity"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1 space-y-2">
-                            <div className="flex items-center gap-2">
-                              <Badge variant="secondary">
-                                <h2 className="text-lg">{record.warehouse_name}</h2>
-                              </Badge>
+
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary">
+                              <h2 className="text-lg">
+                                {record.warehouse_name}
+                              </h2>
+                            </Badge>
+                          </div>
+                          <div className="grid grid-cols-1 ps-2 md:grid-cols-4 gap-3 text-sm text-muted-foreground">
+                            <div>
+                              SAP:{" "}
+                              <span className="font-medium text-foreground">
+                                {record.sap_number}
+                              </span>
                             </div>
-                            <div className="grid grid-cols-1 ps-2 md:grid-cols-4 gap-3 text-sm text-muted-foreground">
-                              <div>
-                                SAP:{" "}
-                                <span className="font-medium text-foreground">
-                                  {record.sap_number}
-                                </span>
-                              </div>
-                              <div>
-                                Date:{" "}
-                                <span className="font-medium text-foreground">
-                                  {record.bill_date}
-                                </span>
-                              </div>
-                              <div>
-                                Total Qty:{" "}
-                                <span className="font-medium text-foreground">
-                                  {record.total_full_qty}
-                                </span>
-                              </div>
-                              <div>
-                                Balance:{" "}
-                                <span className="font-medium text-foreground">
-                                  {record.balance}
-                                </span>
-                              </div>
+                            <div>
+                              Date:{" "}
+                              <span className="font-medium text-foreground">
+                                {record.bill_date}
+                              </span>
+                            </div>
+                            <div>
+                              Total Qty:{" "}
+                              <span className="font-medium text-foreground">
+                                {record.total_full_qty}
+                              </span>
+                            </div>
+                            <div>
+                              Balance:{" "}
+                              <span className="font-medium text-foreground">
+                                {record.balance}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="font-medium text-foreground">
+                                <Button
+                                  onClick={() =>
+                                    handleUnload(record)
+                                  }
+                                >
+                                  Unload
+                                </Button>
+                              </span>
                             </div>
                           </div>
-                          <ChevronDown
-                            className={`w-5 h-5 text-muted-foreground transition-transform ${
-                              isExpanded ? "rotate-180" : ""
-                            }`}
-                          />
                         </div>
-                      </button>
+
+                        <ChevronDown
+                          onClick={() => toggleExpanded(record.id)}
+                          className={`w-5 h-5 text-muted-foreground transition-transform hover:cursor-pointer ${
+                            isExpanded ? "rotate-180" : ""
+                          }`}
+                        />
+                      </div>
 
                       {/* Expandable Line Items */}
                       {isExpanded && (

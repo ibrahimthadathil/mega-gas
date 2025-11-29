@@ -51,8 +51,6 @@ interface DialogFormData {
 
 export default function PlantLoadSection() {
   const { data, isLoading } = UseRQ("credential", getPurchaseCredentials);
-  console.log(data);
-
   const {
     register: registerMain,
     watch: watchMain,
