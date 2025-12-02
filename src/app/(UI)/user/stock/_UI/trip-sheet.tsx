@@ -13,7 +13,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -26,68 +25,89 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { PlantLoadRecord } from "@/types/types";
+import { PlantLoadRecord } from "@/types/types"; // Assuming this type contains line_items, sap_number, etc.
 import { UseRQ } from "@/hooks/useReactQuery";
 import { getWarehouse } from "@/services/client_api-Service/user/warehouse/wareHouse_api";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Warehouse } from "../../warehouses/page";
+import { Warehouse } from "../../warehouses/page"; // Assuming this is the Warehouse type
 
+// --- 1. UPDATED INTERFACES ---
 interface TripLoadRecord {
-  id?: string;
-  warehouse_id: string;
-  fullQuantity: number;
-  emptyQuantity:number;
-  return_qty: number;
-  product_id?:string;
-  retutn_product_id?:string;
-  to_warehouse_id?:string;
-  return_warehouse_id?:string;
-  plant_load_line_item_id?:string;
-  trip_type?:"oneway" | "two_way";
+  id: string; // Unique ID for key/deletion
 
+  // Fields entered by the user
+  to_warehouse_id: string; // The destination warehouse/vehicle ID
+  fullQuantity: number;
+  emptyQuantity: number;
+
+  // Fields inherited from the selected line item
+  trip_type: "oneway" | "two_way";
+  product_id: string;
+  plant_load_line_item_id: string;
+  return_product_id: string | null; // Product ID for empty/return loads
+
+  // Conditional Field
+  return_warehouse_id: string | null; // Set for one-way return, or same as origin for two-way
 }
 
 interface TripFormData {
   date: Date | undefined;
   sapNumber: string;
-  qty: string; // full qty of the vallya wandi
-  warehouse_id: string;
-  plant_load_register_id?:string;
-  plant_load_line_item_id?:string;
+  qty: string;
+  warehouse_id: string; // Origin warehouse ID
+  plant_load_register_id?: string;
+  plant_load_line_item_id?: string;
   tripLoadRecords: TripLoadRecord[];
   helpers: string[];
 }
 
+// Assuming the structure of a line item from unloadRecord
+interface UnloadLineItem {
+  line_item_id: string;
+  product_name: string;
+  product_id: string;
+  trip: "oneway" | "two_way"; // Renamed to 'trip' in source code
+  return_qty: number; // Max possible return quantity
+  return_product_id: string | null;
+}
+
+// --- CONSTANTS ---
 const HELPER_OPTIONS = ["Ramesh", "Akhil", "Musthafa", "Faizal"];
 
 export default function TripSheet() {
-  const { data, isLoading } = UseRQ("warehouse", getWarehouse);
+  const { data: warehouses, isLoading: isWarehouseLoading } = UseRQ<
+    Warehouse[]
+  >("warehouse", getWarehouse);
   const params = useParams();
   const queryClient = useQueryClient();
   const loadSlip_sap = params.id;
+
+  // Retrieve the default record
   const unloadRecord = queryClient.getQueryData([
     "plant_load",
     loadSlip_sap,
   ]) as PlantLoadRecord;
 
+  // --- 2. UPDATED STATE INITIALIZATION ---
   const [formData, setFormData] = useState<TripFormData>({
     date: undefined,
     sapNumber: unloadRecord?.sap_number || "",
     qty: unloadRecord?.total_full_qty?.toString() || "",
-    warehouse_id: unloadRecord?.warehouse_id || "",
+    warehouse_id: unloadRecord?.warehouse_id || "", // Origin warehouse ID
     tripLoadRecords: [],
     helpers: [],
   });
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedLineItem, setSelectedLineItem] = useState<any>(null);
+  const [selectedLineItem, setSelectedLineItem] =
+    useState<UnloadLineItem | null>(null);
+
+  // State for user inputs in the dialog
   const [dialogFormData, setDialogFormData] = useState({
-    warehouse_id: "",
+    to_warehouse_id: "", // The vehicle ID selected by the user
     fullQuantity: "",
-    return_qty: "",
-    to_warehouse_return_id: "",
-    return_product_id: "",
-    trip: "",
+    emptyQuantity: "", // Changed from return_qty for clarity
+    return_warehouse_id: "", // Only needed for one-way trips with returns
   });
 
   const handleDateChange = (date: Date | undefined) => {
@@ -96,55 +116,87 @@ export default function TripSheet() {
 
   // Trip Load Details Dialog Handlers
   const handleDialogFormChange = (field: string, value: string) => {
-    setDialogFormData({ ...dialogFormData, [field]: value });
+    setDialogFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleLineItemClick = (lineItem: any, trip: string) => {
+  // --- 3. UPDATED LINE ITEM CLICK HANDLER ---
+  const handleLineItemClick = (lineItem: UnloadLineItem) => {
     setSelectedLineItem(lineItem);
-    console.log(lineItem,'🤔🤔');
-    
-    // setDialogFormData({
-    //   warehouse_id: "",
-    //   fullQuantity: "",
-    //   return_qty: "",
-    //   to_warehouse_return_id: "",
-    //   return_product_id: "",
-    //   trip,
-    // });
+
+    // Reset inputs, but conditionally pre-set return_warehouse_id for two-way
+    setDialogFormData({
+      to_warehouse_id: "",
+      fullQuantity: "",
+      emptyQuantity: "",
+      // In a two-way trip, the return warehouse is always the origin warehouse.
+      // We will set this explicitly in handleAddTripLoad, but initialize here.
+      return_warehouse_id: "",
+    });
     setDialogOpen(true);
   };
 
+  // --- 4. UPDATED ADD TRIP LOAD LOGIC (CRUCIAL) ---
   const handleAddTripLoad = () => {
-    if (!dialogFormData.warehouse_id || !selectedLineItem) {
+    if (!dialogFormData.to_warehouse_id || !selectedLineItem) {
+      alert("Please select a vehicle/destination warehouse.");
       return;
     }
 
     const fullQty = Number.parseInt(dialogFormData.fullQuantity) || 0;
-    const emptyQty = Number.parseInt(dialogFormData.return_qty) || 0;
+    const emptyQty = Number.parseInt(dialogFormData.emptyQuantity) || 0;
 
     if (fullQty === 0 && emptyQty === 0) {
+      alert("Full quantity or Empty quantity must be greater than zero.");
       return;
     }
 
-    const newRecord = {
+    // Determine the Return Warehouse ID based on trip type and input
+    let finalReturnWarehouseId: string | null = null;
+
+    if (selectedLineItem.trip === "two_way") {
+      // Two-way trip: Return warehouse is the origin warehouse (the plant/current warehouse)
+      finalReturnWarehouseId = formData.warehouse_id || null;
+    } else if (selectedLineItem.trip === "oneway") {
+      if (emptyQty > 0) {
+        // One-way trip with return product requires user to select return warehouse
+        finalReturnWarehouseId = dialogFormData.return_warehouse_id || null;
+        if (!finalReturnWarehouseId) {
+          alert("Please select a Return Warehouse for the empty loads.");
+          return;
+        }
+      }
+      // If emptyQty is 0, finalReturnWarehouseId remains null.
+    }
+
+    // Construct the new TripLoadRecord
+    const newRecord: TripLoadRecord = {
       id: Date.now().toString(),
-      warehouse_id: dialogFormData.warehouse_id,
+      plant_load_line_item_id: selectedLineItem.line_item_id,
+      trip_type: selectedLineItem.trip,
+
+      // Product IDs inherited from the selected line item
+      product_id: selectedLineItem.product_id,
+      return_product_id: selectedLineItem.return_product_id || null,
+
+      // User Input
+      to_warehouse_id: dialogFormData.to_warehouse_id, // The Vehicle/Destination ID
       fullQuantity: fullQty,
-      return_qty: emptyQty,
+      emptyQuantity: emptyQty,
+      return_warehouse_id: finalReturnWarehouseId, // Conditional ID
     };
 
-    setFormData({
-      ...formData,
-      tripLoadRecords: [...formData.tripLoadRecords, newRecord],
-    });
+    // Update form data state
+    setFormData((prev) => ({
+      ...prev,
+      tripLoadRecords: [...prev.tripLoadRecords, newRecord],
+    }));
 
+    // Reset dialog state and close
     setDialogFormData({
-      warehouse_id: "",
+      to_warehouse_id: "",
       fullQuantity: "",
-      return_qty: "",
-      to_warehouse_return_id: "",
-      return_product_id: "",
-      trip: "",
+      emptyQuantity: "",
+      return_warehouse_id: "",
     });
     setSelectedLineItem(null);
     setDialogOpen(false);
@@ -162,23 +214,23 @@ export default function TripSheet() {
   // Helpers Section Handlers
   const handleAddHelper = (helper: string) => {
     if (!formData.helpers.includes(helper)) {
-      setFormData({
-        ...formData,
-        helpers: [...formData.helpers, helper],
-      });
+      setFormData((prev) => ({
+        ...prev,
+        helpers: [...prev.helpers, helper],
+      }));
     }
   };
 
   const handleRemoveHelper = (helper: string) => {
-    setFormData({
-      ...formData,
-      helpers: formData.helpers.filter((h) => h !== helper),
-    });
+    setFormData((prev) => ({
+      ...prev,
+      helpers: prev.helpers.filter((h) => h !== helper),
+    }));
   };
 
   // Calculate Totals
   const totalEmpty = formData.tripLoadRecords.reduce(
-    (sum, r) => sum + r.return_qty,
+    (sum, r) => sum + r.emptyQuantity, // Use emptyQuantity
     0
   );
   const totalFull = formData.tripLoadRecords.reduce(
@@ -186,13 +238,19 @@ export default function TripSheet() {
     0
   );
 
+  // Helper to lookup warehouse name
+  const getWarehouseName = (id: string | undefined): string => {
+    if (!id || !warehouses) return "N/A";
+    return warehouses.find((w) => w.id === id)?.name || id;
+  };
+
   // Handle Submit
   const handleProceed = () => {
     console.log("Trip Sheet Data:", formData);
     alert("Form submitted! Check console for data.");
   };
 
-  if (isLoading) return <Skeleton />;
+  if (isWarehouseLoading) return <Skeleton className="h-screen w-full" />;
 
   if (!unloadRecord) {
     return (
@@ -217,9 +275,8 @@ export default function TripSheet() {
     <div className="w-full max-w-2xl mx-auto space-y-6">
       {/* Section 1: Trip Details Header */}
       <div className="bg-card border border-border rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Trip Details</h2>
+        <h2 className="text-lg font-semibold mb-4">🚚 Trip Details</h2>
 
-        {/* Date and Warehouse */}
         <div className="flex flex-col md:flex-row gap-4 mb-4">
           {/* Date */}
           <div className="flex-1">
@@ -229,15 +286,16 @@ export default function TripSheet() {
             <DatePicker date={formData.date} onDateChange={handleDateChange} />
           </div>
 
-          {/* Warehouse (Display Only) */}
+          {/* Warehouse (Origin - Display Only) */}
           <div className="flex-1">
-            <Label className="text-sm font-medium mb-1 block">Warehouse</Label>
+            <Label className="text-sm font-medium mb-1 block">
+              Origin Warehouse
+            </Label>
             <Input
               value={unloadRecord?.warehouse_name || ""}
               disabled
               className="bg-muted"
             />
-            <Input type="hidden" value={unloadRecord?.warehouse_id || ""} />
           </div>
         </div>
 
@@ -259,7 +317,7 @@ export default function TripSheet() {
               htmlFor="cylinders"
               className="text-sm font-medium mb-1 block"
             >
-              Total Full Quantity
+              Total Full Quantity (From SAP)
             </Label>
             <Input
               id="cylinders"
@@ -271,10 +329,12 @@ export default function TripSheet() {
         </div>
       </div>
 
+      <hr />
+
       {/* Section 2: Trip Load Details */}
       <div className="bg-card border border-border rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Trip Load Details</h2>
+          <h2 className="text-lg font-semibold">📦 Trip Load Details</h2>
           <p className="text-sm text-muted-foreground">
             Click on a product card to add load details
           </p>
@@ -286,11 +346,11 @@ export default function TripSheet() {
             <Card
               key={lineItem.line_item_id}
               className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
-              onClick={() => handleLineItemClick(lineItem, lineItem.trip)}
+              onClick={() => handleLineItemClick(lineItem)}
             >
               <div className="space-y-2">
                 <div>
-                  <p className="text-xs text-muted-foreground">Product name</p>
+                  <p className="text-xs text-muted-foreground">Product</p>
                   <p className="font-medium text-sm truncate">
                     {lineItem.product_name}
                   </p>
@@ -305,9 +365,9 @@ export default function TripSheet() {
                   >
                     {lineItem.trip === "two_way" ? "Two Way" : "One Way"}
                   </div>
-                  {lineItem.trip === "two_way" && lineItem.return_qty > 0 && (
+                  {lineItem.return_qty > 0 && (
                     <p className="text-xs text-muted-foreground">
-                      Return: {lineItem.return_qty}
+                      Max Return: {lineItem.return_qty}
                     </p>
                   )}
                 </div>
@@ -320,81 +380,50 @@ export default function TripSheet() {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Add Load Details</DialogTitle>
+              <DialogTitle>
+                Add Load Details for {selectedLineItem?.product_name}
+              </DialogTitle>
               <DialogDescription>
-                Enter the vehicle and quantity details for this product.
+                Enter the destination and quantity for this product.
               </DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
-              {/* Product ID (Display Only) */}
+              {/* Vehicle/To Warehouse Selection (Destination) */}
               <div className="grid gap-2">
-                <Label>Product Name</Label>
-                <Input
-                  disabled
-                  value={selectedLineItem?.product_name}
-                  className="bg-muted"
-                />
-                <Input
-                  value={selectedLineItem?.product_id || ""}
-                  disabled
-                  className="bg-muted"
-                  type="hidden"
-                />
-              </div>
-              {/* Trip Type (Display Only) */}
-              <div className="grid gap-2">
-                <Label>Trip Type</Label>
-                <Input
-                  value={
-                    selectedLineItem?.trip === "two_way" ? "Two Way" : "One Way"
-                  }
-                  disabled
-                  className="bg-muted"
-                />
-              </div>
-              {/* Return Product ID (if two-way) */}
-              {selectedLineItem?.trip === "two_way" && (
-                <div className="grid gap-2">
-                  <Label>Return Quantity</Label>
-                  <Input
-                    value={selectedLineItem?.return_qty || 0}
-                    disabled
-                    className="bg-muted"
-                  />
-                </div>
-              )}
-              {/* Vehicle Selection */}
-              <div className="grid gap-2">
-                <Label htmlFor="load-vehicle">Vehicle Number</Label>
+                <Label htmlFor="load-vehicle">
+                  Destination Vehicle/Warehouse (to_warehouse_id)
+                </Label>
                 <Select
-                  value={dialogFormData.warehouse_id}
-                  onValueChange={(value) =>
-                    handleDialogFormChange("warehouse_id", value)
+                  value={dialogFormData.to_warehouse_id} // CHANGED
+                  onValueChange={
+                    (value) => handleDialogFormChange("to_warehouse_id", value) // CHANGED
                   }
                 >
                   <SelectTrigger id="load-vehicle">
-                    <SelectValue placeholder="Select vehicle..." />
+                    <SelectValue placeholder="Select vehicle/warehouse..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {isLoading ? (
+                    {isWarehouseLoading ? (
                       <Skeleton />
                     ) : (
-                      (data as Warehouse[]).map((warehouse) => {
-                        return (
-                          <SelectItem value={warehouse.id as string}>
-                            {warehouse.name}
-                          </SelectItem>
-                        );
-                      })
+                      (warehouses as Warehouse[])?.map((warehouse) => (
+                        <SelectItem
+                          key={warehouse.id}
+                          value={warehouse.id as string}
+                        >
+                          {warehouse.name}
+                        </SelectItem>
+                      ))
                     )}
                   </SelectContent>
                 </Select>
               </div>
+
               {/* Quantity Inputs */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid gap-2">
-                  <Label htmlFor="load-full">Full</Label>
+                  <Label htmlFor="load-full">Full Quantity</Label>
                   <Input
                     id="load-full"
                     type="number"
@@ -406,55 +435,74 @@ export default function TripSheet() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="load-empty">Empty</Label>
+                  <Label htmlFor="load-empty">Empty Quantity</Label>
                   <Input
                     id="load-empty"
                     type="number"
                     placeholder="Quantity"
-                    value={dialogFormData.return_qty}
-                    onChange={(e) =>
-                      handleDialogFormChange("return_qty", e.target.value)
+                    value={dialogFormData.emptyQuantity} // CHANGED
+                    onChange={
+                      (e) =>
+                        handleDialogFormChange("emptyQuantity", e.target.value) // CHANGED
                     }
                   />
+                  {/* Hidden field for return product ID */}
                   <Input
                     type="hidden"
                     disabled
-                    value={dialogFormData?.return_product_id}
+                    value={selectedLineItem?.return_product_id || ""}
                   />
                 </div>
-                {selectedLineItem?.trip === "oneway" && (
-                  <div className="grid gap-2">
-                    <Label htmlFor="return-warehouse">Return Warehouse</Label>
-                    <Select
-                      value={dialogFormData.to_warehouse_return_id}
-                      onValueChange={(value) =>
-                        handleDialogFormChange("to_warehouse_return_id", value)
-                      }
-                    >
-                      <SelectTrigger id="return-warehouse">
-                        <SelectValue placeholder="Select return warehouse..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {isLoading ? (
-                          <Skeleton />
-                        ) : (
-                          (data as Warehouse[]).map((warehouse) => {
-                            return (
-                              <SelectItem
-                                key={warehouse.id}
-                                value={warehouse.id as string}
-                              >
-                                {warehouse.name}
-                              </SelectItem>
-                            );
-                          })
-                        )}
-                      </SelectContent>
-                    </Select>
+              </div>
+
+              {/* Conditional Return Warehouse Selection (Only for Oneway) */}
+              {selectedLineItem?.trip === "oneway" && (
+                <div className="grid gap-2">
+                  <Label htmlFor="return-warehouse">
+                    Return Warehouse (If returning empty loads)
+                    {Number.parseInt(dialogFormData.emptyQuantity || "0") >
+                      0 && <span className="text-red-500 ml-1">*</span>}
+                  </Label>
+                  <Select
+                    value={dialogFormData.return_warehouse_id}
+                    onValueChange={(value) =>
+                      handleDialogFormChange("return_warehouse_id", value)
+                    }
+                    disabled={
+                      !dialogFormData.emptyQuantity ||
+                      Number.parseInt(dialogFormData.emptyQuantity) === 0
+                    }
+                  >
+                    <SelectTrigger id="return-warehouse">
+                      <SelectValue placeholder="Select return warehouse..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {isWarehouseLoading ? (
+                        <Skeleton />
+                      ) : (
+                        (warehouses as Warehouse[])?.map((warehouse) => (
+                          <SelectItem
+                            key={warehouse.id}
+                            value={warehouse.id as string}
+                          >
+                            {warehouse.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              {/* Display for Two-Way Return Warehouse (For User Info) */}
+              {selectedLineItem?.trip === "two_way" &&
+                selectedLineItem?.return_qty > 0 && (
+                  <div className="grid gap-2 text-sm text-muted-foreground">
+                    <p className="font-medium">Return Warehouse (Auto-Set)</p>
+                    <p className="text-green-500">
+                      {getWarehouseName(formData.warehouse_id)} (Origin)
+                    </p>
                   </div>
                 )}
-              </div>
-               {/* <Input value={dialogFormData.to_warehouse_return_id} /> */}
             </div>
 
             <DialogFooter>
@@ -467,7 +515,7 @@ export default function TripSheet() {
               >
                 Cancel
               </Button>
-              <Button onClick={handleAddTripLoad}>Add</Button>
+              <Button onClick={handleAddTripLoad}>Add Load</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -484,26 +532,38 @@ export default function TripSheet() {
                     className="flex-shrink-0 min-w-[220px] p-3 relative"
                   >
                     <button
-                      onClick={() => handleDeleteTripLoad(record?.id as string)}
+                      onClick={() => handleDeleteTripLoad(record.id)}
                       className="absolute top-1 right-1 text-muted-foreground hover:text-destructive"
                     >
                       <Trash2 className="w-3 h-3" />
                     </button>
                     <div className="space-y-1.5">
+                      {/* <div>
+                        <p className="text-xs text-muted-foreground">Product ID</p>
+                        <p className="font-medium text-xs truncate">
+                          {record.product_id}
+                        </p>
+                      </div> */}
                       <div>
                         <p className="text-xs text-muted-foreground">
-                          Product ID
+                          Destination (to_warehouse_id)
                         </p>
-                        <p className="font-medium text-xs truncate">
-                          {/* {record.driverName} */}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground">Vehicle</p>
                         <p className="font-medium text-xs">
-                          {record.warehouse_id}
+                          {getWarehouseName(record.to_warehouse_id)}
                         </p>
                       </div>
+
+                      {record.return_warehouse_id && (
+                        <div>
+                          <p className="text-xs text-muted-foreground">
+                            Return Warehouse
+                          </p>
+                          <p className="font-medium text-xs text-blue-500">
+                            {getWarehouseName(record.return_warehouse_id)}
+                          </p>
+                        </div>
+                      )}
+
                       <div className="flex gap-2 text-xs pt-1">
                         {record.fullQuantity > 0 && (
                           <div className="flex-1 bg-green-100 dark:bg-green-900 rounded px-2 py-1">
@@ -515,13 +575,13 @@ export default function TripSheet() {
                             </p>
                           </div>
                         )}
-                        {record.return_qty > 0 && (
+                        {record.emptyQuantity > 0 && (
                           <div className="flex-1 bg-blue-100 dark:bg-blue-900 rounded px-2 py-1">
                             <p className="text-muted-foreground text-xs">
                               Empty
                             </p>
                             <p className="font-semibold text-blue-700 dark:text-blue-100">
-                              {record.return_qty}
+                              {record.emptyQuantity}
                             </p>
                           </div>
                         )}
@@ -535,12 +595,16 @@ export default function TripSheet() {
             {/* Totals */}
             <div className="flex gap-6 text-sm bg-muted/30 rounded p-3">
               <div>
-                <p className="text-muted-foreground">Total Empty:</p>
-                <p className="font-semibold text-lg">{totalEmpty}</p>
+                <p className="text-muted-foreground">Total Full Loaded:</p>
+                <p className="font-semibold text-lg text-green-600">
+                  {totalFull}
+                </p>
               </div>
               <div>
-                <p className="text-muted-foreground">Total Full:</p>
-                <p className="font-semibold text-lg">{totalFull}</p>
+                <p className="text-muted-foreground">Total Empty Returned:</p>
+                <p className="font-semibold text-lg text-blue-600">
+                  {totalEmpty}
+                </p>
               </div>
             </div>
           </>
@@ -551,9 +615,11 @@ export default function TripSheet() {
         )}
       </div>
 
+      <hr />
+
       {/* Section 3: Helpers */}
       <div className="bg-card border border-border rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Helpers</h2>
+        <h2 className="text-lg font-semibold mb-4">👷 Helpers</h2>
 
         <div className="mb-4">
           <Label
