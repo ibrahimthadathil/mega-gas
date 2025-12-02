@@ -5,9 +5,8 @@ import { NextResponse } from "next/server";
 export const POST = async (req: Request) => {
   try {
     const data = await req.json();
-    const { message ,profile, session, success } =
-      await userLoginService(data);
-    if (success ) {
+    const { message, profile, session, success } = await userLoginService(data);
+    if (success) {
       const res = NextResponse.json(
         { message, profile, success },
         { status: STATUS.SUCCESS.code }
@@ -38,7 +37,7 @@ export const POST = async (req: Request) => {
     return NextResponse.json({ message }, { status: STATUS.NOT_FOUND.code });
   } catch (error) {
     console.log(error);
-    
+
     return NextResponse.json(
       { error: (error as Error).message },
       { status: STATUS.UNAUTHORIZED.code }

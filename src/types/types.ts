@@ -9,6 +9,7 @@ export type NavItem = {
   items?: NavItem[]; // for nested menus
 };
 export interface IUser {
+  id?:string
   user_name: string;
   email: string;
   phone: string;
@@ -78,6 +79,7 @@ export interface IProduct {
     qty: number;
     child_product_name: string;
   }[];
+  return_product_id:string|null
 }
 
 export interface CompositionItem {

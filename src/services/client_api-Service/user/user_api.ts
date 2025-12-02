@@ -27,3 +27,13 @@ export const delete_expense = async (id: string) => {
     throw error
   }
 };
+
+
+export const get_userByRole = async(role:string)=>{
+  try {
+    const result = await axios.get(`/api/user/auth/${role}`)
+    return result.data
+  } catch (error) {
+    throw error
+  }
+}

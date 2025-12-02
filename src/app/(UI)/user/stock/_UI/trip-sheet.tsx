@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2, X, Plus } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,11 +25,16 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
-import { PlantLoadRecord } from "@/types/types"; // Assuming this type contains line_items, sap_number, etc.
+import { IProduct, IUser, PlantLoadRecord } from "@/types/types"; // Assuming this type contains line_items, sap_number, etc.
 import { UseRQ } from "@/hooks/useReactQuery";
 import { getWarehouse } from "@/services/client_api-Service/user/warehouse/wareHouse_api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Warehouse } from "../../warehouses/page"; // Assuming this is the Warehouse type
+import { toast } from "sonner";
+import { unloadSlip } from "@/services/client_api-Service/user/stock/unload_slip_transfer_api";
+import { getAllProducts } from "@/services/client_api-Service/admin/product/product_api";
+import { get_userByRole } from "@/services/client_api-Service/user/user_api";
+import Loading from "@/app/(UI)/admin/product/add/loading";
 
 // --- 1. UPDATED INTERFACES ---
 interface TripLoadRecord {
@@ -50,7 +55,7 @@ interface TripLoadRecord {
   return_warehouse_id: string | null; // Set for one-way return, or same as origin for two-way
 }
 
-interface TripFormData {
+export interface TripFormData {
   date: Date | undefined;
   sapNumber: string;
   qty: string;
@@ -72,15 +77,23 @@ interface UnloadLineItem {
 }
 
 // --- CONSTANTS ---
-const HELPER_OPTIONS = ["Ramesh", "Akhil", "Musthafa", "Faizal"];
 
 export default function TripSheet() {
   const { data: warehouses, isLoading: isWarehouseLoading } = UseRQ<
     Warehouse[]
   >("warehouse", getWarehouse);
+  const { data: products, isLoading: isProductLoading } = UseRQ(
+    "products",
+    getAllProducts
+  );
+  const { data: users, isLoading: isUserLoading } = UseRQ("user", () =>
+    get_userByRole("driver")
+  );
+  const router = useRouter();
   const params = useParams();
   const queryClient = useQueryClient();
   const loadSlip_sap = params.id;
+  console.log("xxx", users);
 
   // Retrieve the default record
   const unloadRecord = queryClient.getQueryData([
@@ -91,6 +104,7 @@ export default function TripSheet() {
   // --- 2. UPDATED STATE INITIALIZATION ---
   const [formData, setFormData] = useState<TripFormData>({
     date: undefined,
+    plant_load_register_id: unloadRecord?.id,
     sapNumber: unloadRecord?.sap_number || "",
     qty: unloadRecord?.total_full_qty?.toString() || "",
     warehouse_id: unloadRecord?.warehouse_id || "", // Origin warehouse ID
@@ -122,14 +136,23 @@ export default function TripSheet() {
   // --- 3. UPDATED LINE ITEM CLICK HANDLER ---
   const handleLineItemClick = (lineItem: UnloadLineItem) => {
     setSelectedLineItem(lineItem);
+    let returnProductId = lineItem?.return_product_id;
 
+    if (lineItem.trip === "oneway" && !returnProductId && products) {
+      const matchedProduct = (products as IProduct[]).find(
+        (p: any) => p.id === lineItem.product_id
+      );
+      returnProductId = matchedProduct?.return_product_id || null;
+    }
+    setSelectedLineItem({
+      ...lineItem,
+      return_product_id: returnProductId,
+    });
     // Reset inputs, but conditionally pre-set return_warehouse_id for two-way
     setDialogFormData({
       to_warehouse_id: "",
       fullQuantity: "",
       emptyQuantity: "",
-      // In a two-way trip, the return warehouse is always the origin warehouse.
-      // We will set this explicitly in handleAddTripLoad, but initialize here.
       return_warehouse_id: "",
     });
     setDialogOpen(true);
@@ -227,7 +250,10 @@ export default function TripSheet() {
       helpers: prev.helpers.filter((h) => h !== helper),
     }));
   };
-
+  const getHelperName = (id: string): string => {
+    if (!id || !users) return "N/A";
+    return (users as IUser[]).find((u) => u.id === id)?.user_name || id;
+  };
   // Calculate Totals
   const totalEmpty = formData.tripLoadRecords.reduce(
     (sum, r) => sum + r.emptyQuantity, // Use emptyQuantity
@@ -245,9 +271,16 @@ export default function TripSheet() {
   };
 
   // Handle Submit
-  const handleProceed = () => {
-    console.log("Trip Sheet Data:", formData);
-    alert("Form submitted! Check console for data.");
+  const handleProceed = async () => {
+    try {
+      const data = await unloadSlip(formData);
+      if (data.success) {
+        toast.success("Slip created");
+        router.push("/user/stock");
+      }
+    } catch (error) {
+      toast.error("error in unload submition");
+    }
   };
 
   if (isWarehouseLoading) return <Skeleton className="h-screen w-full" />;
@@ -633,15 +666,19 @@ export default function TripSheet() {
               <SelectValue placeholder="Choose a helper..." />
             </SelectTrigger>
             <SelectContent>
-              {HELPER_OPTIONS.map((helper) => (
-                <SelectItem
-                  key={helper}
-                  value={helper}
-                  disabled={formData.helpers.includes(helper)}
-                >
-                  {helper}
-                </SelectItem>
-              ))}
+              {!isUserLoading ? (
+                (users as IUser[]).map((helper) => (
+                  <SelectItem
+                    key={helper.phone}
+                    value={helper.id as string}
+                    disabled={formData.helpers.includes(helper.id as string)}
+                  >
+                    {helper.user_name}
+                  </SelectItem>
+                ))
+              ) : (
+                <Loading />
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -654,7 +691,8 @@ export default function TripSheet() {
                 key={helper}
                 className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-2 rounded-full text-sm font-medium"
               >
-                {helper}
+                {getHelperName(helper)}
+
                 <button
                   onClick={() => handleRemoveHelper(helper)}
                   className="ml-1 hover:opacity-70"

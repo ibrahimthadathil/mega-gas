@@ -6,12 +6,25 @@ const checkUserByAuthId = async (userId: string) => {
       .from("users")
       .select("*")
       .eq("auth_id", userId)
-      .single()
-      if(error) throw error
-      else return data
-  } catch (error) {    
-    throw error
+      .single();
+    if (error) throw error;
+    else return data;
+  } catch (error) {
+    throw error;
   }
 };
 
-export { checkUserByAuthId };
+const getUserByRole = async (role: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("role", role);
+    if (error) throw error;    
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { checkUserByAuthId, getUserByRole };
