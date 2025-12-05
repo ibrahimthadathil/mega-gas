@@ -1,6 +1,11 @@
 import { TripFormData } from "@/app/(UI)/user/stock/_UI/trip-sheet";
-import { unload_Slip } from "@/repository/user/stock/stockRepository";
+import { StockTransferFormData } from "@/app/(UI)/user/stock/transfer/_UI/stock-transfer-section";
+import {
+  stock_Transfer,
+  unload_Slip,
+} from "@/repository/user/stock/stockRepository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
+import { STATUS } from "@/types/types";
 
 const unloadSlipRegister = async (data: TripFormData, userId: string) => {
   try {
@@ -32,10 +37,39 @@ const unloadSlipRegister = async (data: TripFormData, userId: string) => {
       const result = await unload_Slip(payloadForUnloadSlip);
       if (result) return { success: true };
       else throw new Error("Internal error");
-    }else throw new Error('Un-authorized')
+    } else throw new Error("Un-authorized");
   } catch (error) {
     throw (error as Error).message;
   }
 };
 
-export { unloadSlipRegister };
+const transferStock = async (data: StockTransferFormData, userId: string) => {
+  try {
+    const existUser = await checkUserByAuthId(userId);
+    if (existUser.id) {
+      const payloadData = {
+        payload: {
+          date: data.date,
+          "product id": data.product,
+          qty: data.quantity,
+          "from warehouse": data.from,
+          "to warehouse": data.to,
+          Empty_inclusive: data.withEmpty,
+          "return product id": data.return_product_id,
+          "return qty": data.quantity,
+          "return from warehouse": data.to,
+          "return to warehouse": data.from,
+          remarks: data.remarks,
+          "created by": existUser.id,
+        },
+      };
+      const result = await stock_Transfer(payloadData);
+      if (result) return { success: true };
+      else return { success: false };
+    } else throw new Error(STATUS.FORBIDDEN.message);
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { unloadSlipRegister, transferStock };

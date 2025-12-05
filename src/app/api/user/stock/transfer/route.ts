@@ -1,13 +1,21 @@
-import { stock_Transfer } from "@/repository/user/stock/stockRepository";
+import { transferStock } from "@/services/serverside_api_service/user/stock/stockService";
 import { STATUS } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
 
-export const GET = async (req:NextRequest) => {
+export const POST = async (req: NextRequest) => {
   try {
-    console.log('ghjmk,');
+    const data = await req.json();
+    console.log(data);
     
-    await stock_Transfer()
-    return NextResponse.json({ message:'check console'}, { status: STATUS.SUCCESS.code });
+    const userId = req.headers.get("x-user-id");
+    if (userId) {
+      const { success } = await transferStock(data,userId);
+      return NextResponse.json({ success }, { status: STATUS.SUCCESS.code });
+    } else
+      return NextResponse.json(
+        { message: STATUS.FORBIDDEN.message },
+        { status: STATUS.FORBIDDEN.code }
+      );
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },
