@@ -152,3 +152,10 @@ export interface PlantLoadRecord {
   warehouse_name: string;
   line_items: LineItem[];
 }
+
+export interface Accounts{
+  id?:string;
+  account_type : string;
+  account_name:string;
+  
+}
