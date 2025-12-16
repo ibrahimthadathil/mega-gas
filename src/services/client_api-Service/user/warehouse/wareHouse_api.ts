@@ -30,3 +30,4 @@ export const editWarehouse = async (editData: Warehouse) => {
     throw error;
   }
 };
+
