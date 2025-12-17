@@ -5,6 +5,7 @@ import {
   Settings2,
   LayoutDashboardIcon,
   Warehouse,
+  BookAIcon,
 } from "lucide-react";
 
 export const navItems = [
@@ -65,6 +66,15 @@ export const navItems = [
     icon: BookOpen,
     roles: ["admin", "manager", "accountant", "driver", "plant_driver", "godown_keeper"],
   },
+  {
+    title:'Accounts',
+    url:'/user/accounts',
+    icon:BookAIcon,
+    roles: ["admin", "manager", "accountant", "godown_keeper"],
+    items:[
+      {title:'Transactions',url:'/user/accounts/transactions',roles:["admin", "manager", "accountant", "godown_keeper"]}
+    ]
+  }
 ];
 
 export const filterByRole = (items: NavItem[], role: string): NavItem[] =>{

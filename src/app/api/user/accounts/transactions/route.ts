@@ -5,10 +5,12 @@ import { NextRequest, NextResponse } from "next/server";
 export const POST = async (req: NextRequest) => {
   try {
     const UserId = '5ba724f3-e625-4b82-912c-5f7a080263c9'
-     const newTransaction = req.json() 
+     const newTransaction = await req.json() 
      console.log('😍',newTransaction);
      
     const { success } = await createNewTransaction(newTransaction,UserId);
+    console.log(success);
+    
     if (success) {
       return NextResponse.json(
         { message: STATUS.CREATED.message, success },

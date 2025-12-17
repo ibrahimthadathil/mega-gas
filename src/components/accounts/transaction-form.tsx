@@ -23,6 +23,7 @@ import { Accounts } from "@/types/types";
 type LineItem = {
   date: string;
   account_name: string;
+  account_id: string;
   amount_received: number;
   amount_paid: number;
   source_form: string;
@@ -51,9 +52,10 @@ type Transaction = {
 
 type TransactionFormProps = {
   onSubmit: (transaction: Transaction) => void;
+  transactionType: 'received' | 'paid';
 };
 
-export function TransactionForm({ onSubmit }: TransactionFormProps) {
+export function TransactionForm({ onSubmit, transactionType }: TransactionFormProps) {
   const { data: accountName, isLoading } = UseRQ<Accounts[]>(
     "accounts",
     getAllAccountsParty
@@ -64,6 +66,7 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
     line_Item: {
       date: new Date().toISOString().split("T")[0],
       account_name: "",
+      account_id: "",
       amount_received: 0,
       amount_paid: 0,
       source_form: "Expence",
@@ -88,11 +91,14 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
   const [showCashChest, setShowCashChest] = useState(false);
 
   const checkLineItemsFilled = () => {
+    const amountFilled = transactionType === 'received' 
+      ? formData.line_Item.amount_received > 0
+      : formData.line_Item.amount_paid > 0;
+      
     return (
       formData.line_Item.date !== "" &&
-      formData.line_Item.account_name !== "" &&
-      (formData.line_Item.amount_received > 0 ||
-        formData.line_Item.amount_paid > 0)
+      formData.line_Item.account_id !== "" &&
+      amountFilled
     );
   };
 
@@ -124,6 +130,25 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
     }, 0);
   };
 
+  const handleAccountSelect = (accountId: string) => {
+    const selectedAccount = accountName?.find(acc => acc.id === accountId);
+    
+    setFormData({
+      ...formData,
+      line_Item: {
+        ...formData.line_Item,
+        account_id: accountId,
+        account_name: selectedAccount?.account_name || "",
+      },
+    });
+
+    setTimeout(() => {
+      if (checkLineItemsFilled() && !showCashChest) {
+        setShowCashChest(true);
+      }
+    }, 0);
+  };
+
   const handleCashChestChange = (field: keyof CashChest, value: any) => {
     setFormData({
       ...formData,
@@ -137,6 +162,7 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     alert("check the logs");
+    console.log("Form data:", formData);
     onSubmit(formData);
   };
 
@@ -161,10 +187,8 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
             <div className="grid gap-2">
               <Label htmlFor="account_name">Account Name</Label>
               <Select
-                value={formData.line_Item.account_name}
-                onValueChange={(value) =>
-                  handleLineItemChange("account_name", value)
-                }
+                value={formData.line_Item.account_id}
+                onValueChange={handleAccountSelect}
               >
                 <SelectTrigger id="account_name">
                   <SelectValue placeholder="Select account" />
@@ -183,9 +207,10 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
               </Select>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            {/* Conditionally render amount field based on transaction type */}
+            {transactionType === 'received' ? (
               <div className="grid gap-2">
-                <Label htmlFor="amount_received">Amount Received</Label>
+                <Label htmlFor="amount_received">Cash Received</Label>
                 <Input
                   id="amount_received"
                   type="number"
@@ -199,11 +224,12 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
                       Number.parseFloat(e.target.value) || 0
                     )
                   }
+                  required
                 />
               </div>
-
+            ) : (
               <div className="grid gap-2">
-                <Label htmlFor="amount_paid">Amount Paid</Label>
+                <Label htmlFor="amount_paid">Cash Paid</Label>
                 <Input
                   id="amount_paid"
                   type="number"
@@ -217,9 +243,10 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
                       Number.parseFloat(e.target.value) || 0
                     )
                   }
+                  required
                 />
               </div>
-            </div>
+            )}
 
             <div className="grid gap-2">
               <Label htmlFor="source_form">Source Form</Label>
@@ -425,7 +452,7 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
 
       <div className="flex justify-end gap-3">
         <Button type="submit" size="lg">
-          Add Transaction
+          {transactionType === 'received' ? 'Add Cash Received' : 'Add Cash Paid'}
         </Button>
       </div>
     </form>

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from "react"
@@ -40,7 +41,8 @@ type Transaction = {
 }
 
 export default function TransactionsPage() {
-  const [open, setOpen] = useState(false)
+  const [openReceived, setOpenReceived] = useState(false)
+  const [openPaid, setOpenPaid] = useState(false)
   const [transactions, setTransactions] = useState<Transaction[]>([
     {
       line_Item: {
@@ -69,17 +71,20 @@ export default function TransactionsPage() {
     },
   ])
 
-  const handleAddTransaction = async(transaction: Transaction) => {
+  const handleAddTransaction = async (transaction: any, type: 'received' | 'paid') => {
     try {
-      alert('check the log')
+      // alert('check the log')
       console.log(transaction);
       
-      // await createNewLineItem(transaction)
-      setOpen(false)
+      await createNewLineItem(transaction)
+      // if (type === 'received') {
+      //   setOpenReceived(false)
+      // } else {
+      //   setOpenPaid(false)
+      // }
     } catch (error) {
       toast.error('transaction failed ')
     }
-
   }
 
   const formatCurrency = (amount: number) => {
@@ -105,23 +110,48 @@ export default function TransactionsPage() {
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="mx-auto max-w-7xl">
-        {/* Header with title and add button */}
+        {/* Header with title and add buttons */}
         <div className="mb-8 flex items-center justify-between">
           <h1 className="text-balance text-3xl font-bold tracking-tight">Transactions</h1>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button size="lg">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Transaction
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Add New Transaction</DialogTitle>
-              </DialogHeader>
-              <TransactionForm onSubmit={handleAddTransaction} />
-            </DialogContent>
-          </Dialog>
+          <div className="flex gap-3">
+            {/* Cash Received Button */}
+            <Dialog open={openReceived} onOpenChange={setOpenReceived}>
+              <DialogTrigger asChild>
+                <Button size="lg" variant="default">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Cash Received
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Add Cash Received</DialogTitle>
+                </DialogHeader>
+                <TransactionForm 
+                  onSubmit={(transaction) => handleAddTransaction(transaction, 'received')} 
+                  transactionType="received"
+                />
+              </DialogContent>
+            </Dialog>
+
+            {/* Cash Paid Button */}
+            <Dialog open={openPaid} onOpenChange={setOpenPaid}>
+              <DialogTrigger asChild>
+                <Button size="lg" variant="destructive">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Cash Paid
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Add Cash Paid</DialogTitle>
+                </DialogHeader>
+                <TransactionForm 
+                  onSubmit={(transaction) => handleAddTransaction(transaction, 'paid')} 
+                  transactionType="paid"
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         {/* Transaction cards */}

@@ -23,7 +23,8 @@ export const getAllAccountsParty = async () => {
 
 export const createNewLineItem = async (data: any) => {
   try {
-    const result = await axios.post("/api/user/accounts/transaction", data);
+    alert('0000')
+    const result = await axios.post("/api/user/accounts/transactions", data);
     return result.data;
   } catch (error) {
     throw error;
