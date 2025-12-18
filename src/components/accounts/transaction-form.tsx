@@ -53,15 +53,14 @@ type Transaction = {
 type TransactionFormProps = {
   onSubmit: (transaction: Transaction) => void;
   transactionType: 'received' | 'paid';
+  isSales?:Boolean;
 };
 
-export function TransactionForm({ onSubmit, transactionType }: TransactionFormProps) {
+export function TransactionForm({ onSubmit, transactionType,isSales=false }: TransactionFormProps) {
   const { data: accountName, isLoading } = UseRQ<Accounts[]>(
     "accounts",
     getAllAccountsParty
-  );
-  console.log(accountName,'!!!!');
-  
+  );  
   const [formData, setFormData] = useState<Transaction>({
     line_Item: {
       date: new Date().toISOString().split("T")[0],
@@ -249,25 +248,6 @@ export function TransactionForm({ onSubmit, transactionType }: TransactionFormPr
             )}
 
             <div className="grid gap-2">
-              <Label htmlFor="source_form">Source Form</Label>
-              <Select
-                value={formData.line_Item.source_form}
-                onValueChange={(value) =>
-                  handleLineItemChange("source_form", value)
-                }
-              >
-                <SelectTrigger id="source_form">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Expence">Expence</SelectItem>
-                  <SelectItem value="Income">Income</SelectItem>
-                  <SelectItem value="Transfer">Transfer</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid gap-2">
               <Label htmlFor="remarks">Remarks</Label>
               <Input
                 id="remarks"
@@ -283,7 +263,7 @@ export function TransactionForm({ onSubmit, transactionType }: TransactionFormPr
         </div>
       </div>
 
-      {showCashChest && (
+      {showCashChest&& !isSales &&  (
         <>
           <Separator />
 

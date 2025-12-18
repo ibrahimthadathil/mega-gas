@@ -20,9 +20,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UseRQ } from "@/hooks/useReactQuery";
 import { getWarehouse } from "@/services/client_api-Service/user/warehouse/wareHouse_api";
 import { Warehouse } from "../../warehouses/page";
+import TransactionsPage from "@/app/(UI)/user/sales/_section/transaction-section";
+import { Expense } from "@/types/types";
+import { get_expenses } from "@/services/client_api-Service/user/user_api";
+import { ArrowLeft, Trash2 } from "lucide-react";
+import { recordDelivery } from "@/services/client_api-Service/user/sales/delivery_api";
 
 interface DeliveryBoy {
   id: string;
@@ -34,11 +40,22 @@ export default function Home() {
     "warehouse",
     getWarehouse
   );
+  const { data: Expenses, isLoading: expenseLoading } = UseRQ<Expense[]>(
+    "expenses",
+    get_expenses
+  );
+  console.log("3333", Expenses);
+
   const [currentVehicle, SetCurrentVehicle] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [selectedDeliveryBoys, setSelectedDeliveryBoys] = useState<
     DeliveryBoy[]
   >([]);
+  // add near other state hooks
+  const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
+    null
+  );
+  const [salesTransactions, setSalesTransactions] = useState<any[]>([]);
   const [loads, setLoads] = useState<
     Array<{
       id: string;
@@ -58,17 +75,18 @@ export default function Home() {
       deliveryCharge?: number;
     }>
   >([]);
-  const [expenses, setExpenses] = useState<
-    Array<{ id: string; name: string; amount: number }>
+  // near other state hooks
+  const [oldStock, setOldStock] = useState<
+    { product_id: string; product_name: string; qty: number }[]
   >([]);
-  const [upiReceived, setUpiReceived] = useState(0);
+  const [upiPayments, setUpiPayments] = useState<
+    Array<{ id: string; consumerName: string; amount: number }>
+  >([]);
+
   const [onlinePayments, setOnlinePayments] = useState<
     Array<{ id: string; consumerName: string; amount: number }>
   >([]);
   const [isVerified, setIsVerified] = useState(false);
-  const [closingStock, setClosingStock] = useState<
-    Array<{ id: string; product: string; quantity: number }>
-  >([]);
   const [currencyDenominations, setCurrencyDenominations] = useState<
     Record<string, number>
   >({
@@ -79,6 +97,26 @@ export default function Home() {
     "20": 0,
     "10": 0,
   });
+
+  const qrCodeIds = ["QR-001", "QR-002", "QR-003"];
+  const handleSalesTransaction = (transaction: any) => {
+    setSalesTransactions((prev) => [
+      ...prev,
+      { ...transaction, id: Date.now().toString() },
+    ]);
+  };
+
+  const handleDeleteTransaction = (id: string) => {
+    setSalesTransactions((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
 
   const handlewareHouseSelection = (id: string) => {
     SetCurrentVehicle(id);
@@ -91,38 +129,104 @@ export default function Home() {
       : 0;
     return sum + baseAmount + deliveryAmount;
   }, 0);
-  const totalExpenses = expenses.reduce(
+  const totalExpenses = Expenses?.reduce(
     (sum, expense) => sum + expense.amount,
     0
   );
   const netSales = Number(totalSales || 0) - Number(totalExpenses || 0);
 
+  const totalCashReceivedTxn = salesTransactions
+    .filter((t) => t.transactionType === "received")
+    .reduce((sum, t) => sum + (t.line_Item?.amount_received ?? 0), 0);
+
+  const totalCashPaidTxn = salesTransactions
+    .filter((t) => t.transactionType === "paid")
+    .reduce((sum, t) => sum + (t.line_Item?.amount_paid ?? 0), 0);
+
+  // Net sales after applying transaction-section adjustments
+  const netSalesWithTransactions =
+    netSales + totalCashReceivedTxn - totalCashPaidTxn;
+
+  // === Totals for UPI & Online payments ===
+  const totalUpi = upiPayments.reduce((sum, p) => sum + p.amount, 0);
+  const totalOnline = onlinePayments.reduce((sum, p) => sum + p.amount, 0);
+
+  // Expected cash in hand = adjusted net - UPI - Online
+  const expectedCashInHand = netSalesWithTransactions - totalUpi - totalOnline;
+
   const handleVerify = () => {
     setIsVerified(true);
   };
 
-  const handleSubmitReport = () => {
-    // Calculate cash for the report
-    const totalOnlinePayments = onlinePayments.reduce(
-      (sum, payment) => sum + payment.amount,
+  const handleSubmitReport = async () => {
+    const totalUpi = upiPayments.reduce((sum, p) => sum + p.amount, 0);
+    const totalOnline = onlinePayments.reduce((sum, p) => sum + p.amount, 0);
+    const closingStockForReport = oldStock.map((item) => {
+      const soldQty = sales
+        .filter((s) => s.product === item.product_name)
+        .reduce((sum, s) => sum + s.quantity, 0);
+
+      const closingQty = Math.max(item.qty - soldQty, 0);
+
+      return {
+        product_id: item.product_id,
+        product_name: item.product_name,
+        openingQty: item.qty,
+        soldQty,
+        closingQty,
+      };
+    });
+
+    // Cash counted from denominations
+    const actualCashCounted = Object.entries(currencyDenominations).reduce(
+      (sum, [denom, count]) => sum + Number(denom) * count,
       0
     );
-    const cashReceived = netSales - upiReceived - totalOnlinePayments;
+
+    const cashMismatch = actualCashCounted - expectedCashInHand;
 
     const report = {
       date: selectedDate,
+      warehouseId: currentVehicle,
+      warehouseName:
+        WareHouses?.find((w) => w.id === currentVehicle)?.name ?? null,
+
       deliveryBoys: selectedDeliveryBoys,
-      // oldStock,
-      loads,
+
       sales,
-      expenses,
-      cashReceived,
-      upiReceived,
-      onlinePayments,
-      closingStock,
-      currencyDenominations,
-      netSales,
+      expenses: Expenses?.filter((v) => v.id) ?? [],
+
+      transactions: salesTransactions, // from TransactionsPage (received/paid)
+
+      totals: {
+        totalSales,
+        totalExpenses,
+        netSalesBase: netSales,
+        cashFromTransactionsReceived: totalCashReceivedTxn,
+        cashFromTransactionsPaid: totalCashPaidTxn,
+        netSalesWithTransactions,
+        totalUpi,
+        totalOnline,
+        expectedCashInHand,
+      },
+
+      payments: {
+        upiPayments,
+        onlinePayments,
+      },
+
+      closingStock: closingStockForReport,
+
+      cashChest: {
+        currencyDenominations,
+        actualCashCounted,
+        expectedCashInHand,
+        mismatch: cashMismatch,
+      },
     };
+    try {
+      await recordDelivery(report);
+    } catch (error) {}
     console.log("Report submitted:", report);
     alert("Report submitted successfully!");
   };
@@ -173,20 +277,98 @@ export default function Home() {
                   selectedDeliveryBoys={selectedDeliveryBoys}
                   onChange={setSelectedDeliveryBoys}
                 />
-                <OldStockSection vehicleId={currentVehicle} />
+                {/* <OldStockSection vehicleId={currentVehicle} /> */}
+                {/* <OldStockSection
+                  vehicleId={currentVehicle}
+                  onLoaded={setOldStock}
+                />
                 <SalesSection sales={sales} onChange={setSales} />
-                <TransactionSection sales={sales} onChange={setSales} />
-                <ExpensesSection expenses={expenses} onChange={setExpenses} />
+
+                <ClosingStockSection oldStock={oldStock} sales /> */}
+
+                <OldStockSection
+                  vehicleId={currentVehicle}
+                  onLoaded={setOldStock}
+                />
+                <SalesSection sales={sales as any} onChange={setSales as any} />
+                <ClosingStockSection oldStock={oldStock} sales={sales} />
+
+                <ExpensesSection
+                  expenses={Expenses as Expense[]}
+                  onSelectExpense={setSelectedExpenseId}
+                />
+                <TransactionsPage
+                  isSales={true}
+                  onSalesSubmit={handleSalesTransaction}
+                />
+                {/* Sales Transactions Display */}
+                {salesTransactions.length > 0 ? (
+                  <div className="space-y-3">
+                    {/* <h2 className="text-lg font-semibold tracking-tight">
+                      Sales Transactions
+                    </h2> */}
+                    <div className="flex gap-4 overflow-x-auto pb-2">
+                      {salesTransactions.map((transaction) => (
+                        <Card
+                          key={transaction.id}
+                          className="w-[230px] max-h-[180px] shrink-0 overflow-hidden relative"
+                        >
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute top-1 right-1 h-6 w-6 z-10"
+                            onClick={() =>
+                              handleDeleteTransaction(transaction.id)
+                            }
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                          <CardHeader className="p-2 bg-muted/50">
+                            <CardTitle className="text-sm truncate pr-6">
+                              {transaction.line_Item?.account_name || "N/A"}
+                            </CardTitle>
+                            <p className="text-xs text-muted-foreground">
+                              {transaction.line_Item?.source_form ||
+                                transaction.transactionType}
+                            </p>
+                          </CardHeader>
+                          <CardContent className="p-2">
+                            <p className="text-xs text-muted-foreground">
+                              Amount
+                            </p>
+                            <p className="text-lg font-semibold">
+                              {formatCurrency(
+                                transaction.line_Item?.amount_received ||
+                                  transaction.line_Item?.amount_paid ||
+                                  0
+                              )}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <Card className="p-6 text-center">
+                      <p className="text-muted-foreground text-sm">
+                        No Transaction added yet
+                      </p>
+                    </Card>
+                  </>
+                )}
                 <NetSalesSummarySection
                   totalSales={totalSales}
                   totalExpenses={totalExpenses}
-                  netSales={netSales}
-                  upiReceived={upiReceived}
+                  netSales={netSalesWithTransactions} // will define below
+                  upiPayments={upiPayments}
                   onlinePayments={onlinePayments}
-                  onUpiChange={setUpiReceived}
+                  onUpiPaymentsChange={setUpiPayments}
                   onOnlinePaymentsChange={setOnlinePayments}
+                  qrCodeIds={qrCodeIds}
+                  cashFromTransactionsReceived={totalCashReceivedTxn}
+                  cashFromTransactionsPaid={totalCashPaidTxn}
                 />
-
                 {/* Verification Dialog */}
                 <VerificationDialog
                   isOpen={true}
@@ -198,23 +380,33 @@ export default function Home() {
           </>
         ) : (
           <>
-            {/* Final Sections - Only after verification */}
-            <ClosingStockSection
-              closingStock={closingStock}
-              onChange={setClosingStock}
-            />
-            <CurrencyDenominationsSection
-              denominations={currencyDenominations}
-              onChange={setCurrencyDenominations}
-              netSales={netSales}
-            />
+            {/* Wrapper */}
+            <div className="relative">
+              {/* Back Arrow */}
+              <button
+                onClick={() => window.history.back()}
+                className="absolute left-0 top-0 p-2 rounded-full hover:bg-gray-100"
+                aria-label="Go back"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
 
-            <Button
-              onClick={handleSubmitReport}
-              className="w-full h-12 text-base"
-            >
-              Submit Report
-            </Button>
+              {/* Content */}
+              <div className="pt-10">
+                <CurrencyDenominationsSection
+                  denominations={currencyDenominations}
+                  onChange={setCurrencyDenominations}
+                  netSales={expectedCashInHand}
+                />
+
+                <Button
+                  onClick={handleSubmitReport}
+                  className="w-full h-12 text-base mt-4"
+                >
+                  Submit Report
+                </Button>
+              </div>
+            </div>
           </>
         )}
       </div>

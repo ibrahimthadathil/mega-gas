@@ -21,7 +21,7 @@ export default function SimpleCard({ icon: Icon, title, subtitle, amount, childr
       {amount && (
         <div className="bg-primary/10 rounded p-2">
           <p className="text-xs text-muted-foreground">Amount</p>
-          <p className="text-lg font-bold text-primary mt-1">{amount}</p>
+          <p className="text-lg font-bold text-primary mt-1">{amount||'no amount'}</p>
         </div>
       )}
       {children}

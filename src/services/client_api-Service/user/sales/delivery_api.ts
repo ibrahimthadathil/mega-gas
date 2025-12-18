@@ -17,3 +17,12 @@ export const GetAllDeliverableProducts = async ()=>{
    throw error 
   }
 }
+
+export const recordDelivery = async (data:any) => {
+  try {
+    const result = await axios.post('/api/user/delivery',data)
+    return result.data
+  } catch (error) {
+    throw error
+  }
+}

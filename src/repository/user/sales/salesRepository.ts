@@ -24,4 +24,12 @@ const getAllProductsOptions = async ()=>{
   }
 }
 
-export { getDeliveryPayloadByVehicle, getAllProductsOptions };
+const reportDailyDelivery = async () => {
+  try {
+    
+  } catch (error) {
+    throw error
+  }
+}
+
+export { getDeliveryPayloadByVehicle, getAllProductsOptions, reportDailyDelivery };

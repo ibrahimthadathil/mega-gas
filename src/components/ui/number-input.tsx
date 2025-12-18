@@ -11,7 +11,8 @@ interface NumberInputProps {
   min?: number
   max?: number
   step?: number
-  placeholder?: string
+  placeholder?: string,
+  // disabled:boolean
 }
 
 export default function NumberInput({

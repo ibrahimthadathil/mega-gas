@@ -1,4 +1,4 @@
-import { getAllProductsOptions } from "@/repository/user/sales/salesRepository"
+import { getAllProductsOptions, reportDailyDelivery } from "@/repository/user/sales/salesRepository"
 
 
 const getDeliverableProduct = async () => {
@@ -11,4 +11,12 @@ const getDeliverableProduct = async () => {
     }
 }
 
-export {getDeliverableProduct}
+const recordDelivery = async(data:any) =>{
+    try {
+        // await reportDailyDelivery()
+    } catch (error) {
+        throw error
+    }
+}
+
+export {getDeliverableProduct,recordDelivery}

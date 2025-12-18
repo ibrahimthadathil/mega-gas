@@ -1,268 +1,227 @@
-// "use client"
-
-// import { Card } from "@/components/ui/card"
-// import { Truck } from "lucide-react"
-// import SimpleCard from "@/components/ui/simple-card"
-
-// interface Load {
-//   id: string
-//   date: string
-//   vehicleNo: string
-//   product: string
-//   quantity: number
-// }
-
-// interface LoadSectionProps {
-//   loads: Load[]
-//   onChange: (loads: Load[]) => void
-// }
-
-// const dummyLoad: Load = {
-//   id: "dummy-1",
-//   date: "2025-01-15",
-//   vehicleNo: "MH-12-AB-1234",
-//   product: "LPG 14.2kg",
-//   quantity: 50,
-// }
-
-// export default function LoadSection({ loads, }: LoadSectionProps) {
-//   const displayLoads = loads.length === 0 ? [dummyLoad] : loads
-
-//   return (
-//     <div className="space-y-3">
-//       <h2 className="text-lg font-semibold text-foreground">Load (Auto Fetched)</h2>
-//       <div className="overflow-x-auto pb-2">
-//         <div className="flex gap-3">
-//           {displayLoads.map((load) => (
-//             <Card key={load.id} className="p-4 min-w-max w-64">
-//               <SimpleCard icon={Truck} title={load.product} subtitle={load.vehicleNo} amount={`${load.quantity} units`}>
-//                 <div className="border-t pt-2">
-//                   <p className="text-xs text-muted-foreground">Date</p>
-//                   <p className="text-sm font-medium text-foreground">{load.date}</p>
-//                 </div>
-//               </SimpleCard>
-//             </Card>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
-
-
 "use client"
 
 import { useState } from "react"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Plus, Trash2 } from "lucide-react"
-import NumberInput from "@/components/ui/number-input"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { TransactionForm } from "@/components/accounts/transaction-form"
+import { Plus } from "lucide-react"
+import { createNewLineItem } from "@/services/client_api-Service/user/accounts/accounts_api"
+import { toast } from "sonner"
 
-interface Sale {
-  id: string
-  product: string
-  rate: number
-  quantity: number
-  deliveryFeeIncluded: boolean
-  deliveryCharge?: number
+/* ================= TYPES ================= */
+
+type LineItem = {
+  date: string
+  account_name: string
+  account_id: string
+  amount_received: number
+  amount_paid: number
+  source_form: string
+  source_form_reference_id: string | null
+  created_by: string
+  created_at: string
 }
 
-interface SalesSectionProps {
-  sales: Sale[]
-  onChange: (sales: Sale[]) => void
+type CashChest = {
+  note_500: number
+  note_200: number
+  note_100: number
+  note_50: number
+  note_20: number
+  note_10: number
+  coin_5: number
+  source_reference_type: string
+  created_by: string
+  created_at: string
 }
 
-const products = ["5kg Cylinder", "10kg Cylinder", "15kg Cylinder", "19kg Cylinder"]
-const rates: Record<string, number> = {
-  "5kg Cylinder": 400,
-  "10kg Cylinder": 750,
-  "15kg Cylinder": 1100,
-  "19kg Cylinder": 1350,
+type Transaction = {
+  line_Item: LineItem
+  cash_chest: CashChest
 }
 
-const DELIVERY_ADDON = 31.5
+/* ===== NEW: COMPONENT PROPS (LOGIC ONLY) ===== */
 
-export default function TransactionSection({ sales, onChange }: SalesSectionProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [formData, setFormData] = useState({
-    product: "",
-    rate: 0,
-    quantity: 0,
-    deliveryFeeIncluded: false,
-    deliveryCharge: DELIVERY_ADDON,
-  })
+type TransactionsPageProps = {
+  isSales?: boolean
+  onSalesSubmit?: (transaction: any) => void
+}
 
-  const handleProductChange = (product: string) => {
-    setFormData({
-      ...formData,
-      product,
-      rate: rates[product] || 0,
-    })
-  }
+/* ================= COMPONENT ================= */
 
-  const handleAdd = () => {
-    if (formData.product && formData.rate && formData.quantity > 0) {
-      const newSale: Sale = {
-        id: Date.now().toString(),
-        product: formData.product,
-        rate: formData.rate,
-        quantity: formData.quantity,
-        deliveryFeeIncluded: formData.deliveryFeeIncluded,
-        deliveryCharge: formData.deliveryCharge,
-      }
-      onChange([...sales, newSale])
-      setFormData({
-        product: "",
-        rate: 0,
-        quantity: 0,
-        deliveryFeeIncluded: false,
-        deliveryCharge: DELIVERY_ADDON,
-      })
-      setIsOpen(false)
+export default function TransactionsPage({
+  isSales = false,
+  onSalesSubmit,
+}: TransactionsPageProps) {
+  const [openReceived, setOpenReceived] = useState(false)
+  const [openPaid, setOpenPaid] = useState(false)
+
+  const [transactions, setTransactions] = useState<Transaction[]>([
+    {
+      line_Item: {
+        date: "2025-01-14",
+        account_name: "Musthafakka",
+        account_id: "6d1b9d9e-5556-40c4-a0ea-f6e9ef6423ac",
+        amount_received: 0,
+        amount_paid: 8500,
+        source_form: "Expence",
+        source_form_reference_id: null,
+        created_by: "5ba724f3-e625-4b82-912c-5f7a080263c9",
+        created_at: "2025-01-14T13:20:00Z",
+      },
+      cash_chest: {
+        note_500: 15,
+        note_200: 65,
+        note_100: 75,
+        note_50: 25,
+        note_20: 65,
+        note_10: 45,
+        coin_5: 6,
+        source_reference_type: "payments-receipts",
+        created_by: "5ba724f3-e625-4b82-912c-5f7a080263c9",
+        created_at: "2025-01-14T13:20:00Z",
+      },
+    },
+  ])
+
+  /* ===== UPDATED LOGIC (NO STYLE CHANGE) ===== */
+
+  const handleAddTransaction = async (
+    transaction: any,
+    type: "received" | "paid"
+  ) => {
+    try {
+      // 🟢 SALES MODE → PASS DATA TO PARENT
+      if (isSales) {
+        onSalesSubmit?.({
+          line_Item:{...transaction.line_Item},
+          transactionType: type,
+        })
+
+        type === "received"
+          ? setOpenReceived(false)
+          : setOpenPaid(false)
+
+        return
+      }else await createNewLineItem(transaction)       
+
+      type === "received"
+        ? setOpenReceived(false)
+        : setOpenPaid(false)
+
+    } catch (error) {
+      toast.error("Transaction failed")
     }
   }
 
-  const handleDelete = (id: string) => {
-    onChange(sales.filter((sale) => sale.id !== id))
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 0,
+    }).format(amount)
   }
 
-  const calculateSaleTotal = (sale: Sale) => {
-    const baseAmount = sale.rate * sale.quantity
-    const deliveryAmount = sale.deliveryFeeIncluded ? (sale.deliveryCharge || 0) * sale.quantity : 0
-    return baseAmount + deliveryAmount
-  }
-
-  const groupedSales = products
-    .map((product) => {
-      const items = sales.filter((s) => s.product === product)
-      return {
-        product,
-        items,
-        totalQty: items.reduce((sum, s) => sum + s.quantity, 0),
-        totalPrice: items.reduce((sum, s) => sum + calculateSaleTotal(s), 0),
-      }
-    })
-    .filter((group) => group.items.length > 0)
-
-  const previewTotal = formData.rate * formData.quantity
-  const deliveryAddition = formData.deliveryFeeIncluded ? formData.deliveryCharge * formData.quantity : 0
-  const previewGrandTotal = previewTotal + deliveryAddition
+  /* ================= JSX ================= */
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground">Transaction</h2>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" variant="outline" className="gap-1 bg-transparent">
-              <Plus className="h-4 w-4" />
-              Add
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add Sale</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Product</label>
-                <Select value={formData.product} onValueChange={handleProductChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select product" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {products.map((product) => (
-                      <SelectItem key={product} value={product}>
-                        {product}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Rate (₹)</label>
-                <div className="p-3 bg-muted rounded text-sm font-medium">{formData.rate || "Select a product"}</div>
-              </div>
-              <div>
-                <label className="text-sm font-medium">Quantity</label>
-                <NumberInput
-                  value={formData.quantity}
-                  onChange={(value) => setFormData({ ...formData, quantity: value })}
-                  min={0}
-                  placeholder="0"
-                />
-              </div>
-              <div className="space-y-2 p-3 bg-muted rounded">
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id="delivery-fee"
-                    checked={formData.deliveryFeeIncluded}
-                    onCheckedChange={(checked) => setFormData({ ...formData, deliveryFeeIncluded: checked as boolean })}
-                  />
-                  <label htmlFor="delivery-fee" className="text-sm font-medium cursor-pointer">
-                    Delivery Fee Included (₹{DELIVERY_ADDON} add on)
-                  </label>
-                </div>
-                {formData.deliveryFeeIncluded && (
-                  <div>
-                    <label className="text-xs text-muted-foreground">Delivery Charge per Unit</label>
-                    <NumberInput
-                      value={formData.deliveryCharge}
-                      onChange={(value) => setFormData({ ...formData, deliveryCharge: value })}
-                      min={0}
-                      placeholder={DELIVERY_ADDON.toString()}
-                    />
-                  </div>
-                )}
-              </div>
-              <div className="p-3 bg-primary/10 rounded">
-                <p className="text-xs text-muted-foreground">Total</p>
-                <p className="text-2xl font-bold text-primary mt-1">₹{previewGrandTotal.toLocaleString()}</p>
-              </div>
-              <Button onClick={handleAdd} className="w-full">
-                Add Sale
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+    <div className="bg-background ">
+      <div className="mx-auto max-w-7xl">
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between">
+          <h1 className="text-lg font-semibold tracking-tight">
+            Transactions
+          </h1>
 
-      {groupedSales.length === 0 ? (
-        <Card className="p-6 text-center">
-          <p className="text-muted-foreground text-sm">No sales added yet</p>
-        </Card>
-      ) : (
-        <div className="space-y-2">
-          {groupedSales.map((group) => (
-            <Card key={group.product} className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <p className="text-sm font-medium text-foreground">{group.product}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Qty: {group.totalQty}</p>
-                </div>
-                <p className="text-xl font-bold text-primary">₹{group.totalPrice.toLocaleString()}</p>
-              </div>
-              <div className="space-y-1 border-t pt-3">
-                {group.items.map((sale) => (
-                  <div key={sale.id} className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">
-                      {sale.quantity}x ₹{sale.rate}{" "}
-                      {sale.deliveryFeeIncluded && `(+₹${sale.deliveryCharge}x${sale.quantity} delivery)`}
-                    </span>
-                    <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={() => handleDelete(sale.id)}>
-                      <Trash2 className="h-3 w-3 text-destructive" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
+          <div className="flex gap-3">
+            {/* Cash Received */}
+            <Dialog open={openReceived} onOpenChange={setOpenReceived}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-2 h-3 w-3" />
+                  Cash Received
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[50vh] max-w-2xl overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Add Cash Received</DialogTitle>
+                </DialogHeader>
+                <TransactionForm
+                isSales={isSales}
+                  transactionType="received"
+                  onSubmit={(transaction) =>
+                    handleAddTransaction(transaction, "received")
+                  }
+                />
+              </DialogContent>
+            </Dialog>
+
+            {/* Cash Paid */}
+            <Dialog open={openPaid} onOpenChange={setOpenPaid}>
+              <DialogTrigger asChild>
+                <Button variant="destructive">
+                  <Plus className="mr-2 h-3 w-3" />
+                  Cash Paid
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Add Cash Paid</DialogTitle>
+                </DialogHeader>
+                <TransactionForm
+                  transactionType="paid"
+                  onSubmit={(transaction) =>
+                    handleAddTransaction(transaction, "paid")
+                  }
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+
+        {/* Transaction Cards */}
+        {!isSales&&<div className="flex gap-4 overflow-x-auto pb-2">
+          {transactions.map((transaction, index) => (
+            <Card
+              key={index}
+              className="w-[230px] max-h-[180px] shrink-0 overflow-hidden"
+            >
+              <CardHeader className="p-2 bg-muted/50">
+                <CardTitle className="text-sm truncate">
+                  {transaction.line_Item.account_name}
+                </CardTitle>
+                <p className="text-xs text-muted-foreground">
+                  {transaction.line_Item.source_form}
+                </p>
+              </CardHeader>
+
+              <CardContent className="p-2">
+                <p className="text-xs text-muted-foreground">
+                  Amount
+                </p>
+                <p className="text-lg font-semibold">
+                  {formatCurrency(
+                    transaction.line_Item.amount_received ||
+                      transaction.line_Item.amount_paid
+                  )}
+                </p>
+              </CardContent>
             </Card>
           ))}
-        </div>
-      )}
+        </div>}
+      </div>
     </div>
   )
 }
