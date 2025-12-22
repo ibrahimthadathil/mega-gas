@@ -92,6 +92,7 @@ export default function OldStockSection({
     "oldstock",
     () => getOldStock(vehicleId)
   );
+console.log('999999',oldStock);
 
   useEffect(() => {
     queryClient.invalidateQueries({ queryKey: ["oldstock"] });

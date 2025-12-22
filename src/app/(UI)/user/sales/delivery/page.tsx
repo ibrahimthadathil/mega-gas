@@ -75,6 +75,8 @@ export default function Home() {
       deliveryCharge?: number;
     }>
   >([]);
+  const [chestName, setChestName] = useState<"office" | "godown" | "">("");
+
   // near other state hooks
   const [oldStock, setOldStock] = useState<
     { product_id: string; product_name: string; qty: number }[]
@@ -218,6 +220,7 @@ export default function Home() {
       closingStock: closingStockForReport,
 
       cashChest: {
+        chestName,
         currencyDenominations,
         actualCashCounted,
         expectedCashInHand,
@@ -277,14 +280,6 @@ export default function Home() {
                   selectedDeliveryBoys={selectedDeliveryBoys}
                   onChange={setSelectedDeliveryBoys}
                 />
-                {/* <OldStockSection vehicleId={currentVehicle} /> */}
-                {/* <OldStockSection
-                  vehicleId={currentVehicle}
-                  onLoaded={setOldStock}
-                />
-                <SalesSection sales={sales} onChange={setSales} />
-
-                <ClosingStockSection oldStock={oldStock} sales /> */}
 
                 <OldStockSection
                   vehicleId={currentVehicle}
@@ -384,7 +379,7 @@ export default function Home() {
             <div className="relative">
               {/* Back Arrow */}
               <button
-                onClick={() => window.history.back()}
+                onClick={() => setIsVerified(false)}
                 className="absolute left-0 top-0 p-2 rounded-full hover:bg-gray-100"
                 aria-label="Go back"
               >
@@ -393,6 +388,28 @@ export default function Home() {
 
               {/* Content */}
               <div className="pt-10">
+                <div className="space-y-2">
+                  <Label htmlFor="chestName" className="text-md font-medium">
+                    Chest Name
+                  </Label>
+
+                  <Select
+                    value={chestName}
+                    onValueChange={(value) =>
+                      setChestName(value as "office" | "godown")
+                    }
+                  >
+                    <SelectTrigger id="chestName">
+                      <SelectValue placeholder="Select chest name" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectItem value="office">Office</SelectItem>
+                      <SelectItem value="godown">Godown</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <CurrencyDenominationsSection
                   denominations={currencyDenominations}
                   onChange={setCurrencyDenominations}

@@ -210,11 +210,13 @@ export default function ProductDetailsForm({
               control={control}
               render={({ field }) => {
                 const availableTags = [
-                  "electronics",
-                  "furniture",
-                  "clothing",
-                  "food",
-                  "books",
+                  "admin",
+                  "manager",
+                  "accountant",
+                  "driver",
+                  "godown_keeper",
+                  "office_staff",
+                  "plan_driver"
                 ];
                 return (
                   <div className="border rounded-md p-4">

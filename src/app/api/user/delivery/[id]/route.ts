@@ -6,7 +6,6 @@ export const GET = async(req:NextRequest,{params}:{params:{id:string}})=>{
     try {
       
         const {id} = await params
-        console.log(id,'2222');
        const data = await getDeliveryPayloadByVehicle(id)
        if(!data) throw new Error('')
        return NextResponse.json({data},{status:STATUS.SUCCESS.code})
