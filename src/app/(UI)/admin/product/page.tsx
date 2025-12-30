@@ -30,9 +30,9 @@ export default function ProductListPage() {
       .map((product) => ({ id: product.id, name: product.product_name }));
   }, [data]);
   const handleEdit = (product: IProduct) => {
-    queryClient.setQueryData(["product", product.product_code], product.id);
+    queryClient.setQueryData(["product", product.id], product.id);
     queryClient.setQueryData(["composite", "composite"], compositeProduct);
-    router.push(`/admin/product/edit/${product.product_code}`);
+    router.push(`/admin/product/edit/${product.id}`);
   };
   return (
     <main className="min-h-screen bg-background p-6">

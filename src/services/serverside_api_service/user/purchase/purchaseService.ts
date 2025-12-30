@@ -1,6 +1,6 @@
 import {
   addPurchaseRegister,
-  getMaterializedProduct,
+  getProductForPurchase,
   getPurchaseRegister,
 } from "@/repository/user/purchase/purchaseRepository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
@@ -57,7 +57,8 @@ const addPurchase_Register = async (
 const getPlantLoadCredential = async () => {
   try {
     const warehouse = await gettAllWareHouses();
-    const products = await getMaterializedProduct();
+    const products = await getProductForPurchase();
+    
     if (warehouse && products) return { success: true, warehouse, products };
     else return { success: false };
   } catch (error) {

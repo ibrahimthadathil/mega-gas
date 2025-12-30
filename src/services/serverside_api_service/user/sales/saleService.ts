@@ -1,8 +1,14 @@
+import { getExpensesByStatus } from "@/repository/user/expenses/expenseRepository";
 import {
   getAllProductsOptions,
+  getDeliveryPayloadByVehicle,
+  getGSTCustomer,
   reportDailyDelivery,
 } from "@/repository/user/sales/salesRepository";
-import { checkUserByAuthId } from "@/repository/user/userRepository";
+import {
+  checkUserByAuthId,
+  getUserByRole,
+} from "@/repository/user/userRepository";
 import { STATUS } from "@/types/types";
 
 const getDeliverableProduct = async () => {
@@ -15,43 +21,70 @@ const getDeliverableProduct = async () => {
   }
 };
 
+const getDeliveryPayload = async (vehicleId: string, authId: string) => {
+  try {
+    const user = await checkUserByAuthId(authId);
+    if (user) {
+      const [drivers, currentStock, expenses, products,customers] = await Promise.all([
+        getUserByRole("driver"),
+        getDeliveryPayloadByVehicle(vehicleId),
+        getExpensesByStatus(user.id),
+        getAllProductsOptions(),
+        getGSTCustomer()
+      ]);
+      return {
+        success: true,
+        data: {
+          drivers: drivers ?? [],
+          currentStock: currentStock ?? [],
+          expenses,
+          products,
+          customers
+        },
+      };
+    } else throw new Error(STATUS.FORBIDDEN.message);
+  } catch (error) {
+    throw error;
+  }
+};
+
 const recordDelivery = async (data: any, authId: string) => {
   try {
     const checkUser = await checkUserByAuthId(authId);
-    if(checkUser){
+    if (checkUser) {
       const payload = {
         "From Warehouse id": data.warehouseId,
         Date: data.date,
         "Delivery boys": data.deliveryBoys,
         "Created by": checkUser.id,
         "Created at": data.date,
-  
+
         "Total sales amount": data.totals.totalSales,
-  
+
         "Total expenses amount": data.totals.totalExpenses,
-  
+
         "Total transactions amount":
           data.totals.cashFromTransactionsReceived -
           data.totals.cashFromTransactionsPaid,
-  
+
         "Total upi amount": data.totals.totalUpi,
-  
+
         "Total online amount": data.totals.totalOnline,
-  
+
         "Total Cash amount": data.cashChest.actualCashCounted,
-  
+
         "Opening stock": data.closingStock.map((item: any) => ({
           "product name": item.product_name,
           qty: item.openingQty,
           "product id": item.product_id,
         })),
-  
+
         "Closing stock": data.closingStock.map((item: any) => ({
           "product name": item.product_name,
           qty: item.closingQty,
           "product id": item.product_id,
         })),
-  
+
         Sales: data.sales.map((sale: any) => ({
           "product id": sale.productId,
           "is composite": false,
@@ -59,26 +92,26 @@ const recordDelivery = async (data: any, authId: string) => {
           rate: sale.rate,
           "customer id": null,
         })),
-  
+
         Transaction: data.transactions.map((tx: any) => ({
           "account id": tx.account_id,
           "amount paid": tx.amount_paid ?? 0,
           "amount received": tx.amount_received,
           remark: tx.remarks ?? "",
         })),
-  
+
         Expenses: data.expenses.map((exp: { id: string }) => exp.id),
-  
+
         "UPI payments": data.payments.upiPayments.map((upi: any) => ({
           "UPI Id": upi.consumerName,
           amount: upi.amount,
         })),
-  
+
         "Online payments": data.payments.onlinePayments.map((online: any) => ({
           "consumer no": online.consumerName,
           amount: online.amount,
         })),
-  
+
         "Cash chest": {
           ...data.cashChest.currencyDenominations,
           status: "submitted",
@@ -88,11 +121,10 @@ const recordDelivery = async (data: any, authId: string) => {
       const result = await reportDailyDelivery(payload);
       if (result) return { success: true };
       else throw new Error("Failed to add slip");
-    }else throw new Error(STATUS.FORBIDDEN.message)
-
+    } else throw new Error(STATUS.FORBIDDEN.message);
   } catch (error) {
     throw error;
   }
 };
 
-export { getDeliverableProduct, recordDelivery };
+export { getDeliverableProduct, recordDelivery, getDeliveryPayload };

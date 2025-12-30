@@ -1,9 +1,9 @@
 import axios from "axios";
 
-export const getOldStock = async (id: string) => {
+export const getVehiclePayload = async (id: string) => {
   try {
     const result = await axios.get(`/api/user/delivery/${id}`);
-    return result.data;
+    return result.data.data;
   } catch (error) {
     throw error;
   }

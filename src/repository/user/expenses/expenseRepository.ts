@@ -24,6 +24,20 @@ const add_Expense = async (datas: Expense) => {
   }
 };
 
+const getExpensesByStatus = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("expenses")
+      .select("*")
+      .eq("created_by", userId)
+      .eq("status", false);
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const getAllExpenses = async (userId: string) => {
   try {
     const { data, error } = await supabase
@@ -38,17 +52,19 @@ const getAllExpenses = async (userId: string) => {
   }
 };
 
-const delete_Expense = async (expenseId:string)=>{
+const delete_Expense = async (expenseId: string) => {
   try {
-    const {error} = await supabase.from('expenses').delete().eq('id',expenseId)
-    if(error) throw error
-    return true
+    const { error } = await supabase
+      .from("expenses")
+      .delete()
+      .eq("id", expenseId);
+    if (error) throw error;
+    return true;
   } catch (error) {
-        console.log((error as Error).message);
+    console.log((error as Error).message);
 
-    throw error
+    throw error;
   }
-}
+};
 
-
-export { add_Expense, getAllExpenses, delete_Expense };
+export { add_Expense, getAllExpenses, delete_Expense, getExpensesByStatus };

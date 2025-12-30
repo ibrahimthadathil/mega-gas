@@ -4,7 +4,6 @@ import { useState } from "react";
 import { DatePicker } from "@/components/ui/date-picker";
 import DeliveryPartnerSection from "@/app/(UI)/user/sales/_section/delivery-partner-section";
 import OldStockSection from "@/app/(UI)/user/sales/_section/old-stock-section";
-import TransactionSection from "@/app/(UI)/user/sales/_section/transaction-section";
 import SalesSection from "@/app/(UI)/user/sales/_section/sales-section";
 import ExpensesSection from "@/app/(UI)/user/sales/_section/expenses-section";
 import NetSalesSummarySection from "@/app/(UI)/user/sales/_section/net-sales-summary-section";
@@ -28,53 +27,53 @@ import TransactionsPage from "@/app/(UI)/user/sales/_section/transaction-section
 import { Expense } from "@/types/types";
 import { get_expenses } from "@/services/client_api-Service/user/user_api";
 import { ArrowLeft, Trash2 } from "lucide-react";
-import { recordDelivery } from "@/services/client_api-Service/user/sales/delivery_api";
+import {
+  getVehiclePayload,
+  recordDelivery,
+} from "@/services/client_api-Service/user/sales/delivery_api";
 
 interface DeliveryBoy {
   id: string;
-  name: string;
+  user_name: string;
 }
 
 export default function Home() {
+  const [currentVehicle, SetCurrentVehicle] = useState("");
   const { data: WareHouses, isLoading: wareHouseLoading } = UseRQ<Warehouse[]>(
     "warehouse",
     getWarehouse
   );
-  const { data: Expenses, isLoading: expenseLoading } = UseRQ<Expense[]>(
-    "expenses",
-    get_expenses
+  const { data: payload, isLoading: payloadLoading } = UseRQ<any>(
+    "payload",
+    () => getVehiclePayload(currentVehicle),
+    {
+      enabled: !!currentVehicle,
+    }
   );
-  console.log("3333", Expenses);
 
-  const [currentVehicle, SetCurrentVehicle] = useState("");
+  console.log('eee',payload);
+
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [selectedDeliveryBoys, setSelectedDeliveryBoys] = useState<
-    DeliveryBoy[]
-  >([]);
-  // add near other state hooks
-  const [selectedExpenseId, setSelectedExpenseId] = useState<string | null>(
-    null
-  );
+  const [selectedDeliveryBoys, setSelectedDeliveryBoys] = useState<string[]|null>();
   const [salesTransactions, setSalesTransactions] = useState<any[]>([]);
-  const [loads, setLoads] = useState<
-    Array<{
-      id: string;
-      date: string;
-      vehicleNo: string;
-      product: string;
-      quantity: number;
-    }>
-  >([]);
-  const [sales, setSales] = useState<
-    Array<{
-      id: string;
-      product: string;
-      rate: number;
-      quantity: number;
-      deliveryFeeIncluded: boolean;
-      deliveryCharge?: number;
-    }>
-  >([]);
+
+  // Updated sales state to match SalesSection interface
+  interface Sale {
+    id: string;
+    productId: string;
+    productName: string;
+    rate: number;
+    quantity: number;
+    isComposite: boolean;
+    customerId?: string;
+    components?: Array<{
+      qty: number;
+      sale_price: number;
+      child_product_id: string;
+    }> | null;
+  }
+
+  const [sales, setSales] = useState<Sale[]>([]);
   const [chestName, setChestName] = useState<"office" | "godown" | "">("");
 
   // near other state hooks
@@ -124,15 +123,12 @@ export default function Home() {
     SetCurrentVehicle(id);
   };
 
+  // Updated totalSales calculation to match new structure
   const totalSales = sales.reduce((sum, sale) => {
-    const baseAmount = sale.rate * sale.quantity;
-    const deliveryAmount = sale.deliveryFeeIncluded
-      ? (sale.deliveryCharge || 0) * sale.quantity
-      : 0;
-    return sum + baseAmount + deliveryAmount;
+    return sum + sale.rate * sale.quantity;
   }, 0);
-  const totalExpenses = Expenses?.reduce(
-    (sum, expense) => sum + expense.amount,
+  const totalExpenses = payload?.expenses?.reduce(
+    (sum:number, expense:any) => sum + expense.amount,
     0
   );
   const netSales = Number(totalSales || 0) - Number(totalExpenses || 0);
@@ -165,7 +161,7 @@ export default function Home() {
     const totalOnline = onlinePayments.reduce((sum, p) => sum + p.amount, 0);
     const closingStockForReport = oldStock.map((item) => {
       const soldQty = sales
-        .filter((s) => s.product === item.product_name)
+        .filter((s) => s.productId === item.product_id)
         .reduce((sum, s) => sum + s.quantity, 0);
 
       const closingQty = Math.max(item.qty - soldQty, 0);
@@ -187,19 +183,35 @@ export default function Home() {
 
     const cashMismatch = actualCashCounted - expectedCashInHand;
 
+    // Format sales for submission - matches your required format
+    const formattedSales = sales.map((sale) => {
+      const baseSale: any = {
+        "product id": sale.productId,
+        "is composite": sale.isComposite,
+        "sale qty": sale.quantity,
+        rate: sale.rate,
+        // Add customer id if available
+        // "customer id": customerId || null,
+      };
+
+      if (sale.isComposite && sale.components && sale.components.length > 0) {
+        baseSale["json components"] = sale.components.map((comp) => ({
+          "composite product id": comp.child_product_id,
+          "component qty": comp.qty,
+          "component sale price": comp.sale_price,
+        }));
+      }
+
+      return baseSale;
+    });
+
     const report = {
       date: selectedDate,
       warehouseId: currentVehicle,
-      warehouseName:
-        WareHouses?.find((w) => w.id === currentVehicle)?.name ?? null,
-
       deliveryBoys: selectedDeliveryBoys,
-
-      sales,
-      expenses: Expenses?.filter((v) => v.id) ?? [],
-
-      transactions: salesTransactions, // from TransactionsPage (received/paid)
-
+      sales: formattedSales, // Use formatted sales
+      expenses: payload?.expenses?.filter((v: Expense) => v.id) ?? [],
+      transactions: {},
       totals: {
         totalSales,
         totalExpenses,
@@ -211,14 +223,11 @@ export default function Home() {
         totalOnline,
         expectedCashInHand,
       },
-
       payments: {
         upiPayments,
         onlinePayments,
       },
-
       closingStock: closingStockForReport,
-
       cashChest: {
         chestName,
         currencyDenominations,
@@ -229,7 +238,9 @@ export default function Home() {
     };
     try {
       await recordDelivery(report);
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error submitting report:", error);
+    }
     console.log("Report submitted:", report);
     alert("Report submitted successfully!");
   };
@@ -265,112 +276,126 @@ export default function Home() {
                 </SelectContent>
               </Select>
             </div>
-            {!currentVehicle ? (
+            {!currentVehicle && !payload ? (
               <div className="self-center">Select your vehicle</div>
+            ) : payloadLoading ? (
+              <div>
+                <p className="text-red-500">{"losdfdf"}</p>
+              </div>
             ) : (
-              <>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Select Date</label>
-                  <DatePicker
-                    date={selectedDate}
-                    onDateChange={setSelectedDate}
+              payload && (
+                <>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Select Date</label>
+                    <DatePicker
+                      date={selectedDate}
+                      onDateChange={setSelectedDate}
+                    />
+                  </div>
+                  <DeliveryPartnerSection
+                    deliveryBoys={payload?.drivers as DeliveryBoy[]}
+                    selectedDeliveryBoys={selectedDeliveryBoys as string[]}
+                    onChange={setSelectedDeliveryBoys}
                   />
-                </div>
-                <DeliveryPartnerSection
-                  selectedDeliveryBoys={selectedDeliveryBoys}
-                  onChange={setSelectedDeliveryBoys}
-                />
 
-                <OldStockSection
-                  vehicleId={currentVehicle}
-                  onLoaded={setOldStock}
+                  <OldStockSection
+                  loading={payloadLoading}
+                  openingStock={payload?.currentStock}
                 />
-                <SalesSection sales={sales as any} onChange={setSales as any} />
-                <ClosingStockSection oldStock={oldStock} sales={sales} />
+                  <SalesSection
+                    products={payload?.products || []}
+                    sales={sales}
+                    customers={payload?.customers}
+                    onChange={setSales}
+                  />
+                  <ClosingStockSection 
+                    oldStock={payload?.currentStock} 
+                    sales={sales}
+                  />
 
-                <ExpensesSection
-                  expenses={Expenses as Expense[]}
-                  onSelectExpense={setSelectedExpenseId}
-                />
-                <TransactionsPage
-                  isSales={true}
-                  onSalesSubmit={handleSalesTransaction}
-                />
-                {/* Sales Transactions Display */}
-                {salesTransactions.length > 0 ? (
-                  <div className="space-y-3">
-                    {/* <h2 className="text-lg font-semibold tracking-tight">
+                  <ExpensesSection
+                    expenses={payload?.expenses as Expense[]}
+                  />
+                  <TransactionsPage
+                    isSales={true}
+                    onSalesSubmit={handleSalesTransaction}
+                  />
+                  {/* Sales Transactions Display */}
+                  {salesTransactions.length > 0 ? (
+                    <div className="space-y-3">
+                      {/* <h2 className="text-lg font-semibold tracking-tight">
                       Sales Transactions
                     </h2> */}
-                    <div className="flex gap-4 overflow-x-auto pb-2">
-                      {salesTransactions.map((transaction) => (
-                        <Card
-                          key={transaction.id}
-                          className="w-[230px] max-h-[180px] shrink-0 overflow-hidden relative"
-                        >
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute top-1 right-1 h-6 w-6 z-10"
-                            onClick={() =>
-                              handleDeleteTransaction(transaction.id)
-                            }
+                      <div className="flex gap-4 overflow-x-auto pb-2">
+                        {salesTransactions.map((transaction) => (
+                          <Card
+                            key={transaction.id}
+                            className="w-[230px] max-h-[180px] shrink-0 overflow-hidden relative"
                           >
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                          <CardHeader className="p-2 bg-muted/50">
-                            <CardTitle className="text-sm truncate pr-6">
-                              {transaction.line_Item?.account_name || "N/A"}
-                            </CardTitle>
-                            <p className="text-xs text-muted-foreground">
-                              {transaction.line_Item?.source_form ||
-                                transaction.transactionType}
-                            </p>
-                          </CardHeader>
-                          <CardContent className="p-2">
-                            <p className="text-xs text-muted-foreground">
-                              Amount
-                            </p>
-                            <p className="text-lg font-semibold">
-                              {formatCurrency(
-                                transaction.line_Item?.amount_received ||
-                                  transaction.line_Item?.amount_paid ||
-                                  0
-                              )}
-                            </p>
-                          </CardContent>
-                        </Card>
-                      ))}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="absolute top-1 right-1 h-6 w-6 z-10"
+                              onClick={() =>
+                                handleDeleteTransaction(transaction.id)
+                              }
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                            <CardHeader className="p-2 bg-muted/50">
+                              <CardTitle className="text-sm truncate pr-6">
+                                {transaction.line_Item?.account_name || "N/A"}
+                              </CardTitle>
+                              <p className="text-xs text-muted-foreground">
+                                {transaction.line_Item?.source_form ||
+                                  transaction.transactionType}
+                              </p>
+                            </CardHeader>
+                            <CardContent className="p-2">
+                              <p className="text-xs text-muted-foreground">
+                                Amount
+                              </p>
+                              <p className="text-lg font-semibold">
+                                {formatCurrency(
+                                  transaction.line_Item?.amount_received ||
+                                    transaction.line_Item?.amount_paid ||
+                                    0
+                                )}
+                              </p>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <>
-                    <Card className="p-6 text-center">
-                      <p className="text-muted-foreground text-sm">
-                        No Transaction added yet
-                      </p>
-                    </Card>
-                  </>
-                )}
-                <NetSalesSummarySection
-                  totalSales={totalSales}
-                  totalExpenses={totalExpenses}
-                  netSales={netSalesWithTransactions} // will define below
-                  upiPayments={upiPayments}
-                  onlinePayments={onlinePayments}
-                  onUpiPaymentsChange={setUpiPayments}
-                  onOnlinePaymentsChange={setOnlinePayments}
-                  qrCodeIds={qrCodeIds}
-                  cashFromTransactionsReceived={totalCashReceivedTxn}
-                  cashFromTransactionsPaid={totalCashPaidTxn}
-                />
-                {/* Verification Dialog */}
-                <VerificationDialog
-                  isOpen={true}
-                  onVerify={handleVerify}
-                  onCancel={() => {}}
-                />
-              </>
+                  ) : (
+                    <>
+                      <Card className="p-6 text-center">
+                        <p className="text-muted-foreground text-sm">
+                          No Transaction added yet
+                        </p>
+                      </Card>
+                    </>
+                  )}
+                  <NetSalesSummarySection
+                    totalSales={totalSales}
+                    totalExpenses={totalExpenses}
+                    netSales={netSalesWithTransactions} // will define below
+                    upiPayments={upiPayments}
+                    onlinePayments={onlinePayments}
+                    onUpiPaymentsChange={setUpiPayments}
+                    onOnlinePaymentsChange={setOnlinePayments}
+                    qrCodeIds={qrCodeIds}
+                    cashFromTransactionsReceived={totalCashReceivedTxn}
+                    cashFromTransactionsPaid={totalCashPaidTxn}
+                  />
+                  {/* Verification Dialog */}
+                  <VerificationDialog
+                    isOpen={true}
+                    onVerify={handleVerify}
+                    onCancel={() => {}}
+                  />
+                </>
+              )
             )}
           </>
         ) : (

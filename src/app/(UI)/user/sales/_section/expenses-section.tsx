@@ -7,12 +7,10 @@ import { Expense } from "@/types/types";
 
 interface ExpensesSectionProps {
   expenses: Expense[];
-  onSelectExpense: (id: string) => void;
 }
 
 export default function ExpensesSection({
   expenses,
-  onSelectExpense,
 }: ExpensesSectionProps) {
   return (
     <div className="space-y-3">
