@@ -67,34 +67,7 @@ export default function TransactionsPage({
 }: TransactionsPageProps) {
   const [openReceived, setOpenReceived] = useState(false)
   const [openPaid, setOpenPaid] = useState(false)
-
-  const [transactions, setTransactions] = useState<Transaction[]>([
-    {
-      line_Item: {
-        date: "2025-01-14",
-        account_name: "Musthafakka",
-        account_id: "6d1b9d9e-5556-40c4-a0ea-f6e9ef6423ac",
-        amount_received: 0,
-        amount_paid: 8500,
-        source_form: "Expence",
-        source_form_reference_id: null,
-        created_by: "5ba724f3-e625-4b82-912c-5f7a080263c9",
-        created_at: "2025-01-14T13:20:00Z",
-      },
-      cash_chest: {
-        note_500: 15,
-        note_200: 65,
-        note_100: 75,
-        note_50: 25,
-        note_20: 65,
-        note_10: 45,
-        coin_5: 6,
-        source_reference_type: "payments-receipts",
-        created_by: "5ba724f3-e625-4b82-912c-5f7a080263c9",
-        created_at: "2025-01-14T13:20:00Z",
-      },
-    },
-  ])
+  const [transactions, setTransactions] = useState<Transaction[]>()
 
   /* ===== UPDATED LOGIC (NO STYLE CHANGE) ===== */
 
@@ -181,6 +154,7 @@ export default function TransactionsPage({
                   <DialogTitle>Add Cash Paid</DialogTitle>
                 </DialogHeader>
                 <TransactionForm
+                isSales={false}
                   transactionType="paid"
                   onSubmit={(transaction) =>
                     handleAddTransaction(transaction, "paid")
@@ -193,7 +167,7 @@ export default function TransactionsPage({
 
         {/* Transaction Cards */}
         {!isSales&&<div className="flex gap-4 overflow-x-auto pb-2">
-          {transactions.map((transaction, index) => (
+          {transactions?.map((transaction, index) => (
             <Card
               key={index}
               className="w-[230px] max-h-[180px] shrink-0 overflow-hidden"

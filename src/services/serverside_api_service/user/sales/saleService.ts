@@ -9,6 +9,7 @@ import {
   checkUserByAuthId,
   getUserByRole,
 } from "@/repository/user/userRepository";
+import { DeliveryPayload } from "@/types/deliverySlip";
 import { STATUS } from "@/types/types";
 
 const getDeliverableProduct = async () => {
@@ -25,13 +26,14 @@ const getDeliveryPayload = async (vehicleId: string, authId: string) => {
   try {
     const user = await checkUserByAuthId(authId);
     if (user) {
-      const [drivers, currentStock, expenses, products,customers] = await Promise.all([
-        getUserByRole("driver"),
-        getDeliveryPayloadByVehicle(vehicleId),
-        getExpensesByStatus(user.id),
-        getAllProductsOptions(),
-        getGSTCustomer()
-      ]);
+      const [drivers, currentStock, expenses, products, customers] =
+        await Promise.all([
+          getUserByRole("driver"),
+          getDeliveryPayloadByVehicle(vehicleId),
+          getExpensesByStatus(user.id),
+          getAllProductsOptions(),
+          getGSTCustomer(),
+        ]);
       return {
         success: true,
         data: {
@@ -39,7 +41,7 @@ const getDeliveryPayload = async (vehicleId: string, authId: string) => {
           currentStock: currentStock ?? [],
           expenses,
           products,
-          customers
+          customers,
         },
       };
     } else throw new Error(STATUS.FORBIDDEN.message);
@@ -48,70 +50,35 @@ const getDeliveryPayload = async (vehicleId: string, authId: string) => {
   }
 };
 
-const recordDelivery = async (data: any, authId: string) => {
+const recordDelivery = async (data: DeliveryPayload, authId: string) => {
   try {
     const checkUser = await checkUserByAuthId(authId);
     if (checkUser) {
+      console.log('❤️',data);
+      
       const payload = {
-        "From Warehouse id": data.warehouseId,
-        Date: data.date,
-        "Delivery boys": data.deliveryBoys,
+        "From Warehouse id": data["From Warehouse id"],
+        Date: data.Date,
+        "Delivery boys": data["Delivery boys"],
         "Created by": checkUser.id,
-        "Created at": data.date,
-
+        "Created at": data.Date,
         "Total sales amount": data.totals.totalSales,
-
         "Total expenses amount": data.totals.totalExpenses,
-
         "Total transactions amount":
           data.totals.cashFromTransactionsReceived -
           data.totals.cashFromTransactionsPaid,
-
         "Total upi amount": data.totals.totalUpi,
-
         "Total online amount": data.totals.totalOnline,
-
         "Total Cash amount": data.cashChest.actualCashCounted,
-
-        "Opening stock": data.closingStock.map((item: any) => ({
-          "product name": item.product_name,
-          qty: item.openingQty,
-          "product id": item.product_id,
-        })),
-
-        "Closing stock": data.closingStock.map((item: any) => ({
-          "product name": item.product_name,
-          qty: item.closingQty,
-          "product id": item.product_id,
-        })),
-
-        Sales: data.sales.map((sale: any) => ({
-          "product id": sale.productId,
-          "is composite": false,
-          "sale qty": sale.quantity,
-          rate: sale.rate,
-          "customer id": null,
-        })),
-
-        Transaction: data.transactions.map((tx: any) => ({
-          "account id": tx.account_id,
-          "amount paid": tx.amount_paid ?? 0,
-          "amount received": tx.amount_received,
-          remark: tx.remarks ?? "",
-        })),
-
-        Expenses: data.expenses.map((exp: { id: string }) => exp.id),
-
-        "UPI payments": data.payments.upiPayments.map((upi: any) => ({
-          "UPI Id": upi.consumerName,
-          amount: upi.amount,
-        })),
-
-        "Online payments": data.payments.onlinePayments.map((online: any) => ({
-          "consumer no": online.consumerName,
-          amount: online.amount,
-        })),
-
+        "Opening stock": data["Opening stock"],
+        "Closing stock": data["Closing stock"],
+        Sales: data.Sales,
+        Transaction: data.Transaction,
+        round_off:data.cashChest.mismatch,
+        remark:data.remark,
+        Expenses: data.Expenses,
+        "UPI payments": data["UPI payments"],
+        "Online payments": data["Online payments"],
         "Cash chest": {
           ...data.cashChest.currencyDenominations,
           status: "submitted",

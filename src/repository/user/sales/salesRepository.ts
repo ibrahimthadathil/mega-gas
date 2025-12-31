@@ -127,11 +127,11 @@ const reportDailyDelivery = async (payload: any) => {
     //     "chest name": "Main Chest"
     //   }
     // }
-    const { data, error } = await supabase.rpc("create_sales_slip", {
-      payload,
-    });
+    // const { data, error } = await supabase.rpc("create_sales_slip", {
+    //   payload,
+    // });
 
-    if (error) throw error;
+    // if (error) throw error;
     return true;
   } catch (error) {
     console.log((error as Error).message);
