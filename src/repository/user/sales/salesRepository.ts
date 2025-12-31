@@ -33,7 +33,21 @@ const getAllProductsOptions = async () => {
   }
 };
 
-const reportDailyDelivery = async (payload: any) => {
+const getUPIQR = async () => {
+  try {
+    const { data, error } = await supabase.from("upi_qrcode").select("*");
+    if(error) throw error
+    return data
+  } catch (error) {
+    throw error;
+  }
+};
+
+const reportDailyDelivery = async (
+  payload: any,
+  remark: string,
+  roundOff: number
+) => {
   try {
     // const payload = {
     //   "From Warehouse id": "5ea32457-d1d2-4c10-a90c-f0fc4de70ffb",
@@ -127,11 +141,13 @@ const reportDailyDelivery = async (payload: any) => {
     //     "chest name": "Main Chest"
     //   }
     // }
-    // const { data, error } = await supabase.rpc("create_sales_slip", {
-    //   payload,
-    // });
+    const { data, error } = await supabase.rpc("create_sales_slip_new", {
+      payload,
+      p_remark: remark,
+      p_round_off: roundOff,
+    });
 
-    // if (error) throw error;
+    if (error) throw error;
     return true;
   } catch (error) {
     console.log((error as Error).message);
@@ -142,19 +158,20 @@ const reportDailyDelivery = async (payload: any) => {
 
 const getGSTCustomer = async () => {
   try {
-    const {data,error} = await supabase.from('customers').select('*')
-    if(error) throw error
-    return data
+    const { data, error } = await supabase.from("customers").select("*");
+    if (error) throw error;
+    return data;
   } catch (error) {
     console.log((error as Error).message);
-    
-    throw error
+
+    throw error;
   }
-}
+};
 
 export {
   getDeliveryPayloadByVehicle,
   getAllProductsOptions,
   reportDailyDelivery,
-  getGSTCustomer
+  getGSTCustomer,
+  getUPIQR
 };

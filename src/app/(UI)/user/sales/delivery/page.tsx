@@ -82,15 +82,12 @@ export default function Home() {
   const [chestName, setChestName] = useState<"office" | "godown" | "">("");
 
   // near other state hooks
-  const [oldStock, setOldStock] = useState<
-    { product_id: string; product_name: string; qty: number }[]
-  >([]);
   const [upiPayments, setUpiPayments] = useState<
-    Array<{ id: string; consumerName: string; amount: number }>
+    Array<{ "UPI Id": string; amount: number }>
   >([]);
 
   const [onlinePayments, setOnlinePayments] = useState<
-    Array<{ id: string; consumerName: string; amount: number }>
+    Array<{ "consumer no": string; amount: number }>
   >([]);
   const [reportRemark, setReportRemark] = useState<string>("");
   const [isVerified, setIsVerified] = useState(false);
@@ -400,6 +397,7 @@ export default function Home() {
                     </Card>
                   )}
                   <NetSalesSummarySection
+                    Qrcode={payload?.Qrcode}
                     totalSales={totalSales}
                     totalExpenses={totalExpenses}
                     netSales={netSalesWithTransactions} // will define below

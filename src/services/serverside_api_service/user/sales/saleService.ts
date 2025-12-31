@@ -3,6 +3,7 @@ import {
   getAllProductsOptions,
   getDeliveryPayloadByVehicle,
   getGSTCustomer,
+  getUPIQR,
   reportDailyDelivery,
 } from "@/repository/user/sales/salesRepository";
 import {
@@ -26,13 +27,14 @@ const getDeliveryPayload = async (vehicleId: string, authId: string) => {
   try {
     const user = await checkUserByAuthId(authId);
     if (user) {
-      const [drivers, currentStock, expenses, products, customers] =
+      const [drivers, currentStock, expenses, products, customers, Qrcode] =
         await Promise.all([
           getUserByRole("driver"),
           getDeliveryPayloadByVehicle(vehicleId),
           getExpensesByStatus(user.id),
           getAllProductsOptions(),
           getGSTCustomer(),
+          getUPIQR(),
         ]);
       return {
         success: true,
@@ -42,6 +44,7 @@ const getDeliveryPayload = async (vehicleId: string, authId: string) => {
           expenses,
           products,
           customers,
+          Qrcode,
         },
       };
     } else throw new Error(STATUS.FORBIDDEN.message);
@@ -54,8 +57,6 @@ const recordDelivery = async (data: DeliveryPayload, authId: string) => {
   try {
     const checkUser = await checkUserByAuthId(authId);
     if (checkUser) {
-      console.log('❤️',data);
-      
       const payload = {
         "From Warehouse id": data["From Warehouse id"],
         Date: data.Date,
@@ -74,8 +75,6 @@ const recordDelivery = async (data: DeliveryPayload, authId: string) => {
         "Closing stock": data["Closing stock"],
         Sales: data.Sales,
         Transaction: data.Transaction,
-        round_off:data.cashChest.mismatch,
-        remark:data.remark,
         Expenses: data.Expenses,
         "UPI payments": data["UPI payments"],
         "Online payments": data["Online payments"],
@@ -85,7 +84,11 @@ const recordDelivery = async (data: DeliveryPayload, authId: string) => {
           "chest name": data.cashChest.chestName,
         },
       };
-      const result = await reportDailyDelivery(payload);
+      const result = await reportDailyDelivery(
+        payload,
+        data.remark as string,
+        data.cashChest.mismatch
+      );
       if (result) return { success: true };
       else throw new Error("Failed to add slip");
     } else throw new Error(STATUS.FORBIDDEN.message);
