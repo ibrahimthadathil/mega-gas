@@ -6,7 +6,7 @@ const creatUserAuth = async (email: string, password: string) => {
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: true
+      email_confirm: true,
     });
     if (error) throw error;
 
@@ -36,9 +36,8 @@ const existUserCheck = async () => {
   try {
   } catch (error) {
     throw new Error((error as Error).message);
-    
   }
-} 
+};
 
 const findByEmail = async (email: string) => {
   try {
@@ -46,12 +45,14 @@ const findByEmail = async (email: string) => {
       .from("users")
       .select("*")
       .eq("email", email)
-      .single();
+      .maybeSingle();
     if (error) throw error;
     return data;
-  } catch (error) {    throw new Error((error as Error).message);
-}
-
+  } catch (error) {
+    console.log((error as Error).message,'444');
+    
+    throw new Error((error as Error).message);
+  }
 };
 
 export { creatUserAuth, createUserProfile, findByEmail, existUserCheck };

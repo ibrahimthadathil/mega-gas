@@ -42,4 +42,18 @@ const stock_Transfer = async (data: Record<string, unknown>) => {
   }
 };
 
-export { unload_Slip, stock_Transfer };
+const getpurchasedLoad = async (id: string) => {
+  try {
+    const { data, error} = await supabase
+      .from("plant_load_register_view")
+      .select("*")
+      .eq("id", id);
+      if(error) throw error
+      return data
+  } catch (error) {
+    console.log((error as Error).message);
+    throw error
+  }
+};
+
+export { unload_Slip, stock_Transfer, getpurchasedLoad };

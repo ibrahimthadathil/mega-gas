@@ -23,4 +23,23 @@ export const userFormSchema = z.object({
     .min(10, "Phone number must be at least 10 digits")
     .regex(/^[0-9+\-() ]+$/, "Invalid phone number"),
   role: z.nativeEnum(userRole).describe("Please select a role"),
+  warehouse_id: z.string().min(1, "Warehouse is required"),
+  delivery_boys: z.array(z.string()).min(1, "At least one delivery boy is required"),
 });
+
+
+// export const userEditFormSchema = z.object({
+//   user_name: z
+//     .string()
+//     .min(3, "Username must be at least 3 characters")
+//     .max(50, "Username is too long"),
+//   password: z.string().min(6, "Password must be at least 6 characters").optional(),
+//   email: z.string().email("Invalid email address"),
+//   phone: z
+//     .string()
+//     .min(10, "Phone number must be at least 10 digits")
+//     .regex(/^[0-9+\-() ]+$/, "Invalid phone number"),
+//   role: z.nativeEnum(userRole).describe("Please select a role"),
+//   warehouse_id: z.string().min(1, "Warehouse is required"),
+//   delivery_boys: z.array(z.string()).min(1, "At least one delivery boy is required"),
+// });

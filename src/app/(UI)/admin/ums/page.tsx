@@ -1,127 +1,153 @@
-"use client"
-import React, { useState } from 'react'
-
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+"use client";
+import React, { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Label } from '@/components/ui/label'
-import { Search, Plus,  } from 'lucide-react'
-import UserDialog from '@/components/dialog'
-
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Search, Plus, Pencil, DotSquare, Trash } from "lucide-react";
+import UserDialog from "@/components/dialog";
+import { UseRQ } from "@/hooks/useReactQuery";
+import { deleteUser, editUser, getAllUsers } from "@/services/client_api-Service/admin/ums/ums_api";
+import { IUser } from "@/types/types";
+import { Avatar } from "@radix-ui/react-avatar";
+import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import DataTable from "@/components/data-table";
+import { formatDate } from "@/lib/utils";
+import AlertModal from "@/components/alert-dialog";
+import { toast } from "sonner";
 const Page = () => {
-  // const [users] = useState([
-  //   {
-  //     _id: "u1",
-  //     user_name: "Ibrahim",
-  //     email: "ibrahim@gmail.com",
-  //     role: "Seller",
-  //     createdAt: new Date().toISOString(),
-  //   },
-  //   {
-  //     _id: "u2",
-  //     user_name: "John",
-  //     email: "john@gmail.com",
-  //     role: "Buyer",
-  //     createdAt: new Date().toISOString(),
-  //   },
-  //   {
-  //     _id: "u3",
-  //     user_name: "Meera",
-  //     email: "meera@gmail.com",
-  //     role: "Seller",
-  //     createdAt: new Date().toISOString(),
-  //   },
-  //   {
-  //     _id: "u4",
-  //     user_name: "Anas",
-  //     email: "anas@gmail.com",
-  //     role: "Buyer",
-  //     createdAt: new Date().toISOString(),
-  //   },
-  //   {
-  //     _id: "u5",
-  //     user_name: "Riya",
-  //     email: "riya@gmail.com",
-  //     role: "Buyer",
-  //     createdAt: new Date().toISOString(),
-  //   }
-  // ])
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedRole, setSelectedRole] = useState("all");
+  const { data: users, isLoading: loadingUser } = UseRQ<IUser[]>(
+    "users",
+    getAllUsers
+  );
+  const handelDeleteUser = async(id: string) => {
+    try {
+      const data = await deleteUser(id);
+      if (data.success) {
+        toast.success("User deleted successfully");
+      }
+    } catch (error: unknown) {
+      toast.error((error as Error).message);
+    }
+  };
+  const handleSaveUser = async(data:IUser,id?:string,authid?:string) => {
+    try {
+      data.auth_id=authid
+      await editUser(data,id)
+    } catch (error) {
+      
+    }    
+  };
 
-  const [searchQuery, setSearchQuery] = useState('')
-  const [sortBy, setSortBy] = useState('name')
+  const filteredUsers = useMemo(() => {
+    let filtered = users || [];
 
-  // Handle save user (add or edit)
-  const handleSaveUser = () => {
+    // Search filter
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (user) =>
+          user.user_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          user.role.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
 
-  }
+    // Role filter
+    if (selectedRole && selectedRole !== "all") {
+      filtered = filtered.filter((user) => user.role === selectedRole);
+    }
 
+    return filtered;
+  }, [users, searchQuery, selectedRole]);
 
-  // const columns = [
-  //   {
-  //     header: "No",
-  //     render: (_e: IUser, i: number) => `LB${i + 101}`,
-  //   },
-  //   {
-  //     key: "user_name",
-  //     header: "User",
-  //     render: (user: IUser) => (
-  //       <div className="flex items-center gap-2">
-  //         <Avatar className="h-8 w-8 border rounded-full">
-  //           <AvatarImage
-  //             src={user?.user_name}
-  //             alt={user?.user_name}
-  //             className="object-cover w-8 h-8 rounded-full"
-  //           />
-  //           <AvatarFallback>
-  //             {user?.user_name
-  //               .split(" ")
-  //               .map((n: string) => n[0])
-  //               .join("")
-  //               .toUpperCase()}
-  //           </AvatarFallback>
-  //         </Avatar>
-  //         <span className="font-medium text-yellow-500">
-  //           {user?.user_name}
-  //         </span>
-  //       </div>
-  //     ),
-  //   },
-  //   { key: "email", header: "Email" },
-  //   { key: "role", header: "Role" },
-  //   {
-  //     header: "Joined",
-  //     render: (user: IUser) =>
-  //       new Date(user?.createdAt as Date).toLocaleDateString(),
-  //   },
-  //   {
-  //     header: "Actions",
-  //     render: (user: IUser) => (
-  //       <UserDialog
-  //         user={user}
-  //         onSave={handleSaveUser}
-  //         trigger={
-  //           <Button variant="ghost" size="sm">
-  //             <Pencil className="h-4 w-4" />
-  //           </Button>
-  //         }
-  //       />
-  //     ),
-  //   },
-  // ]
+  const columns = [
+    {
+      header: "No",
+      render: (_e: IUser, i: number) => `LB${i + 1}`,
+    },
+    {
+      key: "user_name",
+      header: "User",
+      render: (user: IUser) => (
+        <div className="flex items-center gap-2">
+          <Avatar className="h-8 w-8 border rounded-full">
+            <AvatarFallback>
+              {user?.user_name
+                .split(" ")
+                .map((n: string) => n[0])
+                .join("")
+                .toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <span className="font-medium text-yellow-500">{user?.user_name}</span>
+        </div>
+      ),
+    },
+    { key: "email", header: "Email" },
+    { key: "role", header: "Role" },
+    {
+      header: "Joined",
+      render: (user: IUser) => formatDate(new Date(user?.created_at as Date)),
+    },
+    {
+      header: "Actions",
+      render: (user: IUser) => (
+        <UserDialog
+          user={user}
+          onSave={handleSaveUser}
+          users={users || []}
+          trigger={
+            <Button variant="ghost" size="sm">
+              <Pencil className="h-4 w-4" />
+            </Button>
+          }
+        />
+      ),
+    },
+    {
+      header: "Delete",
+      render: (user: IUser) => (
+        <AlertModal
+          data={user}
+          contents={[
+            <Trash className="h-5 w-5" />,
+            <>
+              This action cannot be undone. This will permanently delete{" "}
+              <span className="font-semibold text-orange-400">
+                {user.user_name || "this user"}
+              </span>
+              's account and remove their data from our servers.
+            </>,
+          ]}
+          style="hover:bg-destructive hover:text-destructive-foreground p-2"
+         action={()=>handelDeleteUser(user.id as string)}
+        />
+      ),
+    },
+  ];
 
-  return (
-    <div className="space-y-4 p-6">
+  return loadingUser ? (
+    <>
+      <div className="space-y-4 p-3 flex justify-center h-full items-center">
+        <DotSquare className="w-8 h-8 animate-bounce" />
+      </div>
+    </>
+  ) : (
+    <div className="space-y-4 p-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">User Management</h1>
         <UserDialog
           onSave={handleSaveUser}
+          users={users || []}
           trigger={
             <Button>
               <Plus className="h-4 w-4 mr-2" />
@@ -143,24 +169,35 @@ const Page = () => {
           />
         </div>
         <div className="flex items-center gap-2">
-          <Label className="text-sm text-gray-600">Sort by:</Label>
-          <Select value={sortBy} onValueChange={setSortBy}>
+          <Label className="text-sm text-gray-600">Filter by Role:</Label>
+          <Select value={selectedRole} onValueChange={setSelectedRole}>
             <SelectTrigger className="w-[150px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="name">Name</SelectItem>
-              <SelectItem value="email">Email</SelectItem>
-              <SelectItem value="role">Role</SelectItem>
+              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="manager">Manager</SelectItem>
+              <SelectItem value="accountant">Accountant</SelectItem>
+              <SelectItem value="driver">Driver</SelectItem>
+              <SelectItem value="office_staff">Office Staff</SelectItem>
+              <SelectItem value="plant_driver">Plant Driver</SelectItem>
+              <SelectItem value="godown_staff">Godown Staff</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
       {/* Data Table */}
-      {/* <DataTable data={users} columns={columns} /> */}
+      {users && (
+        <DataTable
+          data={filteredUsers ?? []}
+          columns={columns}
+          itemsPerPage={9}
+        />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Page
+export default Page;

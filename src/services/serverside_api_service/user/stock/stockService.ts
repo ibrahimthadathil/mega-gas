@@ -1,6 +1,7 @@
 import { TripFormData } from "@/app/(UI)/user/stock/_UI/trip-sheet";
 import { StockTransferFormData } from "@/app/(UI)/user/stock/transfer/_UI/stock-transfer-section";
 import {
+  getpurchasedLoad,
   stock_Transfer,
   unload_Slip,
 } from "@/repository/user/stock/stockRepository";
@@ -72,4 +73,13 @@ const transferStock = async (data: StockTransferFormData, userId: string) => {
   }
 };
 
-export { unloadSlipRegister, transferStock };
+const getunloadData = async (id:string) =>{
+  try {
+    const result = await getpurchasedLoad(id)
+    if(result) return { success:true , result}
+    else return {success:false}
+  } catch (error) {
+    throw error
+  }
+}
+export { unloadSlipRegister, transferStock, getunloadData };

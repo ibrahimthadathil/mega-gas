@@ -14,7 +14,6 @@ import { useState } from "react";
 
 export default function PlantLoadPage() {
   const { data, isLoading } = UseRQ("register", getPlantLoadRegister);
-  const queryClient = useQueryClient()
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const router = useRouter()
   console.log(data);
@@ -31,8 +30,7 @@ export default function PlantLoadPage() {
     });
   };
   const handleUnload = (Record: PlantLoadRecord) => {
-    queryClient.setQueryData(["plant_load",Record.sap_number],Record)
-    router.push(`/user/stock/load-slip/${Record.sap_number}`)
+    router.push(`/user/stock/load-slip/${Record.id}`)
   };
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-8 space-y-6">

@@ -10,18 +10,24 @@ export type NavItem = {
 };
 export interface IUser {
   id?:string
+  auth_id?:string
   user_name: string;
   email: string;
   phone: string;
   password: string;
   role: userRole;
-  createdAt?: Date;
+  created_at?: Date;
 }
 
 export enum userRole {
-  Admin = "Admin",
-  Staff = "Staff",
-  Sriver = "Driver",
+  Admin = "admin",
+  Staff = "office_staff",
+  Driver = "driver",
+  Plant_driver = "plant_driver",
+  Godown_staff = "godown_staff",
+  Accountant = "accountant",
+  Manager = "manager"
+
 }
 
 export const STATUS = {

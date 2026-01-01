@@ -19,3 +19,13 @@ export const transferStock = async (data:StockTransferFormData) => {
         throw error
     }
 }
+
+export const getLoadslipByLoad = async (id:string)=>{
+    try {
+        const result = await axios.get(`/api/user/stock/${id}`)
+        return result.data
+    } catch (error) {
+        throw error
+    }
+}
+

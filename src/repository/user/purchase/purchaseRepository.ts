@@ -87,6 +87,8 @@ const getPurchaseRegister = async (userId: string) => {
   }
 };
 
+
+
 export {
   addPurchaseRegister,
   getProductForPurchase,
