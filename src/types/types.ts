@@ -157,6 +157,7 @@ export interface PlantLoadRecord {
   total_return_qty: number;
   warehouse_name: string;
   line_items: LineItem[];
+  is_unloaded:boolean
 }
 
 export interface Accounts{

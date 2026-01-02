@@ -97,13 +97,15 @@ export default function PlantLoadPage() {
                               </span>
                             </div>
                             <div>
-                              <span className="font-medium text-foreground">
+                              <span className={`font-medium text-foreground ${record.is_unloaded ? "text-muted-foreground": "text-white"}`}>
                                 <Button
                                   onClick={() =>
                                     handleUnload(record)
                                   }
+                                  disabled={record.is_unloaded}
+                                  className={`${record.is_unloaded? "bg-red-600":"bg-black"}`}
                                 >
-                                  Unload
+                                  {record?.is_unloaded ? "Settled":"Unload"}
                                 </Button>
                               </span>
                             </div>

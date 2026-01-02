@@ -56,7 +56,6 @@ export const navItems = [
     icon: Settings2,
     roles: ["admin", "manager", "accountant", "godown_keeper"],
     items: [
-      { title: "Load Slip", url: "/user/stock/load-slip", roles: ["admin", "manager", "accountant", "godown_keeper"] },
       { title: "Stock Transfer", url: "/user/stock/transfer", roles: ["admin", "manager", "accountant", "godown_keeper"] },
     ],
   },

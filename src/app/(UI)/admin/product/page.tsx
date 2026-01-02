@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit } from "lucide-react";
+import { Plus, Edit, Trash } from "lucide-react";
 import { IProduct } from "@/types/types";
 import { UseRQ } from "@/hooks/useReactQuery";
 import { getAllProducts } from "@/services/client_api-Service/admin/product/product_api";
@@ -17,7 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-
+import AlertModal from "@/components/alert-dialog"
 export default function ProductListPage() {
   const { data, isLoading } = UseRQ("products", getAllProducts);
   const queryClient = useQueryClient();
@@ -95,11 +95,11 @@ export default function ProductListPage() {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Sale Price:</span>
-                      <span className="font-medium">${product.sale_price}</span>
+                      <span className="font-medium">₹{product.sale_price}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Cost Price:</span>
-                      <span className="font-medium">${product.cost_price}</span>
+                      <span className="font-medium">₹{product.cost_price}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Available:</span>
@@ -122,12 +122,35 @@ export default function ProductListPage() {
                   </div>
                   <Button
                     variant="outline"
-                    className="w-full gap-2"
+                    className="w-full gap-2 mt-2"
                     onClick={() => handleEdit(product)}
                   >
                     <Edit className="w-4 h-4" />
                     Edit
                   </Button>
+                  {/* <Button variant="destructive" className="w-full gap-2 mt-2"> */}
+                    <AlertModal
+                      data={product}
+                      contents={[
+                        <>
+                        <Trash className="h-5 w-5" color="red" />
+                        </>,
+                        <>
+                          This action cannot be undone. This will permanently
+                          delete{" "}
+                          <span className="font-semibold text-orange-400">
+                            {product.product_name || "This Product"}
+                          </span>
+                          's account and remove their data from our servers.
+                        </>,
+                      ]}
+                      // style="hover:bg-destructive hover:text-destructive-foreground p-2"
+                      
+                      action={() => alert(product.id)}
+                    />
+                    {/* <Trash className="w-4 h-4" />
+                    Delete */}
+                  {/* </Button> */}
                 </CardContent>
               </Card>
             ))}
