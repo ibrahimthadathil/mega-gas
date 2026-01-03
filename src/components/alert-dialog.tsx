@@ -16,13 +16,14 @@ interface categoryProps<T>{
   contents:string|React.ReactNode[],
   data:T,
   style?:string,action:Function
+  varient?:"outline" | "link" | "default" | "destructive" | "secondary" | "ghost" | null | undefined
 }  
-   function AlertModal<T extends Record<string,T>>({data,contents,style,action}:categoryProps<T>) {
+   function AlertModal<T extends Record<string,T>>({data,contents,style,action,varient='outline'}:categoryProps<T>) {
     
     return (
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant='outline' className={style}>{contents[0]}</Button>
+          <Button variant={varient} className={style}>{contents[0]}</Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>

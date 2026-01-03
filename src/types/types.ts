@@ -166,3 +166,29 @@ export interface Accounts{
   account_name:string;
   
 }
+
+export type Transaction = {
+  line_item_id: string;          
+  date: string;                  
+  account_id: string;            
+  account_name: string;            
+  amount_received: number;       
+  amount_paid: number;           
+  source_form: string;
+  created_by: string;            
+  created_at: string;            
+  remark: string | null;
+  cash_chest_id: string;         
+  chest_name: string;
+  note_2000: number;
+  note_500: number;
+  note_200: number;
+  note_100: number;
+  note_50: number;
+  note_20: number;
+  note_10: number;
+  coin_5: number;
+  total_amount: number;          
+  status: string;                
+  transaction_date: string;      
+};

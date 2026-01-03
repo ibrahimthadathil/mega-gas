@@ -26,22 +26,7 @@ const getAccountNames = async () => {
   }
 };
 
-// to set a new transaction
 
-const addNewLineItem = async (payload: any) => {
-  try {
-    const { error } = await supabase.rpc(
-      "insert_line_item_and_cash_chest",
-      payload
-    );
-
-    if (error) throw error;
-    return true;
-  } catch (err) {
-    console.error("RPC error:", (err as Error).message || err);
-    throw err;
-  }
-};
 
 // delete account
 
@@ -65,4 +50,4 @@ const update_Account = async (id: string, payload: any) => {
     throw error;
   }
 };
-export { addNewAccount, addNewLineItem, getAccountNames, delete_Account, update_Account };
+export { addNewAccount, getAccountNames, delete_Account, update_Account };
