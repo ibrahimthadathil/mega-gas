@@ -1,6 +1,7 @@
 import {
   add_Expense,
   delete_Expense,
+  edit_Expense,
   getAllExpenses,
 } from "@/repository/user/expenses/expenseRepository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
@@ -16,8 +17,6 @@ const addExpenses = async (expenseData: Expense) => {
     if (success) return success;
     else return success;
   } catch (error) {
-    console.log("hhh");
-
     throw new Error((error as Error).message);
   }
 };
@@ -44,4 +43,14 @@ const clear_Expense = async (expenseId: string) => {
     throw new Error((error as Error).message);
   }
 };
-export { addExpenses, getExpensesByUser, clear_Expense };
+
+const updateExpense = async(id:string,expense:Partial<Expense>)=>{
+  try {
+    const updated = await edit_Expense(id,expense)
+    if(updated)return {success:true,message:'updated'}
+    else return {success:false,message:'failed to update'}
+  } catch (error) {
+    throw error
+  }
+}
+export { addExpenses, getExpensesByUser, clear_Expense, updateExpense };

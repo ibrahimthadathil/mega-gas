@@ -49,7 +49,7 @@ export interface Expense {
   image?: string;
   created_time?: string;
   description?: string;
-  settled?: boolean;
+  status?: boolean;
 }
 
 export interface Vehicle {

@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-import { clear_Expense } from "@/services/serverside_api_service/user/expenses/expensesService";
+import { clear_Expense, updateExpense } from "@/services/serverside_api_service/user/expenses/expensesService";
 import { STATUS } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -25,3 +25,22 @@ export const DELETE = async (
     );
   }
 };
+
+
+export const PUT = async (
+  req:NextRequest,
+  {params}:{params:{id:string}}
+)=>{
+  try {
+    const {id} = await params
+    const editedExpense = await req.json()
+    const {message,success}= await updateExpense(id,editedExpense)
+    if(success) return NextResponse.json({success,message},{status:STATUS.SUCCESS.code})
+    else return NextResponse.json({success,message},{status:STATUS.NOT_FOUND.code})  
+  } catch (error) {
+     return NextResponse.json(
+      { error: (error as Error).message },
+      { status: STATUS.SERVER_ERROR.code }
+    );
+  }
+}

@@ -67,4 +67,25 @@ const delete_Expense = async (expenseId: string) => {
   }
 };
 
-export { add_Expense, getAllExpenses, delete_Expense, getExpensesByStatus };
+const edit_Expense = async (id: string, expense: Partial<Expense>) => {
+  try {
+    const { error } = await supabase
+      .from("expenses")
+      .update(expense)
+      .eq("id", id)
+      .select()
+      .single();
+      if(error) throw error
+      return true
+  } catch (error) {
+    throw error;
+  }
+};
+
+export {
+  add_Expense,
+  getAllExpenses,
+  delete_Expense,
+  getExpensesByStatus,
+  edit_Expense,
+};

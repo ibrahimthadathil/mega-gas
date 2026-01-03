@@ -1,4 +1,9 @@
-import { addNewLineItem, delete_transaction, edit_transaction, getAll_transactions } from "@/repository/user/accounts/transaction/transactionRepository";
+import {
+  addNewLineItem,
+  delete_transaction,
+  edit_transaction,
+  getAll_transactions,
+} from "@/repository/user/accounts/transaction/transactionRepository";
 
 const createNewTransaction = async (newTransaction: any, userId: string) => {
   try {
@@ -25,33 +30,36 @@ const createNewTransaction = async (newTransaction: any, userId: string) => {
   }
 };
 
-const getAllTransaction = async()=>{
+const getAllTransaction = async () => {
   try {
-    const result = await getAll_transactions()
-    if(result)return { success:true , result}
-    else return {success:false}
+    const result = await getAll_transactions();
+    if (result) return { success: true, result };
+    else return { success: false };
   } catch (error) {
     console.log((error as Error).message);
-    throw error
+    throw error;
   }
-}
+};
 
-const deleteTransactionAccount = async(id:string)=>{
+const deleteTransactionAccount = async (id: string) => {
   try {
-    const deleted = await delete_transaction(id)
-    if(deleted)return {success:true}
-    else return {success:false}
+    const deleted = await delete_transaction(id);
+    if (deleted) return { success: true };
+    else return { success: false };
   } catch (error) {
-    throw error
+    throw error;
   }
-}
+};
 
-const editTransaction = async (id: string, updatedTransaction: any, userId: string) => {
+const editTransaction = async (
+  id: string,
+  updatedTransaction: any,
+  userId: string
+) => {
   try {
-    const { source_form_reference_id, ...lineItem } = updatedTransaction.line_Item;
-    const {account_name,created_at,...rest} = lineItem
-    console.log(updatedTransaction.cash_chest,'😶‍🌫️😶‍🌫️');
-    
+    const { source_form_reference_id, ...lineItem } =
+      updatedTransaction.line_Item;
+    const { account_name, created_at, ...rest } = lineItem;
     const payload = {
       p_line_item_id: id,
       p_line_item: {
@@ -63,7 +71,7 @@ const editTransaction = async (id: string, updatedTransaction: any, userId: stri
       },
     };
 
-    const result = await edit_transaction( payload);
+    const result = await edit_transaction(payload);
     if (result) return { success: true };
     else return { success: false };
   } catch (error) {
@@ -72,4 +80,9 @@ const editTransaction = async (id: string, updatedTransaction: any, userId: stri
   }
 };
 
-export { createNewTransaction,getAllTransaction,deleteTransactionAccount,editTransaction };
+export {
+  createNewTransaction,
+  getAllTransaction,
+  deleteTransactionAccount,
+  editTransaction,
+};
