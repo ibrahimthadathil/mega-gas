@@ -1,6 +1,8 @@
 import {
   addNewAccount,
+  delete_Account,
   getAccountNames,
+  update_Account,
 } from "@/repository/user/accounts/accountsRepository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
 
@@ -26,4 +28,24 @@ const getAllAccounts = async () => {
     throw error;
   }
 };
-export { createNewAccount, getAllAccounts };
+
+const deleteAccountById =async (id:string)=>{
+  try {
+    const deleted = await delete_Account(id);
+    if (deleted) return { success: true };
+    else return { success: false, message: "Failed to delete" };
+  } catch (error) {
+    throw error;
+  }
+};
+
+const updateAccountById = async (id:string,payload:any)=>{
+  try {
+    const updated = await update_Account(id,payload);
+    if (updated) return { success: true };
+    else return { success: false, message: "Failed to update" };
+  } catch (error) {
+    throw error;
+  }
+};
+export { createNewAccount, getAllAccounts, deleteAccountById, updateAccountById };

@@ -32,8 +32,8 @@ interface categoryProps<T>{
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-red-500 hover:cursor-pointer">Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={()=>action(data._id)}>Proceed</AlertDialogAction>
+            <AlertDialogCancel className=" hover:cursor-pointer">Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={()=>action(data._id)} className="bg-red-400 hover:cursor-pointer">Proceed</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

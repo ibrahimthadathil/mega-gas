@@ -12,6 +12,7 @@ export const POST = async (req: NextRequest) => {
     data.created_by = userId as string;
     if (userId) {
       const { success } = await createNewAccount(data);
+      
       if (success)
         return NextResponse.json(
           { message: STATUS.CREATED.message },

@@ -43,4 +43,26 @@ const addNewLineItem = async (payload: any) => {
   }
 };
 
-export { addNewAccount, addNewLineItem, getAccountNames };
+// delete account
+
+const delete_Account = async (id: string) => {
+  try {
+    const { error } = await supabase.from("accounts").delete().eq("id", id);
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// update account
+const update_Account = async (id: string, payload: any) => {
+  try {
+    const { error } = await supabase.from("accounts").update(payload).eq("id", id);
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+export { addNewAccount, addNewLineItem, getAccountNames, delete_Account, update_Account };

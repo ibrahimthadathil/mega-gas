@@ -29,3 +29,21 @@ export const createNewLineItem = async (data: any) => {
     throw error;
   }
 };
+
+export const deleteAccount = async (id:string)=> {
+   try {
+    const {data} = await axios.delete(`/api/user/accounts/${id}`)
+    return data
+   } catch (error) {
+    throw error
+   }
+}
+
+export const updateAccount = async (id:string,account:Accounts)=> {
+  try {
+    const {data} = await axios.put(`/api/user/accounts/${id}`,account)
+    return data
+  } catch (error) {
+    throw error
+  }
+}
