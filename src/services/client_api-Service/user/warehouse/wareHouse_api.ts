@@ -31,3 +31,12 @@ export const editWarehouse = async (editData: Warehouse) => {
   }
 };
 
+export const deleteWarehouse = async(id:string)=>{
+  try {
+    const result = await axios.delete(`/api/user/warehouse/${id}`)
+    return result.data
+  } catch (error) {
+    throw error
+  }
+}
+

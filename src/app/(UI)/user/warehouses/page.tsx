@@ -6,8 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import AddWarehouseDialog from "@/app/(UI)/user/warehouses/_UI/warehouse-dialog";
 import { Trash2, Edit2 } from "lucide-react";
+import AlertModal from "@/components/alert-dialog";
 import {
   addNew_wareHouse,
+  editWarehouse,
+  deleteWarehouse,
   getWarehouse,
 } from "@/services/client_api-Service/user/warehouse/wareHouse_api";
 import { toast } from "sonner";
@@ -25,18 +28,18 @@ export interface Warehouse {
 
 export default function WarehousePage() {
   const { data, isLoading } = UseRQ("warehouse", getWarehouse);
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingWarehouse, setEditingWarehouse] = useState<Warehouse | null>(
     null
   );
 
-  const handleAddWarehouse = async (newWarehouse:Warehouse) => {
+  const handleAddWarehouse = async (newWarehouse: Warehouse) => {
     try {
       const data = await addNew_wareHouse(newWarehouse);
       if (data.success) {
-        queryClient.invalidateQueries({queryKey:['warehouse']})
-        toast.success("Added new Ware House");
+        queryClient.invalidateQueries({ queryKey: ["warehouse"] });
+        toast.success("Added new Warehouse");
         setIsDialogOpen(false);
       }
     } catch (error) {
@@ -45,29 +48,48 @@ export default function WarehousePage() {
       );
     }
   };
-  // const handleAddressEdit = async()=>{
-  //   try {
-      
-  //   } catch (error) {
-      
-  //   }
-  // }
 
-  const handleEditWarehouse = async(warehouse: Warehouse) => {
-    setEditingWarehouse(warehouse);
-    setIsDialogOpen(true);
-    console.log(warehouse);
-    // try {
-      
-    // } catch (error) {
-      
-    // }
-    //  await editWarehouse(warehouse)
+  const handleEditWarehouse = async (warehouse: Warehouse) => {
+    try {
+      const response = await editWarehouse({
+        ...warehouse,
+        id: editingWarehouse?.id,
+      });
+
+      if (response.success) {
+        queryClient.invalidateQueries({ queryKey: ["warehouse"] });
+        toast.success("Warehouse updated successfully");
+        setIsDialogOpen(false);
+        setEditingWarehouse(null);
+      }
+    } catch (error) {
+      toast.error(
+        ((error as AxiosError).response?.data as Record<string, string>)
+          ?.message || "Failed to update warehouse"
+      );
+    }
   };
 
-  const handleDeleteWarehouse = (id:string) => {
-    console.log(id);
-    
+  const handleEditClick = (warehouse: Warehouse) => {
+    setEditingWarehouse(warehouse);
+    setIsDialogOpen(true);
+  };
+
+  const handleDeleteWarehouse = async (id: string) => {
+    try {
+      const data = await deleteWarehouse(id);
+      if (data) queryClient.invalidateQueries({ queryKey: ["warehouse"] });
+      toast.success(data.message);
+    } catch (error) {
+      toast.error("failed to delete");
+    }
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    if (!open) {
+      setEditingWarehouse(null);
+    }
+    setIsDialogOpen(open);
   };
 
   const typeColors: Record<
@@ -102,7 +124,7 @@ export default function WarehousePage() {
         {/* Add Warehouse Dialog */}
         <AddWarehouseDialog
           isOpen={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
+          onOpenChange={handleDialogClose}
           onEdit={handleEditWarehouse}
           onSubmit={handleAddWarehouse}
           initialData={editingWarehouse || undefined}
@@ -120,7 +142,7 @@ export default function WarehousePage() {
         ) : (data as Warehouse[]).length === 0 ? (
           <div className="flex items-center justify-center py-16">
             <p className="text-muted-foreground text-lg">
-             { `No warehouses yet. Click "Add Warehouse" to create one.`}
+              {`No warehouses yet. Click "Add Warehouse" to create one.`}
             </p>
           </div>
         ) : (
@@ -136,19 +158,37 @@ export default function WarehousePage() {
                   </CardTitle>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleEditWarehouse(warehouse)}
+                      onClick={() => handleEditClick(warehouse)}
                       className="p-1 hover:bg-muted rounded-md transition-colors"
                       aria-label="Edit warehouse"
                     >
                       <Edit2 className="w-4 h-4 text-muted-foreground hover:text-foreground" />
                     </button>
-                    <button
-                      onClick={() => handleDeleteWarehouse(warehouse.id as string)}
-                      className="p-1 hover:bg-destructive/10 rounded-md transition-colors"
-                      aria-label="Delete warehouse"
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </button>
+                    <AlertModal
+                      data={warehouse}
+                      varient="ghost"
+                      contents={[
+                        <Button
+                          key="delete-btn"
+                          variant="ghost"
+                          size="sm"
+                          className="mt-1 text-destructive hover:text-destructive gap-2 w-full"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>,
+                        <span key="delete-text">
+                          This action cannot be undone. This will permanently
+                          delete{" "}
+                          <span className="font-semibold text-orange-400">
+                            {warehouse.name || "This warehouse"}
+                          </span>
+                          's account and remove their data from our servers.
+                        </span>,
+                      ]}
+                      action={() =>
+                        handleDeleteWarehouse(warehouse.id as string)
+                      }
+                    />
                   </div>
                 </CardHeader>
                 <CardContent>
