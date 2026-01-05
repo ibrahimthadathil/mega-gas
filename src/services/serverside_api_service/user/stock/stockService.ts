@@ -1,6 +1,7 @@
 import { TripFormData } from "@/app/(UI)/user/stock/_UI/trip-sheet";
 import { StockTransferFormData } from "@/app/(UI)/user/stock/transfer/_UI/stock-transfer-section";
 import {
+  getAlltransferedStock,
   getpurchasedLoad,
   stock_Transfer,
   unload_Slip,
@@ -73,13 +74,26 @@ const transferStock = async (data: StockTransferFormData, userId: string) => {
   }
 };
 
-const getunloadData = async (id:string) =>{
+const getunloadData = async (id: string) => {
   try {
-    const result = await getpurchasedLoad(id)
-    if(result) return { success:true , result}
-    else return {success:false}
+    const result = await getpurchasedLoad(id);
+    if (result) return { success: true, result };
+    else return { success: false };
   } catch (error) {
-    throw error
+    throw error;
   }
-}
-export { unloadSlipRegister, transferStock, getunloadData };
+};
+
+const getTransferedView = async (id: string) => {
+  try {
+    const existUser = await checkUserByAuthId(id);
+    if (existUser) {
+      const result = await getAlltransferedStock(existUser.id);
+      if (result) return { result, success: true };
+      else return { result: [], success: true };
+    } else throw new Error(STATUS.UNAUTHORIZED.message);
+  } catch (error) {
+    throw error;
+  }
+};
+export { unloadSlipRegister, transferStock, getunloadData, getTransferedView };

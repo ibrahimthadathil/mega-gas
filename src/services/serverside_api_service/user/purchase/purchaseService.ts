@@ -45,6 +45,8 @@ const addPurchase_Register = async (
         },
         p_line_items,
       };
+      console.log(payload,'💕💕💕');
+      
       const success = await addPurchaseRegister(payload);
       if (success) return { success: true };
       else return { success: false };

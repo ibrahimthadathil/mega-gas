@@ -33,7 +33,7 @@ const addPurchaseRegister = async (payload: Record<string, unknown>) => {
   // }
   try {
     const { error } = await supabase.rpc(
-      "create_plant_load_with_lines2",
+      "create_plant_load_with_lines",
       payload
     );
     if (error) throw error;

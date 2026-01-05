@@ -13,11 +13,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function PlantLoadPage() {
-  const { data, isLoading } = UseRQ("register", getPlantLoadRegister);
+  const { data, isLoading } = UseRQ<PlantLoadRecord[]>("register", getPlantLoadRegister);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
-  const router = useRouter()
-  console.log(data);
-  
+  const router = useRouter()  
   const toggleExpanded = (id: string) => {
     setExpandedIds((prev) => {
       const newSet = new Set(prev);
@@ -30,7 +28,7 @@ export default function PlantLoadPage() {
     });
   };
   const handleUnload = (Record: PlantLoadRecord) => {
-    router.push(`/user/stock/load-slip/${Record.id}`)
+    router.push(`/user/stock/load-slip/${Record?.id}`)
   };
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-8 space-y-6">
@@ -47,17 +45,16 @@ export default function PlantLoadPage() {
       {/* Records List */}
       <div className="space-y-3">
         <p className="text-sm font-medium text-muted-foreground">
-          Total Records({data ? (data as PlantLoadRecord[]).length : 0})
+          Total Records({data ? data.length : 0})
         </p>
         <div className="space-y-3">
           {isLoading ? (
             <Skeleton />
           ) : (
-            (data as PlantLoadRecord[]).map((record) => {
-              const isExpanded = expandedIds.has(record.id);
-
+            (data)?.map((record) => {              
+              const isExpanded = expandedIds.has(record?.id);
               return (
-                <Card key={record.id} className="bg-card w-full">
+                <Card key={record?.id} className="bg-card w-full">
                   <CardContent className="pt-2">
                     <div className="space-y-4">
                       {/* Record Header */}
@@ -67,7 +64,7 @@ export default function PlantLoadPage() {
                           <div className="flex items-center gap-2">
                             <Badge variant="secondary">
                               <h2 className="text-lg">
-                                {record.warehouse_name}
+                                {record?.warehouse_name}
                               </h2>
                             </Badge>
                           </div>
@@ -75,35 +72,35 @@ export default function PlantLoadPage() {
                             <div>
                               SAP:{" "}
                               <span className="font-medium text-foreground">
-                                {record.sap_number}
+                                {record?.sap_number}
                               </span>
                             </div>
                             <div>
                               Date:{" "}
                               <span className="font-medium text-foreground">
-                                {record.bill_date}
+                                {record?.bill_date}
                               </span>
                             </div>
                             <div>
                               Total Qty:{" "}
                               <span className="font-medium text-foreground">
-                                {record.total_full_qty}
+                                {record?.total_full_qty}
                               </span>
                             </div>
                             <div>
                               Balance:{" "}
                               <span className="font-medium text-foreground">
-                                {record.balance}
+                                {record?.balance}
                               </span>
                             </div>
                             <div>
-                              <span className={`font-medium text-foreground ${record.is_unloaded ? "text-muted-foreground": "text-white"}`}>
+                              <span className={`font-medium text-foreground ${record?.is_unloaded ? "text-muted-foreground": "text-white"}`}>
                                 <Button
                                   onClick={() =>
                                     handleUnload(record)
                                   }
-                                  disabled={record.is_unloaded}
-                                  className={`${record.is_unloaded? "bg-red-600":"bg-black"}`}
+                                  disabled={record?.is_unloaded}
+                                  className={`${record?.is_unloaded? "bg-red-600":"bg-black"}`}
                                 >
                                   {record?.is_unloaded ? "Settled":"Unload"}
                                 </Button>
@@ -113,7 +110,7 @@ export default function PlantLoadPage() {
                         </div>
 
                         <ChevronDown
-                          onClick={() => toggleExpanded(record.id)}
+                          onClick={() => toggleExpanded(record?.id)}
                           className={`w-5 h-5 text-muted-foreground transition-transform hover:cursor-pointer ${
                             isExpanded ? "rotate-180" : ""
                           }`}
@@ -124,10 +121,10 @@ export default function PlantLoadPage() {
                       {isExpanded && (
                         <div className="border-t border-border pt-4 space-y-2">
                           <p className="text-sm font-medium text-muted-foreground mb-3">
-                            Line Items ({record.line_items.length})
+                            Line Items ({record?.line_items?.length})
                           </p>
                           <div className="space-y-2">
-                            {record.line_items.map((item, idx) => (
+                            {record?.line_items.map((item, idx) => (
                               <div
                                 key={idx}
                                 className="flex items-center justify-between p-3 bg-muted/50 rounded-md text-sm"
@@ -157,19 +154,19 @@ export default function PlantLoadPage() {
                             <div className="text-center">
                               <p className="text-muted-foreground">Unloaded</p>
                               <p className="font-semibold text-foreground">
-                                {record.unloaded_qty}
+                                {record?.unloaded_qty}
                               </p>
                             </div>
                             <div className="text-center">
                               <p className="text-muted-foreground">Return</p>
                               <p className="font-semibold text-foreground">
-                                {record.total_return_qty}
+                                {record?.total_return_qty}
                               </p>
                             </div>
                             <div className="text-center">
                               <p className="text-muted-foreground">Balance</p>
                               <p className="font-semibold text-foreground">
-                                {record.balance}
+                                {record?.balance}
                               </p>
                             </div>
                           </div>

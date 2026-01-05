@@ -44,16 +44,29 @@ const stock_Transfer = async (data: Record<string, unknown>) => {
 
 const getpurchasedLoad = async (id: string) => {
   try {
-    const { data, error} = await supabase
+    const { data, error } = await supabase
       .from("plant_load_register_view")
       .select("*")
       .eq("id", id);
-      if(error) throw error
-      return data
+    if (error) throw error;
+    return data;
   } catch (error) {
     console.log((error as Error).message);
-    throw error
+    throw error;
   }
 };
 
-export { unload_Slip, stock_Transfer, getpurchasedLoad };
+const getAlltransferedStock = async (userId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("stock_transfers")
+      .select("*")
+      .eq("created_by", userId);
+      if(error) throw error
+      return data
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { unload_Slip, stock_Transfer, getpurchasedLoad, getAlltransferedStock };

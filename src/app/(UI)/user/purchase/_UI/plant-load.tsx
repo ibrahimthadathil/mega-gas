@@ -64,6 +64,7 @@ export default function PlantLoadSection() {
       warehouse: "",
     },
   });
+console.log(data,'000');
 
   const {
     register: registerDialog,
@@ -149,6 +150,7 @@ export default function PlantLoadSection() {
         quantity: p.quantity,
       })),
     };
+
     try {
       const result = await addPurchaseRegister(purchaseData);
       if (result.success) {
@@ -158,6 +160,8 @@ export default function PlantLoadSection() {
         toast.success("Purchase Registered");
       }
     } catch (error) {
+      console.log(error);
+      
       toast.error((error as Error).message + "error in add purchase");
     }
   };

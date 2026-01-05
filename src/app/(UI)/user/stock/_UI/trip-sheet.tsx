@@ -73,14 +73,10 @@ interface UnloadLineItem {
 
 export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
   const router = useRouter();
-  // const params = useParams();
-  // const loadSlip_sap = params.id;
 
   const { data: unloadRecord, isLoading: isUnloadData } = UseRQ<
     PlantLoadRecord[]
   >("plant_load", () => getLoadslipByLoad(loadSlipId));
-  console.log(unloadRecord, "88");
-
   const { data: warehouses, isLoading: isWarehouseLoading } = UseRQ<
     Warehouse[]
   >("warehouse", getWarehouse);
@@ -93,7 +89,8 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
   const { data: users, isLoading: isUserLoading } = UseRQ("user", () =>
     get_userByRole("driver")
   );
-
+  console.log(unloadRecord,'****');
+  
   // Initialize state with empty values
   const [formData, setFormData] = useState<TripFormData>({
     date: undefined,
@@ -264,11 +261,14 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 
   const handleProceed = async () => {
     try {
-      const data = await unloadSlip(formData);
-      if (data.success) {
-        toast.success("Slip created");
-        router.push("/user/stock");
-      }
+      alert('check console')
+      console.log(formData,'1111');
+      
+      // const data = await unloadSlip(formData);
+      // if (data.success) {
+      //   toast.success("Slip created");
+      //   router.push("/user/stock");
+      // }
     } catch (error) {
       toast.error("error in unload submission");
     }
@@ -367,8 +367,10 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-          {unloadRecord[0]?.line_items?.map((lineItem: any) => (
-            <Card
+          {unloadRecord[0]?.line_items?.map((lineItem: any) => {
+            console.log(lineItem,'000');
+            
+            return (<Card
               key={lineItem.line_item_id}
               className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
               onClick={() => handleLineItemClick(lineItem)}
@@ -379,6 +381,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                   <p className="font-medium text-sm truncate">
                     {lineItem.product_name}
                   </p>
+                  <p>Qty : {lineItem.qty}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <div
@@ -397,8 +400,8 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                   )}
                 </div>
               </div>
-            </Card>
-          ))}
+            </Card>)
+})}
         </div>
 
         {/* Dialog for Adding Load Details */}
