@@ -55,18 +55,38 @@ const getpurchasedLoad = async (id: string) => {
     throw error;
   }
 };
-
+// this fuction is not using currently 
 const getAlltransferedStock = async (userId: string) => {
   try {
     const { data, error } = await supabase
       .from("stock_transfers")
       .select("*")
       .eq("created_by", userId);
-      if(error) throw error
-      return data
+    if (error) throw error;
+    return data;
   } catch (error) {
     throw error;
   }
 };
 
-export { unload_Slip, stock_Transfer, getpurchasedLoad, getAlltransferedStock };
+const view_Transfered_stock = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("stock_transfer_view")
+      .select("*");
+      if(error) throw error
+      return data
+  } catch (error) {
+    console.log((error as Error).message);
+
+    throw error;
+  }
+};
+
+export {
+  unload_Slip,
+  stock_Transfer,
+  getpurchasedLoad,
+  getAlltransferedStock,
+  view_Transfered_stock,
+};

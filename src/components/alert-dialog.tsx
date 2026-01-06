@@ -18,7 +18,7 @@ interface categoryProps<T>{
   style?:string,action:Function
   varient?:"outline" | "link" | "default" | "destructive" | "secondary" | "ghost" | null | undefined
 }  
-   function AlertModal<T extends Record<string,T>>({data,contents,style,action,varient='outline'}:categoryProps<T>) {
+   const  AlertModal = <T extends Record<string,T>> ({data,contents,style,action,varient='outline'}:categoryProps<T>)=> {
     
     return (
       <AlertDialog>

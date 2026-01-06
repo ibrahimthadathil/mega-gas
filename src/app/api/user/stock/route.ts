@@ -1,4 +1,5 @@
 import {
+  displayStockTransfer,
   getTransferedView,
   unloadSlipRegister,
 } from "@/services/serverside_api_service/user/stock/stockService";
@@ -25,9 +26,10 @@ export const GET = async (req: NextRequest) => {
   try {
     const userId = req.headers.get("x-user-id");
     if (userId) {
-      const { success, result } = await getTransferedView(userId);
+      // const { success, result } = await getTransferedView(userId);
+      const {success,viewData} = await displayStockTransfer()
       return NextResponse.json(
-        { success, data: result },
+        { success, data: viewData },
         { status: STATUS.CREATED.code }
       );
     } else return NextResponse.json({}, { status: STATUS.UNAUTHORIZED.code });

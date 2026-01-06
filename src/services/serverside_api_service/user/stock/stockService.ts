@@ -5,6 +5,7 @@ import {
   getpurchasedLoad,
   stock_Transfer,
   unload_Slip,
+  view_Transfered_stock,
 } from "@/repository/user/stock/stockRepository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
 import { STATUS } from "@/types/types";
@@ -84,6 +85,7 @@ const getunloadData = async (id: string) => {
   }
 };
 
+// this function currently not using
 const getTransferedView = async (id: string) => {
   try {
     const existUser = await checkUserByAuthId(id);
@@ -96,4 +98,20 @@ const getTransferedView = async (id: string) => {
     throw error;
   }
 };
-export { unloadSlipRegister, transferStock, getunloadData, getTransferedView };
+
+const displayStockTransfer = async () => {
+  try {
+    const viewData = await view_Transfered_stock()
+    if(viewData)return{ success:true , viewData}
+    else return {success:true,viewData:[]}
+  } catch (error) {
+    throw error;
+  }
+};
+export {
+  unloadSlipRegister,
+  transferStock,
+  getunloadData,
+  getTransferedView,
+  displayStockTransfer,
+};
