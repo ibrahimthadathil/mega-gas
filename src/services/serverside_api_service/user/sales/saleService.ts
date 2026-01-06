@@ -84,6 +84,8 @@ const recordDelivery = async (data: DeliveryPayload, authId: string) => {
           "chest name": data.cashChest.chestName,
         },
       };
+      console.log(payload);
+      
       const result = await reportDailyDelivery(
         payload,
         data.remark as string,

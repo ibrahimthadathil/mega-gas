@@ -40,7 +40,7 @@ import { get_userByRole } from "@/services/client_api-Service/user/user_api";
 
 // --- INTERFACES ---
 interface TripLoadRecord {
-  id: string;
+  id?: string;
   to_warehouse_id: string;
   fullQuantity: number;
   emptyQuantity: number;
@@ -63,10 +63,11 @@ export interface TripFormData {
 }
 
 interface UnloadLineItem {
-  line_item_id: string;
+  plant_load_line_item_id
+: string;
   product_name: string;
   product_id: string;
-  trip: "oneway" | "two_way";
+  trip_type: "oneway" | "two_way";
   return_qty: number;
   return_product_id: string | null;
 }
@@ -89,7 +90,6 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
   const { data: users, isLoading: isUserLoading } = UseRQ("user", () =>
     get_userByRole("driver")
   );
-  console.log(unloadRecord,'****');
   
   // Initialize state with empty values
   const [formData, setFormData] = useState<TripFormData>({
@@ -137,7 +137,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
     setSelectedLineItem(lineItem);
     let returnProductId = lineItem?.return_product_id;
 
-    if (lineItem.trip === "oneway" && !returnProductId && products) {
+    if (lineItem.trip_type === "oneway" && !returnProductId && products) {
       const matchedProduct = (products as IProduct[]).find(
         (p: any) => p.id === lineItem.product_id
       );
@@ -175,9 +175,9 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 
     let finalReturnWarehouseId: string | null = null;
 
-    if (selectedLineItem.trip === "two_way") {
+    if (selectedLineItem.trip_type === "two_way") {
       finalReturnWarehouseId = formData.warehouse_id || null;
-    } else if (selectedLineItem.trip === "oneway") {
+    } else if (selectedLineItem.trip_type === "oneway") {
       if (emptyQty > 0) {
         finalReturnWarehouseId = dialogFormData.return_warehouse_id || null;
         if (!finalReturnWarehouseId) {
@@ -186,11 +186,11 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
         }
       }
     }
-
+    console.log(selectedLineItem,'8888888');
+    
     const newRecord: TripLoadRecord = {
-      id: Date.now().toString(),
-      plant_load_line_item_id: selectedLineItem.line_item_id,
-      trip_type: selectedLineItem.trip,
+      plant_load_line_item_id: selectedLineItem.plant_load_line_item_id,
+      trip_type: selectedLineItem.trip_type,
       product_id: selectedLineItem.product_id,
       return_product_id: selectedLineItem.return_product_id || null,
       to_warehouse_id: dialogFormData.to_warehouse_id,
@@ -261,14 +261,12 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 
   const handleProceed = async () => {
     try {
-      alert('check console')
-      console.log(formData,'1111');
       
-      // const data = await unloadSlip(formData);
-      // if (data.success) {
-      //   toast.success("Slip created");
-      //   router.push("/user/stock");
-      // }
+      const data = await unloadSlip(formData);
+      if (data.success) {
+        toast.success("Slip created");
+        router.push("/user/stock");
+      }
     } catch (error) {
       toast.error("error in unload submission");
     }
@@ -367,9 +365,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-          {unloadRecord[0]?.line_items?.map((lineItem: any) => {
-            console.log(lineItem,'000');
-            
+          {unloadRecord[0]?.line_items?.map((lineItem: any) => {            
             return (<Card
               key={lineItem.line_item_id}
               className="p-4 cursor-pointer hover:bg-muted/50 transition-colors"
@@ -475,7 +471,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                 </div>
               </div>
 
-              {selectedLineItem?.trip === "oneway" && (
+              {selectedLineItem?.trip_type === "oneway" && (
                 <div className="grid gap-2">
                   <Label htmlFor="return-warehouse">
                     Return Warehouse (If returning empty loads)
@@ -509,7 +505,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                 </div>
               )}
 
-              {selectedLineItem?.trip === "two_way" &&
+              {selectedLineItem?.trip_type === "two_way" &&
                 selectedLineItem?.return_qty > 0 && (
                   <div className="grid gap-2 text-sm text-muted-foreground">
                     <p className="font-medium">Return Warehouse (Auto-Set)</p>
@@ -546,7 +542,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                     className="flex-shrink-0 min-w-[220px] p-3 relative"
                   >
                     <button
-                      onClick={() => handleDeleteTripLoad(record.id)}
+                      onClick={() => handleDeleteTripLoad(record.id as string)}
                       className="absolute top-1 right-1 text-muted-foreground hover:text-destructive"
                     >
                       <Trash2 className="w-3 h-3" />
