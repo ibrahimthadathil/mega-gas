@@ -2,6 +2,7 @@ import { TripFormData } from "@/app/(UI)/user/stock/_UI/trip-sheet";
 import { StockTransferFormData } from "@/app/(UI)/user/stock/transfer/_UI/stock-transfer-section";
 import {
   delete_stock_transfer,
+  Edit_stock_transfer,
   getAlltransferedStock,
   getpurchasedLoad,
   stock_Transfer,
@@ -102,28 +103,49 @@ const getTransferedView = async (id: string) => {
 
 const displayStockTransfer = async () => {
   try {
-    const viewData = await view_Transfered_stock()
-    if(viewData)return{ success:true , viewData}
-    else return {success:true,viewData:[]}
+    const viewData = await view_Transfered_stock();
+    if (viewData) return { success: true, viewData };
+    else return { success: true, viewData: [] };
   } catch (error) {
     throw error;
   }
 };
 
-const deleteTransferStock = async(transferId:string)=>{
+const deleteTransferStock = async (transferId: string) => {
   try {
-    const deleted = await delete_stock_transfer(transferId)
-    if(deleted)return {success:true,message:'Deleted'}
-    else return {success:false,message:"Failed to Delete"}
+    const deleted = await delete_stock_transfer(transferId);
+    if (deleted) return { success: true, message: "Deleted" };
+    else return { success: false, message: "Failed to Delete" };
   } catch (error) {
-    throw error
+    throw error;
   }
-}
+};
+
+const EditStockTranfer = async (
+  authId: string,
+  transferId: string,
+  data: StockTransferFormData
+) => {
+  try {
+    const checkUser = await checkUserByAuthId(authId);
+    const payload ={
+      "created by":checkUser.id
+    }
+    if (checkUser) {
+      const Edited = await Edit_stock_transfer(transferId, payload);
+      if(Edited)return {success:true,message:'Transfer Edited'}
+      else return {success:false,message:'Failed to edit'}
+    } else throw Error(STATUS.UNAUTHORIZED.message);
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+};
 export {
   unloadSlipRegister,
   transferStock,
   getunloadData,
   getTransferedView,
   displayStockTransfer,
-  deleteTransferStock
+  deleteTransferStock,
+  EditStockTranfer,
 };

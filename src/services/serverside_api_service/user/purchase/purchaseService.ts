@@ -1,5 +1,6 @@
 import {
   addPurchaseRegister,
+  delete_purchase,
   getProductForPurchase,
   getPurchaseRegister,
 } from "@/repository/user/purchase/purchaseRepository";
@@ -45,8 +46,7 @@ const addPurchase_Register = async (
         },
         p_line_items,
       };
-      console.log(payload,'💕💕💕');
-      
+
       const success = await addPurchaseRegister(payload);
       if (success) return { success: true };
       else return { success: false };
@@ -60,7 +60,7 @@ const getPlantLoadCredential = async () => {
   try {
     const warehouse = await gettAllWareHouses();
     const products = await getProductForPurchase();
-    
+
     if (warehouse && products) return { success: true, warehouse, products };
     else return { success: false };
   } catch (error) {
@@ -76,7 +76,22 @@ const getPlantLoadRegister = async (authId: string) => {
       return { success: true, data };
     } else throw new Error("un-authorized");
   } catch (error) {
-    throw (error as Error).message
+    throw (error as Error).message;
   }
 };
-export { addPurchase_Register, getPlantLoadCredential, getPlantLoadRegister };
+
+const deletePurchaseRecord = async (id: string) => {
+  try {
+    const isDeleted = await delete_purchase(id);
+    if (isDeleted) return { success: true, message: "Deleted" };
+    else return { success: false, message: "Failed to delete" };
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+};
+export {
+  addPurchase_Register,
+  getPlantLoadCredential,
+  getPlantLoadRegister,
+  deletePurchaseRecord,
+};

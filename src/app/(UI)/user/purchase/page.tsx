@@ -5,17 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UseRQ } from "@/hooks/useReactQuery";
-import { getPlantLoadRegister } from "@/services/client_api-Service/user/purchase/purchase_api";
+import { deletePurchasedRecord, getPlantLoadRegister } from "@/services/client_api-Service/user/purchase/purchase_api";
 import { PlantLoadRecord } from "@/types/types";
+import AlertModal from "@/components/alert-dialog";
 import { useQueryClient } from "@tanstack/react-query";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Pencil, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function PlantLoadPage() {
-  const { data, isLoading } = UseRQ<PlantLoadRecord[]>("register", getPlantLoadRegister);
+  const { data, isLoading } = UseRQ<PlantLoadRecord[]>(
+    "register",
+    getPlantLoadRegister
+  );
+  const queryClient = useQueryClient()
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
-  const router = useRouter()  
+  const router = useRouter();
   const toggleExpanded = (id: string) => {
     setExpandedIds((prev) => {
       const newSet = new Set(prev);
@@ -28,8 +34,21 @@ export default function PlantLoadPage() {
     });
   };
   const handleUnload = (Record: PlantLoadRecord) => {
-    router.push(`/user/stock/load-slip/${Record?.id}`)
+    router.push(`/user/stock/load-slip/${Record?.id}`);
   };
+
+  const deleteLoad = async (id: string) => {
+    try {
+      const data = await deletePurchasedRecord(id)
+      if(data.success){
+        queryClient.invalidateQueries({queryKey:['register']})
+        toast.success(data.message)
+      }else toast.warning(data.message)
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-8 space-y-6">
       {/* Header */}
@@ -51,7 +70,7 @@ export default function PlantLoadPage() {
           {isLoading ? (
             <Skeleton />
           ) : (
-            (data)?.map((record) => {              
+            data?.map((record) => {
               const isExpanded = expandedIds.has(record?.id);
               return (
                 <Card key={record?.id} className="bg-card w-full">
@@ -94,21 +113,53 @@ export default function PlantLoadPage() {
                               </span>
                             </div>
                             <div>
-                              <span className={`font-medium text-foreground ${record?.is_unloaded ? "text-muted-foreground": "text-white"}`}>
+                              <span
+                                className={`font-medium text-foreground ${
+                                  record?.is_unloaded
+                                    ? "text-muted-foreground"
+                                    : "text-white"
+                                }`}
+                              >
                                 <Button
-                                  onClick={() =>
-                                    handleUnload(record)
-                                  }
+                                  onClick={() => handleUnload(record)}
                                   disabled={record?.is_unloaded}
-                                  className={`${record?.is_unloaded? "bg-red-600":"bg-black"}`}
+                                  className={`${
+                                    record?.is_unloaded
+                                      ? "bg-red-600"
+                                      : "bg-black"
+                                  }`}
                                 >
-                                  {record?.is_unloaded ? "Settled":"Unload"}
+                                  {record?.is_unloaded ? "Settled" : "Unload"}
                                 </Button>
                               </span>
                             </div>
                           </div>
                         </div>
-
+                        {!record.is_unloaded && (
+                          <>
+                            <Button variant="ghost">
+                              <Pencil color="skyblue" />
+                            </Button>
+                            <AlertModal
+                              data={record}
+                              contents={[
+                                <>
+                                  <Trash className="h-5 w-5" color="red" />
+                                </>,
+                                <>
+                                  This action cannot be undone. This will
+                                  permanently delete{" "}
+                                  <span className="font-semibold text-orange-400">
+                                    {record?.sap_number || "This Product"}
+                                  </span>
+                                  's account and remove their data from our
+                                  servers.
+                                </>,
+                              ]}
+                              action={() => deleteLoad(record.id)}
+                            />
+                          </>
+                        )}
                         <ChevronDown
                           onClick={() => toggleExpanded(record?.id)}
                           className={`w-5 h-5 text-muted-foreground transition-transform hover:cursor-pointer ${

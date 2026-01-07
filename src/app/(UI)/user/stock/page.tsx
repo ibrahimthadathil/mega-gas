@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { Rootstate } from "@/redux/store";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const { data: stocks, isLoading: stockLoading } = UseRQ<StockTransfer[]>(
@@ -24,6 +25,7 @@ export default function Home() {
   );
   const { role } = useSelector((user: Rootstate) => user.user);
   const queryClieny = useQueryClient();
+  const router = useRouter()
   const handleDelete = async (id: string) => {
     try {
       const data = await deleteTransferedStockRecord(id);
@@ -35,7 +37,10 @@ export default function Home() {
       toast.error((error as Error).message);
     }
   };
-  const handleEdit = (data: StockTransfer) => {};
+  // const handleEdit = (data: StockTransfer) => {
+  //   // Navigate to transfer page with edit mode and stock data
+  //   router.push(`/user/stock/transfer?mode=edit&id=${data.id}`);
+  // };  
   const columns = [
     {
       header: "No",
@@ -108,7 +113,7 @@ export default function Home() {
     {
       header: "Actions",
       render: (row: StockTransfer) => (
-        role==''?<Button variant="ghost" size="sm" onClick={() => handleEdit(row)}>
+        role=='admin'?<Button variant="ghost" size="sm" onClick={() => alert('Not implemented')}>
           <Pencil className="h-4 w-4" />
         </Button>:
         <>

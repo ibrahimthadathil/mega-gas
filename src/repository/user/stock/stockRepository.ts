@@ -69,6 +69,22 @@ const getAlltransferedStock = async (userId: string) => {
   }
 };
 
+// edit stock transfer
+
+const Edit_stock_transfer = async (transferId: string, payload: Record<string,unknown>) => {
+  try {
+    const { error } = await supabase.rpc("edit_stock_transfer", {
+      p_transfer_id: transferId,
+      payload,
+    });
+    if(error) throw error
+    return true
+  } catch (error) {
+    throw error
+  }
+};
+
+// view all transfered stock
 const view_Transfered_stock = async () => {
   try {
     const { data, error } = await supabase
@@ -84,13 +100,14 @@ const view_Transfered_stock = async () => {
   }
 };
 
+// delete stock transfer
 const delete_stock_transfer = async (transferId: string) => {
   try {
     const { error } = await supabase.rpc("delete_stock_transfer", {
       p_transfer_id: transferId,
     });
-    if(error) throw error
-    return true
+    if (error) throw error;
+    return true;
   } catch (error) {
     console.log((error as Error).message);
   }
@@ -102,4 +119,5 @@ export {
   getAlltransferedStock,
   view_Transfered_stock,
   delete_stock_transfer,
+  Edit_stock_transfer
 };
