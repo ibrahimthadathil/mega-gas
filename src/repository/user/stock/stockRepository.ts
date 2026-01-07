@@ -55,7 +55,7 @@ const getpurchasedLoad = async (id: string) => {
     throw error;
   }
 };
-// this fuction is not using currently 
+// this fuction is not using currently
 const getAlltransferedStock = async (userId: string) => {
   try {
     const { data, error } = await supabase
@@ -73,9 +73,10 @@ const view_Transfered_stock = async () => {
   try {
     const { data, error } = await supabase
       .from("stock_transfer_view")
-      .select("*");
-      if(error) throw error
-      return data
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data;
   } catch (error) {
     console.log((error as Error).message);
 
@@ -83,10 +84,22 @@ const view_Transfered_stock = async () => {
   }
 };
 
+const delete_stock_transfer = async (transferId: string) => {
+  try {
+    const { error } = await supabase.rpc("delete_stock_transfer", {
+      p_transfer_id: transferId,
+    });
+    if(error) throw error
+    return true
+  } catch (error) {
+    console.log((error as Error).message);
+  }
+};
 export {
   unload_Slip,
   stock_Transfer,
   getpurchasedLoad,
   getAlltransferedStock,
   view_Transfered_stock,
+  delete_stock_transfer,
 };

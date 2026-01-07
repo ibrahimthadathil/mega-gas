@@ -4,18 +4,37 @@ import DataTable from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import { UseRQ } from "@/hooks/useReactQuery";
 import { formatDate } from "@/lib/utils";
-import { getTransferedStockSTatus } from "@/services/client_api-Service/user/stock/transfer_api";
+import {
+  deleteTransferedStockRecord,
+  getTransferedStockSTatus,
+} from "@/services/client_api-Service/user/stock/transfer_api";
 import { StockTransfer } from "@/types/stock";
-import { Pencil, Trash } from "lucide-react";
+import { Ban, Pencil, Trash } from "lucide-react";
 import AlertModal from "@/components/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import { Rootstate } from "@/redux/store";
 
 export default function Home() {
   const { data: stocks, isLoading: stockLoading } = UseRQ<StockTransfer[]>(
     "stock",
     getTransferedStockSTatus
   );
-  const handleDelete = (id: string) => {};
+  const { role } = useSelector((user: Rootstate) => user.user);
+  const queryClieny = useQueryClient();
+  const handleDelete = async (id: string) => {
+    try {
+      const data = await deleteTransferedStockRecord(id);
+      if (data.success) {
+        queryClieny.invalidateQueries({ queryKey: ["stock"] });
+        toast.success(data.message);
+      } else toast.warning(data.message);
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+  };
   const handleEdit = (data: StockTransfer) => {};
   const columns = [
     {
@@ -89,27 +108,35 @@ export default function Home() {
     {
       header: "Actions",
       render: (row: StockTransfer) => (
-        <Button variant="ghost" size="sm" onClick={() => handleEdit(row)}>
+        role==''?<Button variant="ghost" size="sm" onClick={() => handleEdit(row)}>
           <Pencil className="h-4 w-4" />
-        </Button>
+        </Button>:
+        <>
+        <Ban className="h-5 w-5 text-red-500"  />
+        </>
       ),
     },
     {
       header: "Delete",
-      render: (row: StockTransfer) => (
-        <AlertModal
-          data={row}
-          contents={[
-            <Trash className="h-5 w-5" />,
-            <>
-              This action cannot be undone. This will permanently delete this
-              transfer record.
-            </>,
-          ]}
-          style="hover:bg-destructive hover:text-destructive-foreground p-2"
-          action={() => handleDelete(row.id)}
-        />
-      ),
+      render: (row: StockTransfer) =>
+        role == "admin" ? (
+          <AlertModal
+            data={row}
+            contents={[
+              <Trash className="h-5 w-5" />,
+              <>
+                This action cannot be undone. This will permanently delete this
+                transfer record.
+              </>,
+            ]}
+            style="hover:bg-destructive hover:text-destructive-foreground p-2"
+            action={() => handleDelete(row.id)}
+          />
+        ) : (
+          <>
+            <Ban className="h-5 w-5 text-red-500 " />
+          </>
+        ),
     },
   ];
 

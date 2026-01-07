@@ -1,6 +1,7 @@
 import { TripFormData } from "@/app/(UI)/user/stock/_UI/trip-sheet";
 import { StockTransferFormData } from "@/app/(UI)/user/stock/transfer/_UI/stock-transfer-section";
 import {
+  delete_stock_transfer,
   getAlltransferedStock,
   getpurchasedLoad,
   stock_Transfer,
@@ -108,10 +109,21 @@ const displayStockTransfer = async () => {
     throw error;
   }
 };
+
+const deleteTransferStock = async(transferId:string)=>{
+  try {
+    const deleted = await delete_stock_transfer(transferId)
+    if(deleted)return {success:true,message:'Deleted'}
+    else return {success:false,message:"Failed to Delete"}
+  } catch (error) {
+    throw error
+  }
+}
 export {
   unloadSlipRegister,
   transferStock,
   getunloadData,
   getTransferedView,
   displayStockTransfer,
+  deleteTransferStock
 };
