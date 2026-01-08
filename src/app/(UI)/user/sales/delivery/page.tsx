@@ -320,6 +320,7 @@ export default function Home() {
                     <DatePicker
                       date={selectedDate}
                       onDateChange={setSelectedDate}
+                      allowFutureDates={true}
                     />
                   </div>
                   <DeliveryPartnerSection
