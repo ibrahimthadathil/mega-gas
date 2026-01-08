@@ -49,7 +49,7 @@ const unloadSlipRegister = async (data: TripFormData, userId: string) => {
 };
 
 const transferStock = async (data: StockTransferFormData, userId: string) => {
-  try {
+  try {    
     const existUser = await checkUserByAuthId(userId);
     if (existUser.id) {
       const payloadData = {
@@ -60,8 +60,8 @@ const transferStock = async (data: StockTransferFormData, userId: string) => {
           "from warehouse": data.from,
           "to warehouse": data.to,
           Empty_inclusive: data.withEmpty,
-          "return product id": data.return_product_id,
-          "return qty": data.quantity,
+          "return product id": data.withEmpty ? data.return_product_id: null,
+          "return qty": data.withEmpty ?data.quantity:0,
           "return from warehouse": data.to,
           "return to warehouse": data.from,
           remarks: data.remarks,
