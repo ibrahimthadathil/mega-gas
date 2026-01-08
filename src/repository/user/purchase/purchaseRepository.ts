@@ -88,7 +88,7 @@ const getPurchaseRegister = async (userId: string) => {
 };
 
 const delete_purchase = async (id: string) => {
-  try {    
+  try {
     const { error } = await supabase.rpc("delete_plant_load_register", {
       p_register_id: id,
     });
@@ -99,10 +99,30 @@ const delete_purchase = async (id: string) => {
   }
 };
 
+const edit_Purchased_Load = async (
+  registerId: string,
+  registerPayload: Record<string, unknown>,
+  lineItemsPayload: Record<string, any>
+) => {
+  try {
+    const { error } = await supabase.rpc("edit_plant_load_register", {
+      p_register_id: registerId,
+      p_register: registerPayload,
+      p_line_items: lineItemsPayload,
+    });
+    if(error) throw error
+    return true
+  } catch (error) {
+    console.log((error as Error).message);
+    throw error;
+  }
+};
+
 export {
   addPurchaseRegister,
   getProductForPurchase,
   getMaterializedProduct,
   getPurchaseRegister,
   delete_purchase,
+  edit_Purchased_Load,
 };

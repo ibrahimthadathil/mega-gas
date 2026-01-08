@@ -26,6 +26,8 @@ export const GET = async (req: NextRequest) => {
     const authId = req.headers.get("x-user-id") as string;
     if (authId) {
       const { data, success } = await getPlantLoadRegister(authId);
+      console.log(data[0]);
+      
       return NextResponse.json(
         { data, success },
         { status: STATUS.SUCCESS.code }

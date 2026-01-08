@@ -49,6 +49,12 @@ export default function PlantLoadPage() {
     }
   };
 
+  const handleEdit = (data:PlantLoadRecord)=>{
+    
+    queryClient.setQueryData(['newLoad',data.id],data)
+    router.push(`/user/purchase/plant-load?id=${data.id}`)
+  }
+
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-8 space-y-6">
       {/* Header */}
@@ -137,7 +143,7 @@ export default function PlantLoadPage() {
                         </div>
                         {!record.is_unloaded && (
                           <>
-                            <Button variant="ghost">
+                            <Button variant="ghost" onClick={()=>handleEdit(record)}>
                               <Pencil color="skyblue" />
                             </Button>
                             <AlertModal

@@ -1,6 +1,7 @@
 import {
   addPurchaseRegister,
   delete_purchase,
+  edit_Purchased_Load,
   getProductForPurchase,
   getPurchaseRegister,
 } from "@/repository/user/purchase/purchaseRepository";
@@ -89,9 +90,56 @@ const deletePurchaseRecord = async (id: string) => {
     return { success: false, message: (error as Error).message };
   }
 };
+
+const editPurchasedLoad = async (
+  id: string,
+  userId: string,
+  data: PurchaseRegisterPayload
+) => {
+  try {
+    const existUser = await checkUserByAuthId(userId);
+    if(existUser){
+
+      const registerPayload = {
+        sap_number: data.sapNumber,
+      bill_date: data.date,
+      warehouse_id: data.warehouse,
+      tax_invoice_number: data.invoiceNumber,
+      created_by: userId,
+    };
+    const lineItemPayload = data.products.map((product) => ({
+      product_id: product.id,
+      full_qty: product.quantity,
+      trip_type: product.tripType,
+      return_qty: product.quantity,
+      warehouse_id: data.warehouse,
+      composite: product.is_composite,
+      return_product_id: product.return_product_id,
+      created_by: existUser.id,
+      product_component: product.is_composite
+        ? product.components?.map((child) => ({
+            child_product_id: child.child_product_id,
+            qty: child.qty,
+          })) || []
+          : [],
+    }));
+    
+    const isEdited = await edit_Purchased_Load(
+      id,
+      registerPayload,
+      lineItemPayload
+    );
+    if (isEdited) return { success: true, message: "Purchase Updated" };
+    else return { success: false, message: "Updation Failed" };
+  } else throw Error('Un-authorized')
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+};
 export {
   addPurchase_Register,
   getPlantLoadCredential,
   getPlantLoadRegister,
   deletePurchaseRecord,
+  editPurchasedLoad,
 };

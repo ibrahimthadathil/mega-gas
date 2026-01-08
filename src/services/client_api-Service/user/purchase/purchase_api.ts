@@ -27,11 +27,23 @@ export const getPlantLoadRegister = async () => {
   }
 };
 
-export const deletePurchasedRecord = async(id:string)=>{
+export const deletePurchasedRecord = async (id: string) => {
   try {
-    const result = await axios.delete(`/api/user/purchase/${id}`)
-    return result.data
+    const result = await axios.delete(`/api/user/purchase/${id}`);
+    return result.data;
   } catch (error) {
-    throw error
+    throw error;
   }
-}
+};
+
+export const editPurchase = async (
+  id: string,
+  data: Record<string, unknown>
+) => {
+  try {
+    const result = await axios.put(`/api/user/purchase/${id}`, data);
+    return result.data;
+  } catch (error) {
+    throw error;
+  }
+};
