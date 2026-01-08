@@ -482,6 +482,7 @@ import {
 import Loading from "@/loading";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 export interface Product {
   id: string;
@@ -502,7 +503,7 @@ interface DialogFormData {
 export default function PlantLoadSection({ recordId }: { recordId?: string }) {
   const { data, isLoading } = UseRQ("credential", getPurchaseCredentials);
   const queryClient = useQueryClient();
-
+  const router = useRouter()
   const editData = useMemo(() => {
     if (!recordId) return null;
     return queryClient.getQueryData<PlantLoadRecord>(["newLoad", recordId]);
@@ -650,6 +651,7 @@ export default function PlantLoadSection({ recordId }: { recordId?: string }) {
       let result;
       if (isEditMode) {
         result = await editPurchase(recordId!, purchaseData);
+        router.push('/user/purchase')
       } else {
         result = await addPurchaseRegister(purchaseData);
       }

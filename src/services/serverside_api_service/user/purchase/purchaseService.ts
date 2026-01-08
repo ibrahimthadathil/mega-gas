@@ -105,7 +105,7 @@ const editPurchasedLoad = async (
       bill_date: data.date,
       warehouse_id: data.warehouse,
       tax_invoice_number: data.invoiceNumber,
-      created_by: userId,
+      created_by: existUser.id,
     };
     const lineItemPayload = data.products.map((product) => ({
       product_id: product.id,
