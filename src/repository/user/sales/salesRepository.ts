@@ -36,8 +36,8 @@ const getAllProductsOptions = async () => {
 const getUPIQR = async () => {
   try {
     const { data, error } = await supabase.from("upi_qrcode").select("*");
-    if(error) throw error
-    return data
+    if (error) throw error;
+    return data;
   } catch (error) {
     throw error;
   }
@@ -168,10 +168,29 @@ const getGSTCustomer = async () => {
   }
 };
 
+const daily_Report_View = async (
+  userId: string,
+ { page = 1, limit = 7 }: { page?: number; limit?: number } = {}
+) => {
+  const offset = (page - 1) * limit;
+  try {
+    const { data, error } = await supabase
+      .from("")
+      .select("*", { count: "exact" })
+      .eq("created_by", userId)
+      .range(offset, offset + limit - 1);
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export {
   getDeliveryPayloadByVehicle,
   getAllProductsOptions,
+  daily_Report_View,
   reportDailyDelivery,
   getGSTCustomer,
-  getUPIQR
+  getUPIQR,
 };

@@ -85,7 +85,7 @@ const recordDelivery = async (data: DeliveryPayload, authId: string) => {
         },
       };
       console.log(payload);
-      
+
       const result = await reportDailyDelivery(
         payload,
         data.remark as string,
@@ -99,4 +99,17 @@ const recordDelivery = async (data: DeliveryPayload, authId: string) => {
   }
 };
 
-export { getDeliverableProduct, recordDelivery, getDeliveryPayload };
+const dailyReport = async (authId:string) => {
+  try {
+    
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+};
+
+export {
+  getDeliverableProduct,
+  recordDelivery,
+  getDeliveryPayload,
+  dailyReport,
+};
