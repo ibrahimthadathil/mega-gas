@@ -10,7 +10,7 @@ export interface SalesSlipPayload {
   sales_slip_id: string;      // uuid
   date: string;               // ISO date (YYYY-MM-DD)
   created_by: string;         // uuid
-
+  chest_name:string;
   total_sales_amount: number;
   total_upi_amount: number;
   total_online_amount: number;
