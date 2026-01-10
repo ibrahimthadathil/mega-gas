@@ -175,7 +175,7 @@ const daily_Report_View = async (
   const offset = (page - 1) * limit;
   try {
     const { data, error } = await supabase
-      .from("")
+      .from("daily_sales_report_view")
       .select("*", { count: "exact" })
       .eq("created_by", userId)
       .range(offset, offset + limit - 1);

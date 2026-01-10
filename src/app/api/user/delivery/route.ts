@@ -1,5 +1,6 @@
 import { reportDailyDelivery } from "@/repository/user/sales/salesRepository";
 import {
+  dailyReport,
   getDeliverableProduct,
   recordDelivery,
 } from "@/services/serverside_api_service/user/sales/saleService";
@@ -40,6 +41,28 @@ export const POST = async (req: NextRequest) => {
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },
+      { status: STATUS.SERVER_ERROR.code }
+    );
+  }
+};
+
+export const GET = async (req: NextRequest) => {
+  try {
+    const authId = req.headers.get("x-user-id");
+    const { success, data, message } = await dailyReport(authId as string);
+    if (success)
+      return NextResponse.json(
+        { success, data },
+        { status: STATUS.SUCCESS.code }
+      );
+    else
+      return NextResponse.json(
+        { success, message },
+        { status: STATUS.NOT_FOUND.code }
+      );
+  } catch (error) {
+    return NextResponse.json(
+      { message: STATUS.SERVER_ERROR.message },
       { status: STATUS.SERVER_ERROR.code }
     );
   }

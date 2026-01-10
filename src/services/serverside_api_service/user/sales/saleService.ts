@@ -1,5 +1,7 @@
+import supabase from "@/lib/supabase/supabaseClient";
 import { getExpensesByStatus } from "@/repository/user/expenses/expenseRepository";
 import {
+  daily_Report_View,
   getAllProductsOptions,
   getDeliveryPayloadByVehicle,
   getGSTCustomer,
@@ -101,7 +103,12 @@ const recordDelivery = async (data: DeliveryPayload, authId: string) => {
 
 const dailyReport = async (authId:string) => {
   try {
-    
+    const user = await checkUserByAuthId(authId)
+    if(user){
+      const data = await daily_Report_View(user.id)
+      if(data)return {success:true,data}
+      else return {success:false,message:'Not found'}
+    }else throw Error('Unauthorized')
   } catch (error) {
     return { success: false, message: (error as Error).message };
   }

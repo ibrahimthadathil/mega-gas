@@ -26,3 +26,14 @@ export const recordDelivery = async (data:any) => {
     throw error
   }
 }
+
+// get Daily report by the user 
+
+export const getDailyReportByUser = async()=>{
+  try {
+    const {data} = await axios.get('/api/user/delivery') 
+    return data
+  } catch (error) {
+    throw error
+  }
+}

@@ -150,7 +150,7 @@ export function TransactionForm({
           account_id: "",
           amount_received: 0,
           amount_paid: 0,
-          source_form: "Expence",
+          source_form: "Transaction "  + transactionType,
           source_form_reference_id: null,
           remarks: "",
           
