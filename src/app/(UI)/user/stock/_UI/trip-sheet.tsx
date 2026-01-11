@@ -89,6 +89,8 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
   const { data: users, isLoading: isUserLoading } = UseRQ("user", () =>
     get_userByRole("driver")
   );
+    const [isSubmit,setSubmit] = useState<boolean>(false)
+  
 
   // Initialize state with empty values
   const [formData, setFormData] = useState<TripFormData>({
@@ -260,6 +262,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 
   const handleProceed = async () => {
     try {
+      setSubmit(true)
       const data = await unloadSlip(formData);
       if (data.success) {
         toast.success("Slip created");
@@ -676,7 +679,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
       </div>
 
       {/* Submit Button */}
-      <Button onClick={handleProceed} className="w-full" size="lg">
+      <Button disabled={isSubmit} onClick={handleProceed} className="w-full" size="lg">
         Proceed
       </Button>
     </div>

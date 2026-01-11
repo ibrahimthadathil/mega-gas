@@ -80,7 +80,7 @@ export default function Home() {
 
   const [sales, setSales] = useState<Sale[]>([]);
   const [chestName, setChestName] = useState<"office" | "godown" | "">("");
-
+  const [isSubmit,setSubmit] = useState<boolean>(false)
   // near other state hooks
   const [upiPayments, setUpiPayments] = useState<
     Array<{ "UPI Id": string; amount: number }>
@@ -267,9 +267,11 @@ export default function Home() {
     };
 
     try {
+      setSubmit(true)
       await recordDelivery(report);
       console.log("Report submitted:", report);
       alert("Report submitted successfully!");
+      alert("Don't submit successfuagain...!!");
     } catch (error) {
       console.error("Error submitting report:", error);
     }
@@ -478,6 +480,7 @@ export default function Home() {
                   </p>
                 </div>
                 <Button
+                disabled={isSubmit}
                   onClick={handleSubmitReport}
                   className="w-full h-12 text-base mt-4"
                 >
