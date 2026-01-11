@@ -263,12 +263,12 @@ export default function SalesSection({
     });
   };
 
-  // // Log formatted data (you can call this on form submission)
-  // const handleSubmit = () => {
-  //   const formattedSales = formatSalesForSubmission();
-  //   console.log("Sales:", JSON.stringify(formattedSales, null, 2));
-  //   return formattedSales;
-  // };
+  // Log formatted data (you can call this on form submission)
+  const handleSubmit = () => {
+    const formattedSales = formatSalesForSubmission();
+    console.log("Sales:", JSON.stringify(formattedSales, null, 2));
+    return formattedSales;
+  };
 
   return (
     <div className="space-y-3">
@@ -548,12 +548,12 @@ export default function SalesSection({
         </div>
       )}
 
-      {/* Debug button - remove in production
+      {/* Debug button - remove in production */}
       {sales.length > 0 && (
         <Button onClick={handleSubmit} variant="secondary" className="w-full">
           Log Formatted Sales (Dev Only)
         </Button>
-      )} */}
+      )}
     </div>
   );
 }

@@ -908,7 +908,7 @@ export default function Home() {
       setSubmit(true);
       let data;
       if (!isEditMode) data = await recordDelivery(report);
-      else await updateSalesSlip(report,report.id as string);
+      else data = await updateSalesSlip(report,report.id as string);
       if (data.success){ 
         route.push('/user/sales')
         toast.success(data.message)}
