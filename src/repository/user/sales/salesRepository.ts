@@ -39,6 +39,7 @@ const getUPIQR = async () => {
     if (error) throw error;
     return data;
   } catch (error) {
+    console.log((error as Error).message);
     throw error;
   }
 };

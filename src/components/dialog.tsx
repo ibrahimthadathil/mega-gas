@@ -113,6 +113,7 @@ const UserDialog: React.FC<UserDialogProps> = ({
       if (user) {
         // Edit mode - call onSave with user id
         onSave(userData, user.id, user.auth_id);
+         setOpen(false);
       } else {
         // Add mode - call API directly
         const { data } = await axios.post("/api/admin/auth", userData);

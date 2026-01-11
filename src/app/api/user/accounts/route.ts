@@ -1,3 +1,4 @@
+import { getAuthUser } from "@/lib/auth/jwt";
 import {
   createNewAccount,
   getAllAccounts,
@@ -8,9 +9,9 @@ import { NextRequest, NextResponse } from "next/server";
 export const POST = async (req: NextRequest) => {
   try {
     const data = await req.json();
-    const userId = req.headers.get("x-user-id");
-    data.created_by = userId as string;
-    if (userId) {
+    const { user, error: authError } = await getAuthUser();
+    data.created_by = user?.id as string;
+    if (user?.id) {
       const { success } = await createNewAccount(data);
       
       if (success)

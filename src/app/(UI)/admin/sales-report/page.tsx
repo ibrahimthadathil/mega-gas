@@ -34,6 +34,7 @@ import {
 import { deleteDailyReport } from "@/services/client_api-Service/admin/sales/sales_admin_api";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const Home = () => {
   const { data: report, isLoading } = UseRQ<SalesSlipPayload[]>(
@@ -41,120 +42,123 @@ const Home = () => {
     getDailyReportByUser
   );
   const queryQlient = useQueryClient();
+  const route = useRouter()
   const handleDelete = async (id: string) => {
     const data = await deleteDailyReport(id);
     if (data.success) {
       queryQlient.invalidateQueries({ queryKey: ["reports"] });
       toast.success(data.message);
-    } else toast.warning(data.message);
-    const columns = useMemo(() => {
-      return [
-        {
-          header: "Date",
-          render: (row: SalesSlipPayload) => <span>{row.date}</span>,
-        },
-        {
-          header: "Total sales",
-          render: (row: SalesSlipPayload) => (
-            <div className="font-semibold text-md text-orange-900 ">
-              <IndianRupee className="inline h-4 w-4" />
-              {row.total_sales_amount}
-            </div>
-          ),
-        },
-        {
-          header: " Online ( UPI + Online )",
-          render: (row: SalesSlipPayload) => (
-            <span>
-              {row.total_upi_amount} + {row.total_online_amount} ={" "}
-              {row.total_upi_amount + Number(row.total_online_amount)}
-            </span>
-          ),
-        },
-        {
-          header: " Cash",
-          render: (row: SalesSlipPayload) => (
-            <span className="font-semibold text-md text-emerald-600 ">
-              <IndianRupee className="inline h-4 w-4" />
-              {row.total_cash_amount}
-            </span>
-          ),
-        },
+    } else toast.warning(data.message)
+  };
+  const handleEdit = (id:String)=>{
+    route.push(`/user/sales/delivery?id=${id}`)
+  }
+  const columns = useMemo(() => {
+    return [
+      {
+        header: "Date",
+        render: (row: SalesSlipPayload) => <span>{row.date}</span>,
+      },
+      {
+        header: "Total sales",
+        render: (row: SalesSlipPayload) => (
+          <div className="font-semibold text-md text-orange-900 ">
+            <IndianRupee className="inline h-4 w-4" />
+            {row.total_sales_amount}
+          </div>
+        ),
+      },
+      {
+        header: " Online ( UPI + Online )",
+        render: (row: SalesSlipPayload) => (
+          <span>
+            {row.total_upi_amount} + {row.total_online_amount} ={" "}
+            {row.total_upi_amount + Number(row.total_online_amount)}
+          </span>
+        ),
+      },
+      {
+        header: " Cash",
+        render: (row: SalesSlipPayload) => (
+          <span className="font-semibold text-md text-emerald-600 ">
+            <IndianRupee className="inline h-4 w-4" />
+            {row.total_cash_amount}
+          </span>
+        ),
+      },
 
-        {
-          header: "cash status",
-          render: (row: SalesSlipPayload) => (
-            <Badge
-              variant="outline"
-              className={`${
-                row.chest_name == "office"
-                  ? "text-green-700"
-                  : "text-orange-900"
-              }`}
-            >
-              {row.chest_name}
-            </Badge>
-          ),
-        },
-        {
-          header: "View",
-          render: (row: SalesSlipPayload) => (
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="secondary" size="sm">
-                  <Eye className="h-4 w-4 mr-2" />
-                  View Details
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-scroll [&>button]:hidden">
-                <DialogHeader>
-                  <DialogTitle>Unload Details</DialogTitle>
-                </DialogHeader>
-                <div className="mt-4">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>NO</TableHead>
-                        <TableHead>Product</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>QTY</TableHead>
-                        <TableHead>Total Amt</TableHead>
+      {
+        header: "cash status",
+        render: (row: SalesSlipPayload) => (
+          <Badge
+            variant="outline"
+            className={`${
+              row.chest_name == "office" ? "text-green-700" : "text-orange-900"
+            }`}
+          >
+            {row.chest_name}
+          </Badge>
+        ),
+      },
+      {
+        header: "View",
+        render: (row: SalesSlipPayload) => (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="secondary" size="sm">
+                <Eye className="h-4 w-4 mr-2" />
+                View Details
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-scroll [&>button]:hidden">
+              <DialogHeader>
+                <DialogTitle>Unload Details</DialogTitle>
+              </DialogHeader>
+              <div className="mt-4">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>NO</TableHead>
+                      <TableHead>Product</TableHead>
+                      <TableHead>Price</TableHead>
+                      <TableHead>QTY</TableHead>
+                      <TableHead>Total Amt</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {row.sale_items.map((detail, index) => (
+                      <TableRow key={detail.sales_line_item_id}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>{detail.product_name}</TableCell>
+                        <TableCell>
+                          <IndianRupee className="inline h-3 w-3" />
+                          {detail.rate}
+                        </TableCell>
+                        <TableCell>{detail.qty}</TableCell>
+                        <TableCell className="text-green-800 font-semibold">
+                          <IndianRupee className="inline h-3 w-3" />
+                          {detail.total}
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {row.sale_items.map((detail, index) => (
-                        <TableRow key={detail.sales_line_item_id}>
-                          <TableCell>{index + 1}</TableCell>
-                          <TableCell>{detail.product_name}</TableCell>
-                          <TableCell>
-                            <IndianRupee className="inline h-3 w-3" />
-                            {detail.rate}
-                          </TableCell>
-                          <TableCell>{detail.qty}</TableCell>
-                          <TableCell className="text-green-800 font-semibold">
-                            <IndianRupee className="inline h-3 w-3" />
-                            {detail.total}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </DialogContent>
-            </Dialog>
-          ),
-        },
-        {
-          header: "Status",
-          render: (row: SalesSlipPayload) => {
-            const status = row.status?.toLowerCase() || "";
-            const isSubmitted =
-              status.includes("submit") || status === "submitted";
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </DialogContent>
+          </Dialog>
+        ),
+      },
+      {
+        header: "Status",
+        render: (row: SalesSlipPayload) => {
+          const status = row.status?.toLowerCase() || "";
+          const isSubmitted =
+            status.includes("submit") || status === "submitted";
 
-            return (
-              <Badge
-                variant={isSubmitted ? "outline" : "default"}
-                className={`
+          return (
+            <Badge
+              variant={isSubmitted ? "outline" : "default"}
+              className={`
                 ${
                   isSubmitted
                     ? "border-orange-500 text-orange-700 bg-orange-50 dark:bg-orange-950/30 dark:text-orange-400"
@@ -162,94 +166,93 @@ const Home = () => {
                 }
                 font-medium px-3 py-1
               `}
-              >
-                {row.status || "Pending"}
-              </Badge>
-            );
-          },
-        },
-        {
-          header: "remark",
-          render: (row: SalesSlipPayload) => {
-            const remark = "row.remark";
-
-            if (!remark || remark.trim() === "") {
-              return <div className="text-muted-foreground text-center">—</div>;
-            }
-
-            return (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="max-w-[100px] truncate cursor-pointer text-left">
-                      {remark}
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="max-w-xs whitespace-pre-wrap">{remark}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            );
-          },
-        },
-        {
-          header: "Action",
-          render: (row: SalesSlipPayload) => (
-            <AlertModal
-              data={row}
-              contents={[
-                row.status == "Submitted" ? "Close" : "Closed",
-                <>This Slip Will be Closed after this action.</>,
-              ]}
-              disable={row.status !== "Submitted"}
-              varient={row.status == "Submitted" ? "destructive" : "secondary"}
-              style=" hover:text-destructive-foreground p-2"
-              action={() => alert(row.sales_slip_id)}
-            />
-          ),
-        },
-        {
-          header: "Edit",
-          render: (row: SalesSlipPayload) => (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => alert("Not implemented")}
             >
-              <Pencil className="h-4 w-4" />
-            </Button>
-          ),
+              {row.status || "Pending"}
+            </Badge>
+          );
         },
-        {
-          header: "Delete",
-          render: (row: SalesSlipPayload) => (
-            <AlertModal
-              data={row}
-              contents={[
-                <Trash className="h-5 w-5" />,
-                <>
-                  This action cannot be undone. This will permanently delete
-                  this transfer record.
-                </>,
-              ]}
-              style=" hover:text-destructive-foreground p-2"
-              action={() => handleDelete(row.sales_slip_id)}
-            />
-          ),
+      },
+      {
+        header: "remark",
+        render: (row: SalesSlipPayload) => {
+          const remark = "row.remark";
+
+          if (!remark || remark.trim() === "") {
+            return <div className="text-muted-foreground text-center">—</div>;
+          }
+
+          return (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="max-w-[100px] truncate cursor-pointer text-left">
+                    {remark}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs whitespace-pre-wrap">{remark}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          );
         },
-      ];
-    }, [report]);
-    return (
-      <main className="min-h-screen bg-background p-4 sm:p-6">
-        <h1 className="text-3xl font-semibold mb-2">Transfered Stock</h1>
-        {isLoading ? (
-          <Skeleton className="w-full h-24 bg-zinc-50" />
-        ) : (
-          <DataTable columns={columns} itemsPerPage={10} data={report ?? []} />
-        )}
-      </main>
-    );
-  };
+      },
+      {
+        header: "Action",
+        render: (row: SalesSlipPayload) => (
+          <AlertModal
+            data={row}
+            contents={[
+              row.status == "Submitted" ? "Close" : "Closed",
+              <>This Slip Will be Closed after this action.</>,
+            ]}
+            disable={row.status !== "Submitted"}
+            varient={row.status == "Submitted" ? "destructive" : "secondary"}
+            style=" hover:text-destructive-foreground p-2"
+            action={() => alert(row.sales_slip_id)}
+          />
+        ),
+      },
+      {
+        header: "Edit",
+        render: (row: SalesSlipPayload) => (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleEdit(row.sales_slip_id)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+        ),
+      },
+      {
+        header: "Delete",
+        render: (row: SalesSlipPayload) => (
+          <AlertModal
+            data={row}
+            contents={[
+              <Trash className="h-5 w-5" />,
+              <>
+                This action cannot be undone. This will permanently delete this
+                transfer record.
+              </>,
+            ]}
+            style=" hover:text-destructive-foreground p-2"
+            action={() => handleDelete(row.sales_slip_id)}
+          />
+        ),
+      },
+    ];
+  }, [report]);
+  return (
+    <main className="min-h-screen bg-background p-4 sm:p-6">
+      <h1 className="text-3xl font-semibold mb-2">Transfered Stock</h1>
+      {isLoading ? (
+        <Skeleton className="w-full h-24 bg-zinc-50" />
+      ) : (
+        <DataTable columns={columns} itemsPerPage={10} data={report ?? []} />
+      )}
+    </main>
+  );
 };
 export default Home;

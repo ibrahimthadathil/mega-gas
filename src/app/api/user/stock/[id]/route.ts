@@ -1,4 +1,5 @@
 
+import { getAuthUser } from "@/lib/auth/jwt";
 import { getDeliveryPayload } from "@/services/serverside_api_service/user/sales/saleService";
 import { getunloadData } from "@/services/serverside_api_service/user/stock/stockService";
 import { STATUS } from "@/types/types";
@@ -9,8 +10,8 @@ export const GET = async (
   { params }: { params: { id: string } }
 ) => {
   try {
-    const authId = req.headers.get("x-user-id");
-    if (authId) {
+    const { user, error: authError } = await getAuthUser();
+    if (user?.id) {
       const { id } = await params;
       const {result,success} = await getunloadData(id);            
       return NextResponse.json({data:result,success}, { status: STATUS.SUCCESS.code });

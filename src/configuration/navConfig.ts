@@ -6,8 +6,9 @@ import {
   LayoutDashboardIcon,
   Warehouse,
   BookAIcon,
+  Power,
 } from "lucide-react";
-
+import { title } from "process";
 export const navItems = [
   {
     title: "Dashboard",
@@ -76,7 +77,8 @@ export const navItems = [
     items:[
       {title:'Transactions',url:'/user/accounts/transactions',roles:["admin", "manager", "accountant", "godown_keeper"]}
     ]
-  }
+  },
+ 
 ];
 
 export const filterByRole = (items: NavItem[], role: string): NavItem[] =>{

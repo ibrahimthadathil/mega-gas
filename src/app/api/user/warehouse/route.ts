@@ -1,3 +1,4 @@
+import { getAuthUser } from "@/lib/auth/jwt";
 import {
   AddNewWareHouse,
   getWareHouses,
@@ -8,8 +9,8 @@ import { NextRequest, NextResponse } from "next/server";
 export const POST = async (req: NextRequest) => {
   try {
     const data = await req.json();
-    const userId = req.headers.get("x-user-id");
-    data.created_by = userId as string;
+    const { user, error: authError } = await getAuthUser();
+    data.created_by = user?.id as string;
     const success = await AddNewWareHouse(data);
     if (success)
       return NextResponse.json({ success }, { status: STATUS.CREATED.code });
@@ -37,4 +38,3 @@ export const GET = async () => {
     );
   }
 };
-

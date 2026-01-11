@@ -39,9 +39,10 @@ const delete_user = async (userId: string) => {
 
 const editUser = async(userId:string,data:IUser)=>{
   try {
-    console.log(userId,'0000',data);
     
-    const s = await edit_user(data,userId)
+    const edited = await edit_user(data,userId)
+    if (edited) return {success:true};
+     else throw Error("User Not found");
   } catch (error) {
     throw error
   }

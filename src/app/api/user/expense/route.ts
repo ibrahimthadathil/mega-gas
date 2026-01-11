@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+import { getAuthUser } from "@/lib/auth/jwt";
 import { reportDailyDelivery } from "@/repository/user/sales/salesRepository";
 import {
   addExpenses,
@@ -10,8 +11,8 @@ import { NextRequest, NextResponse } from "next/server";
 export const POST = async (req: NextRequest) => {
   try {
     const data = (await req.json()) as Expense;
-    const userId = req.headers.get("x-user-id");
-    data.created_by = userId as string;
+    const { user, error: authError } = await getAuthUser();
+    data.created_by = user?.id as string;
 
     if (data.created_by) {
       const success = await addExpenses(data);
@@ -35,9 +36,9 @@ export const POST = async (req: NextRequest) => {
 
 export const GET = async (req: NextRequest) => {
   try { 
-    const userId = req.headers.get("x-user-id") as string;
-    if (userId) {
-      const { success, data } = await getExpensesByUser(userId);
+    const { user, error: authError } = await getAuthUser();
+    if (user?.id) {
+      const { success, data } = await getExpensesByUser(user?.id);
       if (success) {
         return NextResponse.json(
           { data, success },

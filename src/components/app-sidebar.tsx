@@ -4,6 +4,7 @@ import * as React from "react";
 import {
   AudioWaveform,
   Command,
+  Flame,
   Frame,
   GalleryVerticalEnd,
   Map,
@@ -24,6 +25,7 @@ import {
 import { useSelector } from "react-redux";
 import { Rootstate } from "@/redux/store";
 import { filterByRole, navItems } from "@/configuration/navConfig";
+import { useAuth } from "@/hooks/useAuth";
 
 // This is sample data.
 const data = {
@@ -36,42 +38,43 @@ const data = {
   },
   teams: [
     {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
+      name: "Megha Indane",
+      logo: Flame,
       plan: "Enterprise",
     },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
+    // {
+    //   name: "Acme Corp.",
+    //   logo: AudioWaveform,
+    //   plan: "Startup",
+    // },
+    // {
+    //   name: "Evil Corp.",
+    //   logo: Command,
+    //   plan: "Free",
+    // },
   ],
 
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
+  // projects: [
+  //   {
+  //     name: "Design Engineering",
+  //     url: "#",
+  //     icon: Frame,
+  //   },
+  //   {
+  //     name: "Sales & Marketing",
+  //     url: "#",
+  //     icon: PieChart,
+  //   },
+  //   {
+  //     name: "Travel",
+  //     url: "#",
+  //     icon: Map,
+  //   },
+  // ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const {Logout} = useAuth()
   const user = useSelector((state: Rootstate) => state.user);
   const filterdNav = React.useMemo(
     () => filterByRole(navItems, user.role as string),
@@ -83,11 +86,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={filterdNav} />
-        <NavProjects projects={data.projects} />
+        <NavMain items={filterdNav } onLogout={Logout} />
+        {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        {/* <NavUser user={data.user} /> */}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

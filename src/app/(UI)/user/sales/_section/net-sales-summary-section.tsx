@@ -181,6 +181,7 @@ export default function NetSalesSummarySection({
           <Dialog open={upiDialogOpen} onOpenChange={setUpiDialogOpen}>
             <DialogTrigger asChild>
               <Button
+                type="button"
                 size="sm"
                 variant="outline"
                 className="gap-1 bg-transparent"
@@ -233,7 +234,7 @@ export default function NetSalesSummarySection({
                   />
                 </div>
 
-                <Button className="w-full" onClick={addUpiPayment}>
+                <Button type="button" className="w-full" onClick={addUpiPayment}>
                   Add Payment
                 </Button>
               </div>
@@ -254,6 +255,7 @@ export default function NetSalesSummarySection({
                       </p>
                     </div>
                     <Button
+                    type="button"
                       size="sm"
                       variant="ghost"
                       onClick={() => deleteUpiPayment(payment["UPI Id"], index)}
@@ -283,6 +285,7 @@ export default function NetSalesSummarySection({
           <Dialog open={onlineDialogOpen} onOpenChange={setOnlineDialogOpen}>
             <DialogTrigger asChild>
               <Button
+              type="button"
                 size="sm"
                 variant="outline"
                 className="gap-1 bg-transparent"
@@ -326,7 +329,7 @@ export default function NetSalesSummarySection({
                   />
                 </div>
 
-                <Button className="w-full" onClick={addOnlinePayment}>
+                <Button type="button" className="w-full" onClick={addOnlinePayment}>
                   Add Payment
                 </Button>
               </div>
@@ -349,6 +352,7 @@ export default function NetSalesSummarySection({
                       </p>
                     </div>
                     <Button
+                    type="button"
                       size="sm"
                       variant="ghost"
                       onClick={() => deleteOnlinePayment(index)}

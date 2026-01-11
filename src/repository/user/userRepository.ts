@@ -10,6 +10,8 @@ const checkUserByAuthId = async (userId: string) => {
     if (error) throw error;
     else return data;
   } catch (error) {
+  
+    console.log((error as Error).message,'oooo');
     throw error;
   }
 };
@@ -38,6 +40,7 @@ const getUserByRole = async (role: string) => {
     if (error) throw error;
     return data;
   } catch (error) {
+    console.log((error as Error).message);
     throw error;
   }
 };

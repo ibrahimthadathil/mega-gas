@@ -1,3 +1,4 @@
+import { getAuthUser } from "@/lib/auth/jwt";
 import {
   addPurchase_Register,
   getPlantLoadRegister,
@@ -8,9 +9,9 @@ import { NextRequest, NextResponse } from "next/server";
 export const POST = async (req: NextRequest) => {
   try {
     const data = await req.json();
-    const userId = req.headers.get("x-user-id") as string;
-    if (userId) {
-      const { success } = await addPurchase_Register(data, userId);
+    const { user, error: authError } = await getAuthUser();
+    if (user?.id) {
+      const { success } = await addPurchase_Register(data, user?.id);
       return NextResponse.json({ success }, { status: STATUS.CREATED.code });
     } else return NextResponse.json({}, { status: STATUS.UNAUTHORIZED.code });
   } catch (error) {
@@ -23,9 +24,9 @@ export const POST = async (req: NextRequest) => {
 
 export const GET = async (req: NextRequest) => {
   try {
-    const authId = req.headers.get("x-user-id") as string;
-    if (authId) {
-      const { data, success } = await getPlantLoadRegister(authId);
+    const { user, error: authError } = await getAuthUser();
+    if (user?.id) {
+      const { data, success } = await getPlantLoadRegister(user?.id);
       console.log(data[0]);
       
       return NextResponse.json(

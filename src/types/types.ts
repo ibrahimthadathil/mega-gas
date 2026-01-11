@@ -39,6 +39,7 @@ export const STATUS = {
   NOT_FOUND: { code: 404, message: "Resource not found" },
   CONFLICT: { code: 409, message: "Conflict occurred" },
   SERVER_ERROR: { code: 500, message: "Internal server error" },
+  NO_CONTENT :{code:204,message:"No Content"}
 } as const;
 
 export interface Expense {

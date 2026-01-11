@@ -1,4 +1,5 @@
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin";
+import { DeliveryPayload } from "@/types/deliverySlip";
 
 const daily_Report_View = async ({
   page = 1,
@@ -17,27 +18,56 @@ const daily_Report_View = async ({
   }
 };
 
-const delete_sales = async (slipId:string,userId:string) => {
+const delete_sales = async (slipId: string, userId: string) => {
   try {
-    const {error} = await supabaseAdmin.rpc("delete_sales_slip", {
+    const { error } = await supabaseAdmin.rpc("delete_sales_slip", {
       p_sales_slip_id: slipId,
       p_deleted_by: userId,
+    });
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.log((error as Error).message);
+  }
+};
+
+const edit_sales_slip = async (payload:DeliveryPayload,userId:string,slipId:string) => {
+  try {
+    const { error } = await supabaseAdmin.rpc("update_sales_slip_safe", {
+      p_sales_slip_id: slipId,
+      payload: payload,
+      p_updated_by: userId,
     });
     if(error) throw error
     return true
   } catch (error) {
-    console.log((error as Error).message);    
+    console.log((error as Error).message);
+
+    throw error;
   }
 };
 
-
-const edit_sales_slip = async()=>{
+const get_Sales_Slip_ById = async (slipId: string) => {
   try {
+    const { data,error } = await supabaseAdmin.rpc(
+      "get_sales_slip_full_report",
+      {
+        p_sales_slip_id: slipId,
+      }
+    );
+
+    if (error) throw error;
+    console.log(data);
     
+    return data;
   } catch (error) {
     console.log((error as Error).message);
     
-    throw error
   }
-}
-export { daily_Report_View, delete_sales };
+};
+export {
+  daily_Report_View,
+  delete_sales,
+  edit_sales_slip,
+  get_Sales_Slip_ById,
+};

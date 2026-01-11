@@ -21,9 +21,11 @@ import DataTable from "@/components/data-table";
 import { formatDate } from "@/lib/utils";
 import AlertModal from "@/components/alert-dialog";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 const Page = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
+  const queryClient = useQueryClient()
   const { data: users, isLoading: loadingUser } = UseRQ<IUser[]>(
     "users",
     getAllUsers
@@ -41,7 +43,10 @@ const Page = () => {
   const handleSaveUser = async(data:IUser,id?:string,authid?:string) => {
     try {
       data.auth_id=authid
-      await editUser(data,id)
+      const datas = await editUser(data,id)
+      if(datas.success){
+        queryClient.invalidateQueries({queryKey:['users']})
+      }
     } catch (error) {
       
     }    

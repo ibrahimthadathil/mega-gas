@@ -23,7 +23,7 @@ export default function VerificationDialog({  onVerify }: VerificationDialogProp
 
   return (
     <>
-      <Button onClick={() => setShowVerificationPrompt(true)} className="w-full h-12 text-base">
+      <Button type="button" onClick={() => setShowVerificationPrompt(true)} className="w-full h-12 text-base">
         Proceed
       </Button>
 

@@ -1,3 +1,4 @@
+import { getAuthUser } from "@/lib/auth/jwt";
 import { deleteUnloadSlipById } from "@/services/serverside_api_service/user/unload/unload-service";
 import { STATUS } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
@@ -8,8 +9,8 @@ export const DELETE = async (
 ) => {
   try {
     const { id } = await params;
-    const authId = req.headers.get("x-user-id") as string;
-    const { message, success } = await deleteUnloadSlipById(id, authId);
+    const { user, error: authError } = await getAuthUser();
+    const { message, success } = await deleteUnloadSlipById(id, user?.id as string);
     if (success)
       return NextResponse.json(
         { success, message },

@@ -1,3 +1,4 @@
+import { getAuthUser } from "@/lib/auth/jwt";
 import { displayStockTransfer, transferStock } from "@/services/serverside_api_service/user/stock/stockService";
 import { STATUS } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
@@ -6,9 +7,9 @@ import { NextRequest, NextResponse } from "next/server";
 export const POST = async (req: NextRequest) => {
   try {
     const data = await req.json();    
-    const userId = req.headers.get("x-user-id");
-    if (userId) {
-      const { success } = await transferStock(data,userId);
+    const { user, error: authError } = await getAuthUser();
+    if (user?.id) {
+      const { success } = await transferStock(data,user?.id);
       return NextResponse.json({ success }, { status: STATUS.SUCCESS.code });
     } else
       return NextResponse.json(
@@ -25,9 +26,9 @@ export const POST = async (req: NextRequest) => {
 // showing all transfered stock from vehicle to vehicle/godown/office
 export const GET = async (req: NextRequest) => {
   try {
-    const userId = req.headers.get("x-user-id");
-    if (userId) {
-      // const { success, result } = await getTransferedView(userId);
+    const { user, error: authError } = await getAuthUser();
+    if (user?.id) {
+      // const { success, result } = await getTransferedView(user?.id);
       const {success,viewData} = await displayStockTransfer()
       return NextResponse.json(
         { success, data: viewData },

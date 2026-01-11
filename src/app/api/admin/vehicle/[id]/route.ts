@@ -1,3 +1,4 @@
+import { getAuthUser } from "@/lib/auth/jwt";
 import {
   delete_Vehicle,
   updateVehicle,
@@ -11,10 +12,9 @@ export const DELETE = async (
 ) => {
   try {
     const { id } = await context.params;
-    console.log(id);
 
-    const userId = req.headers.get("x-user-id") as string;
-    if (userId) {
+    const { user, error: authError } = await getAuthUser();
+    if (user?.id) {
       const success = await delete_Vehicle(id);
       if (success) {
         return NextResponse.json({ success }, { status: STATUS.SUCCESS.code });

@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import { ChevronRight, Power, type LucideIcon } from "lucide-react";
 
 import {
   Collapsible,
@@ -20,7 +20,7 @@ import {
 import Link from "next/link";
 
 export function NavMain({
-  items,
+  items,onLogout
 }: {
   items: {
     title: string;
@@ -32,6 +32,7 @@ export function NavMain({
       url: string;
     }[];
   }[];
+  onLogout: () => void;
 }) {
   return (
     <SidebarGroup>
@@ -46,13 +47,13 @@ export function NavMain({
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <Link href={item.url}>
+                <Link href={item.url }>
                   <SidebarMenuButton tooltip={item.title}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
-                    {item.items &&
+                    {item.items && (
                       <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                    }{" "}
+                    )}{" "}
                   </SidebarMenuButton>
                 </Link>
               </CollapsibleTrigger>
@@ -72,6 +73,19 @@ export function NavMain({
             </SidebarMenuItem>
           </Collapsible>
         ))}
+      </SidebarMenu>
+
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            onClick={()=>onLogout()}
+            className="hover:text-red-600"
+            tooltip="Logout"
+          >
+            <Power />
+            <span>Logout</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
   );

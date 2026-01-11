@@ -27,8 +27,11 @@ const getDeliverableProduct = async () => {
 
 const getDeliveryPayload = async (vehicleId: string, authId: string) => {
   try {
+    console.log(authId);
     const user = await checkUserByAuthId(authId);
+    console.log(user);
     if (user) {
+      
       const [drivers, currentStock, expenses, products, customers, Qrcode] =
         await Promise.all([
           getUserByRole("driver"),
@@ -51,6 +54,8 @@ const getDeliveryPayload = async (vehicleId: string, authId: string) => {
       };
     } else throw new Error(STATUS.FORBIDDEN.message);
   } catch (error) {
+    console.log((error as Error).message);
+    
     throw error;
   }
 };

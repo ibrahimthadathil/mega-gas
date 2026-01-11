@@ -1,3 +1,4 @@
+import { getAuthUser } from "@/lib/auth/jwt";
 import {
   deletePurchaseRecord,
   editPurchasedLoad,
@@ -34,10 +35,10 @@ export const PUT = async (
   { params }: { params: { id: string } }
 ) => {
   try {
-    const userId = req.headers.get("x-user-id") as string;
+    const { user, error: authError } = await getAuthUser();
     const { id } = await params;
     const data = await req.json();
-    const { message, success } = await editPurchasedLoad(id, userId, data);
+    const { message, success } = await editPurchasedLoad(id, user?.id as string, data);
     if (success)
       return NextResponse.json(
         { success, message },

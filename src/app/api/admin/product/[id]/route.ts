@@ -1,3 +1,4 @@
+import { getAuthUser } from "@/lib/auth/jwt";
 import {
   editProduct,
   getEditProduct,
@@ -11,9 +12,9 @@ export const GET = async (
 ) => {
   try {
     const { id } = await context.params;
-    const userId = req.headers.get("x-user-id");
-    if (userId) {
-      const { success, data } = await getEditProduct(id, userId);
+    const { user, error: authError } = await getAuthUser();
+    if (user?.id) {
+      const { success, data } = await getEditProduct(id, user.id);
       if (success)
         return NextResponse.json(
           { success, data },
@@ -35,11 +36,10 @@ export const PUT = async (
 ) => {
   try {
     const { id } = await context.params;
-    console.log("!!!!!", id);
-    const userId = req.headers.get("x-user-id");
+    const { user, error: authError } = await getAuthUser();
     const updateData = await req.json();
-    if (userId && updateData) {
-      const {success} = await editProduct(id, userId, updateData);
+    if (user?.id && updateData) {
+      const {success} = await editProduct(id, user.id, updateData);
       if (success)
         return NextResponse.json({success}, { status: STATUS.SUCCESS.code });
       else throw new Error("Failed to update");

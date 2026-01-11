@@ -1,3 +1,4 @@
+import { getAuthUser } from "@/lib/auth/jwt";
 import { reportDailyDelivery } from "@/repository/user/sales/salesRepository";
 import {
   dailyReport,
@@ -25,10 +26,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest) => {
   try {
-    const authId = req.headers.get("x-user-id");
+    const { user, error: authError } = await getAuthUser();
     const payload = await req.json();
-    if (authId) {
-      const { success } = await recordDelivery(payload, authId as string);
+    if (user?.id) {
+      const { success } = await recordDelivery(payload, user?.id as string);
       return NextResponse.json(
         { success, message: "created" },
         { status: STATUS.CREATED.code }
@@ -48,8 +49,8 @@ export const POST = async (req: NextRequest) => {
 
 export const GET = async (req: NextRequest) => {
   try {
-    const authId = req.headers.get("x-user-id");
-    const { success, data, message } = await dailyReport(authId as string);
+    const { user, error: authError } = await getAuthUser();
+    const { success, data, message } = await dailyReport(user?.id as string);
     if (success)
       return NextResponse.json(
         { success, data },
@@ -57,8 +58,8 @@ export const GET = async (req: NextRequest) => {
       );
     else
       return NextResponse.json(
-        { success, message },
-        { status: STATUS.NOT_FOUND.code }
+        { success, message,data:[] },
+        { status: STATUS.NO_CONTENT.code }
       );
   } catch (error) {
     return NextResponse.json(

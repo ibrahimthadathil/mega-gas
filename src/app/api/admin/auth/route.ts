@@ -12,7 +12,6 @@ export const POST = async (req: Request) => {
     } else throw new Error("Failed to load the form data");
   } catch (error) {
     console.log((error as Error).message);
-
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 400 }

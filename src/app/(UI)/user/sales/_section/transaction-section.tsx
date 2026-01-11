@@ -154,7 +154,7 @@ export default function TransactionsPage({
                   <DialogTitle>Add Cash Paid</DialogTitle>
                 </DialogHeader>
                 <TransactionForm
-                isSales={false}
+                isSales={isSales}
                   transactionType="paid"
                   onSubmit={(transaction) =>
                     handleAddTransaction(transaction, "paid")

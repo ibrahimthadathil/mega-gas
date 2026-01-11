@@ -1,4 +1,7 @@
-import { delete_user, editUser } from "@/services/serverside_api_service/admin/ums-service.ts/ums-service";
+import {
+  delete_user,
+  editUser,
+} from "@/services/serverside_api_service/admin/ums-service.ts/ums-service";
 import { STATUS } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -24,10 +27,12 @@ export const PUT = async (
   context: { params: Promise<{ id: string }> }
 ) => {
   try {
-    const {id} = await context.params
-    const data = await req.json()
-  await editUser(id,data)
-  return NextResponse.json({},{status:STATUS.CREATED.code})
+    const { id } = await context.params;
+    const data = await req.json();
+    const { success } = await editUser(id, data);
+    if (success)
+      return NextResponse.json({ success }, { status: STATUS.CREATED.code });
+    else return NextResponse.json({}, { status: STATUS.UNAUTHORIZED.code });
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },

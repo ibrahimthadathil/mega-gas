@@ -1,10 +1,23 @@
-import { Auth_context } from "@/context/authProvider";
-import { useContext } from "react";
+import supabase from "@/lib/supabase/supabaseClient";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { logout } from "@/redux/slice/auth/authSlicer";
+import { toast } from "sonner";
+export const useAuth = () => {
+  const router = useRouter();
+  const dispatch = useDispatch();
 
-const useAuth = () => {
-  const context = useContext(Auth_context);
-  if(!context) throw new Error("useAuth must be used inside AuthProvider")
-  return context;
+  const Logout = async () => {
+    try {
+      await supabase.auth.signOut();
+      await axios.post("/api/user/auth/logout");
+      dispatch(logout());
+      router.replace("/user/login");
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || "Logout failed");
+    }
+  };
+
+  return { Logout };
 };
-
-export default useAuth;

@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 
 interface CurrencyDenominationsSectionProps {
   denominations?: Record<string, number>;
-  onChange: (denominations: Record<string, number> ) => void;
+  onChange: (denominations: Record<string, number>) => void;
   netSales: number;
 }
 
@@ -12,7 +12,7 @@ export default function CurrencyDenominationsSection({
   denominations = {},
   onChange,
   netSales,
-}: CurrencyDenominationsSectionProps ) {
+}: CurrencyDenominationsSectionProps) {
   const denomList = ["500", "200", "100", "50", "20", "10"];
 
   const denominationDetails = denomList.map((denom) => {
@@ -86,6 +86,7 @@ export default function CurrencyDenominationsSection({
                 <td className="px-2 py-2 md:px-4 md:py-3">
                   <div className="flex items-center gap-1 md:gap-2 justify-center">
                     <button
+                      type="button"
                       onClick={() => handleDecrement(item?.denom)}
                       className="h-7 w-7 md:h-8 md:w-8 flex items-center justify-center rounded border border-input hover:bg-muted text-sm font-medium"
                     >
@@ -107,6 +108,7 @@ export default function CurrencyDenominationsSection({
                       }}
                     />
                     <button
+                      type="button"
                       onClick={() => handleIncrement(item?.denom)}
                       className="h-7 w-7 md:h-8 md:w-8 flex items-center justify-center rounded border border-input hover:bg-muted text-sm font-medium"
                     >

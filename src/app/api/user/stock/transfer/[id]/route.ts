@@ -1,3 +1,4 @@
+import { getAuthUser } from "@/lib/auth/jwt";
 import {
   deleteTransferStock,
   EditStockTranfer,
@@ -39,9 +40,9 @@ export const PUT = async (
   try {
     const data = await req.json();
     const { id } = await params;
-    const authId = req.headers.get("x-user-id");
-    if (authId) {
-      const { message, success } = await EditStockTranfer(authId, id, data);
+  const { user, error: authError } = await getAuthUser();
+    if (user?.id) {
+      const { message, success } = await EditStockTranfer(user?.id, id, data);
       if (success)
         return NextResponse.json(
           { success, message },

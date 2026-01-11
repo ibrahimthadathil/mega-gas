@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+import { getAuthUser } from "@/lib/auth/jwt";
 import { clear_Expense, updateExpense } from "@/services/serverside_api_service/user/expenses/expensesService";
 import { STATUS } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,8 +10,8 @@ export const DELETE = async (
 ) => {
   try {
     const { id } = await context.params;
-    const userId = req.headers.get("x-user-id") as string;
-    if (userId) {
+    const { user, error: authError } = await getAuthUser();
+    if (user?.id) {
       const success = await clear_Expense(id);
       if (success) {
         return NextResponse.json({ success }, { status: STATUS.SUCCESS.code });

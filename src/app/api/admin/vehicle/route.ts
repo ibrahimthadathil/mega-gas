@@ -1,3 +1,4 @@
+import { getAuthUser } from "@/lib/auth/jwt";
 import { addVehicle, show_vehicles } from "@/services/serverside_api_service/admin/vehicle/vehicle-service";
 import { STATUS } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
@@ -5,8 +6,8 @@ import { NextRequest, NextResponse } from "next/server";
 export const POST = async (req: NextRequest) => {
   try {
     const data = await req.json();
-    const userId = req.headers.get("x-user-id");
-    data.created_by = userId;
+    const { user, error: authError } = await getAuthUser();
+    data.created_by = user?.id;
     const { success } = await addVehicle(data);
     if (success) return NextResponse.json({ success }, { status: 200 });
     else
@@ -25,8 +26,8 @@ export const POST = async (req: NextRequest) => {
 
 export const GET = async (req:NextRequest) => {
   try {
-    const userId = req.headers.get("x-user-id");
-    if(!userId) throw Error('Un-authorized')
+    const { user, error: authError } = await getAuthUser();
+    if(!user?.id) throw Error('Un-authorized')
       const {result,success} = await show_vehicles()
     if(success) return NextResponse.json({success,data:result},{status:STATUS.SUCCESS.code})
   } catch (error) {

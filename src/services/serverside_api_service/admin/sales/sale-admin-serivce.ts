@@ -1,18 +1,103 @@
-import { delete_sales } from "@/repository/admin/Dashboard/salesReport- repository"
-import { checkUserByAuthId } from "@/repository/user/userRepository"
+import {
+  delete_sales,
+  edit_sales_slip,
+  get_Sales_Slip_ById,
+} from "@/repository/admin/Dashboard/salesReport- repository";
+import { checkUserByAuthId } from "@/repository/user/userRepository";
+import { DeliveryPayload } from "@/types/deliverySlip";
 
+const deleteSaleSlip = async (authid: string, slipId: string) => {
+  try {
+    console.log(authid);
 
-const deleteSaleSlip = async (authid:string,slipId:string) => {
-    try {
-        const checkUser = await checkUserByAuthId(authid)
-        if(checkUser){
-            const isDeleted = await delete_sales(slipId,checkUser.id)
-            if(isDeleted)return {success:true,message:"Deleted successfully"}
-            else return {success:false , message:'Failed to Delete'}
-        }else throw Error('Unauthorized')
-    } catch (error) {
-        return {success:false,message:(error as Error).message}
-    }
-}
+    const checkUser = await checkUserByAuthId(authid);
+    console.log(checkUser);
 
-export {deleteSaleSlip}
+    if (checkUser) {
+      console.log("666");
+
+      const isDeleted = await delete_sales(slipId, checkUser.id);
+      console.log("666ww");
+      if (isDeleted) return { success: true, message: "Deleted successfully" };
+      else return { success: false, message: "Failed to Delete" };
+    } else throw Error("Unauthorized");
+  } catch (error) {
+    console.log((error as Error).message);
+
+    return { success: false, message: (error as Error).message };
+  }
+};
+
+const getSalesSlipByID = async (slipId: string) => {
+  try {
+    const data = await get_Sales_Slip_ById(slipId);
+    if (data) return { success: true, data };
+    else throw Error("Failed to fetch Try Later");
+  } catch (error) {
+    return { success: true, message: (error as Error).message };
+  }
+};
+
+const editSaleSlip = async (data: any, authId: string, slipId: string) => {
+  try {
+    const checkUser = await checkUserByAuthId(authId);
+    if (checkUser) {
+      const cash = data.cashChest.currencyDenominations;
+
+      const payload = {
+        sales_slip_id: data.id,
+        "Created by": authId,
+        "Created at": new Date().toISOString(), // Or preserve previous created_at
+        Date: data.Date,
+        "From Warehouse id": data["From Warehouse id"],
+        "Total sales amount": data.totals.totalSales,
+        "Total expenses amount": data.totals.totalExpenses,
+        "Total upi amount": data.totals.totalUpi,
+        "Total online amount": data.totals.totalOnline,
+        "Total Cash amount": data.totals.expectedCashInHand,
+        "Total transactions amount": data.totals.netSalesWithTransactions,
+        remark: data.remark || "",
+        round_off: data.cashChest.mismatch || 0,
+
+        Sales: data.Sales.map((item: any) => ({
+          line_item_id: item.line_item_id || null,
+          "product id": item["product id"],
+          "sale qty": item["sale qty"],
+          rate: item.rate,
+          "is composite": item["is composite"],
+          "json components": item["json components"] || undefined,
+          components: item["components"] || undefined,
+        })),
+
+        "Delivery boys": data["Delivery boys"] || [],
+        Expenses: data.Expenses || [],
+
+        "Cash chest": {
+          "chest name": data.cashChest.chestName,
+          "2000": cash["2000"] || 0,
+          "500": cash["500"] || 0,
+          "200": cash["200"] || 0,
+          "100": cash["100"] || 0,
+          "50": cash["50"] || 0,
+          "20": cash["20"] || 0,
+          "10": cash["10"] || 0,
+          "5": cash["5"] || 0,
+          remark: data.remark || "",
+          status: data.status || "Submitted",
+        },
+
+        "UPI payments": data["UPI payments"] || [],
+        "Online payments": data["Online payments"] || [],
+        Transaction: data.Transaction || [],
+      };
+
+      const updated = await edit_sales_slip(data, checkUser.id, slipId);
+      if (updated) return { success: true, message: "Updated" };
+      else throw Error("Failed to update, Try Later");
+    } else throw Error("Un-authorized");
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+};
+
+export { deleteSaleSlip, getSalesSlipByID, editSaleSlip };
