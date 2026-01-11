@@ -1,8 +1,9 @@
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin";
 
-const daily_Report_View = async (
-  { page = 1, limit = 7 }: { page?: number; limit?: number } = {}
-) => {
+const daily_Report_View = async ({
+  page = 1,
+  limit = 7,
+}: { page?: number; limit?: number } = {}) => {
   const offset = (page - 1) * limit;
   try {
     const { data, error } = await supabaseAdmin
@@ -16,4 +17,27 @@ const daily_Report_View = async (
   }
 };
 
-export { daily_Report_View };
+const delete_sales = async (slipId:string,userId:string) => {
+  try {
+    const {error} = await supabaseAdmin.rpc("delete_sales_slip", {
+      p_sales_slip_id: slipId,
+      p_deleted_by: userId,
+    });
+    if(error) throw error
+    return true
+  } catch (error) {
+    console.log((error as Error).message);    
+  }
+};
+
+
+const edit_sales_slip = async()=>{
+  try {
+    
+  } catch (error) {
+    console.log((error as Error).message);
+    
+    throw error
+  }
+}
+export { daily_Report_View, delete_sales };

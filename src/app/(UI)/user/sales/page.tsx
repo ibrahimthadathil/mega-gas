@@ -2,7 +2,6 @@
 
 import { UseRQ } from "@/hooks/useReactQuery";
 import { getDailyReportByUser } from "@/services/client_api-Service/user/sales/delivery_api";
-import AlertModal from "@/components/alert-dialog";
 import { SalesSlipPayload } from "@/types/dailyReport";
 import DataTable from "@/components/data-table";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -38,6 +37,15 @@ export default function Home() {
         render: (row: SalesSlipPayload) => <span>{row.date}</span>,
       },
       {
+        header: "Total sales",
+        render: (row: SalesSlipPayload) => (
+          <div className="font-semibold text-md text-orange-900 ">
+            <IndianRupee className="inline h-4 w-4" />
+            {row.total_sales_amount}
+          </div>
+        ),
+      },
+      {
         header: " Online ( UPI + Online )",
         render: (row: SalesSlipPayload) => (
           <span>
@@ -48,17 +56,14 @@ export default function Home() {
       },
       {
         header: " Cash",
-        render: (row: SalesSlipPayload) => <span>{row.total_cash_amount}</span>,
-      },
-      {
-        header: "Total sales",
         render: (row: SalesSlipPayload) => (
-          <div className="font-semibold text-md text-lime-700 ">
+          <span className="font-semibold text-md text-emerald-600 ">
             <IndianRupee className="inline h-4 w-4" />
-            {row.total_sales_amount}
-          </div>
+            {row.total_cash_amount}
+          </span>
         ),
       },
+
       {
         header: "cash status",
         render: (row: SalesSlipPayload) => (
