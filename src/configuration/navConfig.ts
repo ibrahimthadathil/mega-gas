@@ -7,6 +7,7 @@ import {
   Warehouse,
   BookAIcon,
   Power,
+  History,
 } from "lucide-react";
 import { title } from "process";
 export const navItems = [
@@ -37,6 +38,12 @@ export const navItems = [
     items: [
       { title: "Delivery", url: "/user/sales/delivery", roles: ["admin", "manager", "accountant", "driver", "godown_keeper"] },
     ],
+  },
+  {
+    title:'Inventory Level',
+    url :'/user/inventory',
+    icon:History,
+    roles:["admin", "manager", "accountant","driver"]
   },
   {
     title: "Purchase",
