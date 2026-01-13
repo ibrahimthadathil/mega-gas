@@ -44,15 +44,12 @@ const onlinePaymentSchema = z.object({
   amount: z.number().positive("Amount must be greater than 0"),
 });
 
-// Main form schema
+// Main form schema - FIXED: Remove z.coerce to avoid type mismatch
 export const deliveryReportSchema = z
   .object({
-    date: z.coerce
-  .date()
-  .refine((val) => !isNaN(val.getTime()), {
-    message: "Please select a valid date",
-  }),
-
+    date: z.date({
+      error: "Please select a valid date",
+    }),
     vehicleId: z.string().min(1, "Vehicle selection is required"),
     deliveryBoys: z
       .array(z.string())
@@ -67,10 +64,8 @@ export const deliveryReportSchema = z
     upiPayments: z.array(upiPaymentSchema),
     onlinePayments: z.array(onlinePaymentSchema),
     chestName: z.enum(["office", "godown"], {
-  message: "Chest name is required",
-}),
-
-
+      message: "Chest name is required",
+    }),
     currencyDenominations: z.record(z.string(), z.number().min(0)),
     reportRemark: z.string(),
     status: z.enum(["Submitted", "Settled"]).optional(),
