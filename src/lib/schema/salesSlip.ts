@@ -1,3 +1,5 @@
+import { FieldErrors } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 // Schema for Sale item
@@ -136,3 +138,12 @@ export const validateDeliveryReportWithCalculations = (
 
 // Type exports
 export type DeliveryReportFormData = z.infer<typeof deliveryReportSchema>;
+
+
+export const onError = (errors: FieldErrors<DeliveryReportFormData>) => {
+  Object.values(errors).forEach((error) => {
+    if (error?.message) {
+      toast.error(error.message as string);
+    }
+  });
+};

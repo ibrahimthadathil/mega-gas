@@ -99,72 +99,15 @@
 //   ],
 // };
 
-
 // middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getAuthUser, getUserProfile } from "@/lib/auth/jwt";
+import { roleRouteConfig } from "./configuration/navConfig";
 
 export interface AuthRequest extends NextRequest {
   user?: string;
 }
-
-// Define role-based route access
-const roleRouteConfig = {
-  admin: [
-    "/admin",
-    "/user/dashboard",
-    "/user/sales",
-    "/user/purchase",
-    "/user/warehouses",
-    "/user/stock",
-    "/user/expenses",
-    "/user/accounts",
-  ],
-  manager: [
-    "/admin/dashboard",
-    "/admin/ums",
-    "/admin/sales-report",
-    "/admin/inventory",
-    "/admin/product",
-    "/admin/vehicle",
-    "/user/dashboard",
-    "/user/sales",
-    "/user/purchase",
-    "/user/warehouses",
-    "/user/stock",
-    "/user/expenses",
-    "/user/accounts",
-  ],
-  accountant: [
-    "/admin/dashboard",
-    "/user/dashboard",
-    "/user/sales",
-    "/user/purchase",
-    "/user/warehouses",
-    "/user/stock",
-    "/user/expenses",
-    "/user/accounts",
-  ],
-  driver: [
-    "/user/dashboard",
-    "/user/sales",
-    "/user/expenses",
-  ],
-  plant_driver: [
-    "/user/dashboard",
-    "/user/purchase",
-    "/user/expenses",
-  ],
-  godown_keeper: [
-    "/user/dashboard",
-    "/user/sales",
-    "/user/warehouses",
-    "/user/stock",
-    "/user/expenses",
-    "/user/accounts",
-  ],
-};
 
 // Routes that don't require authentication
 const publicRoutes = ["/", "/about", "/contact"];
@@ -175,12 +118,12 @@ const authRoutes = ["/user/login", "/user/register"];
 // Get default dashboard based on role
 function getDefaultDashboard(role: string): string {
   const roleLower = role.toLowerCase();
-  
+
   // Admin and Manager go to admin dashboard
   if (roleLower === "admin" || roleLower === "manager") {
     return "/admin/dashboard";
   }
-  
+
   // Everyone else goes to user dashboard
   return "/user/dashboard";
 }
@@ -188,12 +131,13 @@ function getDefaultDashboard(role: string): string {
 // Check if user has access to the route based on their role
 function hasRouteAccess(pathname: string, role: string): boolean {
   const roleLower = role.toLowerCase();
-  const allowedRoutes = roleRouteConfig[roleLower as keyof typeof roleRouteConfig];
-  
+  const allowedRoutes =
+    roleRouteConfig[roleLower as keyof typeof roleRouteConfig];
+
   if (!allowedRoutes) {
     return false;
   }
-  
+
   // Check if the pathname starts with any of the allowed routes
   return allowedRoutes.some((route) => pathname.startsWith(route));
 }
@@ -214,11 +158,14 @@ export async function middleware(req: AuthRequest) {
   if (isAuthRoute) {
     if (token) {
       const { user, error } = await getAuthUser();
-      
+
       // If token is valid and user exists, redirect to dashboard
       if (!error && user) {
-        const { profile, error: profileError } = await getUserProfile(req, user.id);
-        
+        const { profile, error: profileError } = await getUserProfile(
+          req,
+          user.id
+        );
+
         if (!profileError && profile) {
           const redirectPath = getDefaultDashboard(profile.role);
           return NextResponse.redirect(new URL(redirectPath, req.url));
@@ -236,8 +183,9 @@ export async function middleware(req: AuthRequest) {
   }
 
   // For protected routes, check authentication
-  const isProtectedRoute = pathname.startsWith("/user") || pathname.startsWith("/admin");
-  
+  const isProtectedRoute =
+    pathname.startsWith("/user") || pathname.startsWith("/admin");
+
   if (isProtectedRoute) {
     // Check if user is authenticated
     if (!token) {

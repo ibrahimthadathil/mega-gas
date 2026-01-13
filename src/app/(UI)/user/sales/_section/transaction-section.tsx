@@ -114,22 +114,22 @@ export default function TransactionsPage({
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-lg font-semibold tracking-tight">
+          <h1 className="text-lg sm:text-xs font-semibold tracking-tight">
             Transactions
           </h1>
 
-          <div className="flex gap-3">
+          <div className="flex ">
             {/* Cash Received */}
             <Dialog open={openReceived} onOpenChange={setOpenReceived}>
               <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-3 w-3" />
-                  Cash Received
+                <Button >
+                  <Plus className="mr-2 h-2 w-2" />
+                  <p className="text-sm">Cash Received</p>
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-h-[50vh] max-w-2xl overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Add Cash Received</DialogTitle>
+                  <DialogTitle className="text-sm ">Add Cash Received</DialogTitle>
                 </DialogHeader>
                 <TransactionForm
                 isSales={isSales}

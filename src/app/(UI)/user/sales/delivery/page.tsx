@@ -42,6 +42,7 @@ import { formatDate } from "@/lib/utils";
 import {
   DeliveryReportFormData,
   deliveryReportSchema,
+  onError,
 } from "@/lib/schema/salesSlip";
 
 interface DeliveryBoy {
@@ -493,10 +494,10 @@ export default function Home() {
         currencyDenominations: data.currencyDenominations,
         actualCashCounted,
         expectedCashInHand,
-        mismatch: cashMismatch,
+        mismatch: (Math.round(netSalesWithTransactions / 10) * 10) - netSalesWithTransactions,
       },
     };
-
+    
     try {
       setSubmit(true);
       let response;
@@ -531,7 +532,7 @@ export default function Home() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit,onError)}>
           {!isVerified ? (
             <>
               <div className="space-y-3">

@@ -18,10 +18,13 @@ import { useSelector } from "react-redux";
 import { selectIsAuthenticated } from "@/redux/store/selectors/authSelectors";
 import { useEffect } from "react";
 import { redirect } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 export default function Layout({ children }: { children: React.ReactNode }) {
   const is_authenticated = useSelector(selectIsAuthenticated);
+  const {Logout} = useAuth()
   useEffect(() => {
     if (!is_authenticated) {
+      Logout()
       redirect("/user/login");
     }
   }, [is_authenticated]);

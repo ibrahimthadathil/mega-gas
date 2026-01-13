@@ -40,8 +40,8 @@ export const navItems = [
     ],
   },
   {
-    title:'Inventory Level',
-    url :'/user/inventory',
+    title:"Inventory Level",
+    url :"/user/inventory",
     icon:History,
     roles:["admin", "manager", "accountant","driver"]
   },
@@ -87,6 +87,59 @@ export const navItems = [
   },
  
 ];
+// Define role-based route access
+export const roleRouteConfig = {
+  admin: [
+    "/admin",
+    "/user",
+  ],
+  manager: [
+    "/admin/dashboard",
+    "/admin/ums",
+    "/admin/sales-report",
+    "/admin/inventory",
+    "/admin/product",
+    "/admin/vehicle",
+    "/user/dashboard",
+    "/user/sales",
+    "/user/purchase",
+    "/user/warehouses",
+    "/user/stock",
+    "/user/expenses",
+    "/user/accounts",
+  ],
+  accountant: [
+    "/admin/dashboard",
+    "/user/dashboard",
+    "/user/sales",
+    "/user/purchase",
+    "/user/warehouses",
+    "/user/stock",
+    "/user/expenses",
+    "/user/accounts",
+    "/user/inventory"
+  ],
+  driver: [
+    "/user/dashboard",
+    "/user/sales",
+    "/user/expenses",
+    "/user/inventory"
+  ],
+  plant_driver: [
+    "/user/dashboard",
+    "/user/purchase",
+    "/user/expenses",
+  ],
+  godown_keeper: [
+    "/user/dashboard",
+    "/user/sales",
+    "/user/warehouses",
+    "/user/stock",
+    "/user/expenses",
+    "/user/accounts",
+    "/user/inventory"
+  ],
+};
 
 export const filterByRole = (items: NavItem[], role: string): NavItem[] =>{
   return items
