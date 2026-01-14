@@ -10,3 +10,12 @@ export interface TransferedInventory  {
     source_form_type: string,
     source_form_id: string
   }
+
+  export type InventoryFilters = {
+  warehouseNames?: string[];
+  productNames?: string[];
+  startDate?: string; // YYYY-MM-DD
+  endDate?: string;   // YYYY-MM-DD
+  page?: number;
+  limit?: number;
+};

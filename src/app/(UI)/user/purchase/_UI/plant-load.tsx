@@ -646,6 +646,8 @@ export default function PlantLoadSection({ recordId }: { recordId?: string }) {
     };
 
     try {
+      console.log("❤️", purchaseData);
+
       let result;
       if (isEditMode) {
         result = await editPurchase(recordId!, purchaseData);

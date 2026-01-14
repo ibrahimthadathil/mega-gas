@@ -66,7 +66,6 @@ const getProductForPurchase = async () => {
     return data;
   } catch (error) {
     console.log((error as Error).message);
-
     throw error;
   }
 };
@@ -86,6 +85,8 @@ const getPurchaseRegister = async (userId: string) => {
     throw (error as Error).message;
   }
 };
+
+
 
 const delete_purchase = async (id: string) => {
   try {

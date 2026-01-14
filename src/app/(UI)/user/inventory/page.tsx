@@ -1,51 +1,3 @@
-// "use client";
-// import DataTable from "@/components/data-table";
-// import { Skeleton } from "@/components/ui/skeleton";
-// import { UseRQ } from "@/hooks/useReactQuery";
-// import { getDashboardData } from "@/services/client_api-Service/user/dashboard/dashboar-api";
-// import React, { useMemo } from "react";
-// import { Warehouse } from "../warehouses/page";
-// import { getWarehouse } from "@/services/client_api-Service/user/warehouse/wareHouse_api";
-// import { formatDate } from "@/lib/utils";
-// import { TransferedInventory } from "@/types/inventory";
-
-// const page = () => {
-//   const { data: inventoryLevel, isLoading } = UseRQ<TransferedInventory[]>(
-//     "inventoryLevel",
-//     getDashboardData
-//   );
-//   const { data: warehouses, isLoading: isWarehouseLoading } = UseRQ<
-//     Warehouse[]
-//   >("warehouse", getWarehouse);
-//   const Columns = useMemo(
-//     () => [
-//       {
-//         header: "Transaction Date",
-//         render: (row: TransferedInventory) =>
-//           formatDate(new Date(row.transaction_date)),
-//       },
-//     ],
-//     [inventoryLevel]
-//   );
-//   return (
-//     <main className="min-h-screen bg-background p-4 sm:p-6">
-//       <h1 className="text-3xl font-semibold mb-2">Inventory Level Stock</h1>
-//       {isLoading ? (
-//         <Skeleton className="w-full h-24 bg-zinc-50" />
-//       ) : (
-//         <DataTable
-//           columns={Columns}
-//           itemsPerPage={10}
-//           data={inventoryLevel ?? []}
-//         />
-//       )}
-//     </main>
-//   );
-// };
-
-// export default page;
-
-
 "use client";
 import DataTable from "@/components/data-table";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -68,34 +20,41 @@ import {
 import { Button } from "@/components/ui/button";
 
 type InventoryFilters = {
-  warehouseIds?: string[];
   warehouseNames?: string[];
-  date?: string;
+  productNames?: string[];
+  startDate?: string;
+  endDate?: string;
   page?: number;
   limit?: number;
 };
 
 const page = () => {
+  // Default filters with "14 FULL" product
   const [filters, setFilters] = useState<InventoryFilters>({
     page: 1,
     limit: 10,
+    // Default product
   });
+
   const [selectedWarehouse, setSelectedWarehouse] = useState<string>("");
-  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [selectedProduct, setSelectedProduct] = useState<string>("14 FULL");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
 
   // Fetch warehouses
-  const { data: warehouses, isLoading: isWarehouseLoading } = UseRQ<Warehouse[]>("warehouse", getWarehouse);
+  const { data: warehouses, isLoading: isWarehouseLoading } = UseRQ<
+    Warehouse[]
+  >("warehouse", getWarehouse);
 
   // Fetch inventory with filters
-  const { data: inventoryLevel, isLoading } = UseRQ<TransferedInventory[]>(
-    ["inventoryLevel", filters],
-    () => getDashboardData(filters),
-    {
-      enabled: true,
-    }
-  );
+  const { data: inventoryLevel, isLoading } = UseRQ<
+    [[TransferedInventory[], { id: string; product_name: string }[]],success:boolean,count:number]
+  >(["inventoryLevel", filters], () => getDashboardData(filters), {
+    enabled: true,
+  });
+  console.log(inventoryLevel);
 
-  // Define columns - only display named items
+  // Define columns
   const Columns = useMemo(
     () => [
       {
@@ -138,16 +97,25 @@ const page = () => {
       limit: filters.limit,
     };
 
+    // Warehouse filter
     if (selectedWarehouse) {
       const warehouse = warehouses?.find((w) => w.id === selectedWarehouse);
       if (warehouse) {
-        newFilters.warehouseIds = [warehouse.id!];
         newFilters.warehouseNames = [warehouse.name];
       }
     }
 
-    if (selectedDate) {
-      newFilters.date = selectedDate;
+    // Product filter
+    if (selectedProduct) {
+      newFilters.productNames = [selectedProduct];
+    }
+
+    // Date range filter
+    if (startDate) {
+      newFilters.startDate = startDate;
+    }
+    if (endDate) {
+      newFilters.endDate = endDate;
     }
 
     setFilters(newFilters);
@@ -156,10 +124,13 @@ const page = () => {
   // Handle filter reset
   const handleResetFilters = () => {
     setSelectedWarehouse("");
-    setSelectedDate("");
+    setSelectedProduct("14 FULL"); // Reset to default
+    setStartDate("");
+    setEndDate("");
     setFilters({
       page: 1,
       limit: 10,
+      productNames: ["14 FULL"], // Reset to default
     });
   };
 
@@ -175,8 +146,29 @@ const page = () => {
       {/* Filters Section */}
       <div className="bg-white p-4 rounded-lg shadow-sm mb-6 space-y-4">
         <h2 className="text-lg font-medium mb-4">Filters</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Product Filter */}
+          <div className="space-y-2">
+            <Label htmlFor="product">Filter by Product</Label>
+            <Select
+              value={selectedProduct}
+              onValueChange={setSelectedProduct}
+              disabled={isLoading}
+            >
+              <SelectTrigger id="product">
+                <SelectValue placeholder="Select product" />
+              </SelectTrigger>
+              <SelectContent>
+                {inventoryLevel?.[0][1]?.map((product) => (
+                  <SelectItem key={product.id} value={product.product_name}>
+                    {product.product_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Warehouse Filter */}
           <div className="space-y-2">
             <Label htmlFor="warehouse">Filter by Warehouse</Label>
@@ -198,19 +190,30 @@ const page = () => {
             </Select>
           </div>
 
-          {/* Date Filter */}
+          {/* Start Date Filter */}
           <div className="space-y-2">
-            <Label htmlFor="date">Filter by Date</Label>
+            <Label htmlFor="startDate">Start Date</Label>
             <Input
-              id="date"
+              id="startDate"
               type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </div>
+
+          {/* End Date Filter */}
+          <div className="space-y-2">
+            <Label htmlFor="endDate">End Date</Label>
+            <Input
+              id="endDate"
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
             />
           </div>
 
           {/* Filter Actions */}
-          <div className=" flex items-end gap-2">
+          <div className=" flex items-end gap-2 md:col-span-2 lg:col-span-1">
             <Button onClick={handleApplyFilters} className="flex-1">
               Apply Filters
             </Button>
@@ -225,20 +228,28 @@ const page = () => {
         </div>
 
         {/* Active Filters Display */}
-        {(selectedWarehouse || selectedDate) && (
-          <div className="pt-2  border-t">
+        {(selectedWarehouse || selectedProduct || startDate || endDate) && (
+          <div className="pt-2 border-t">
             <p className="text-sm text-muted-foreground">
               Active filters:{" "}
+              {selectedProduct && (
+                <span className="font-medium">Product: {selectedProduct}</span>
+              )}
+              {selectedProduct &&
+                (selectedWarehouse || startDate || endDate) &&
+                " | "}
               {selectedWarehouse && warehouses && (
                 <span className="font-medium">
                   Warehouse:{" "}
                   {warehouses.find((w) => w.id === selectedWarehouse)?.name}
                 </span>
               )}
-              {selectedWarehouse && selectedDate && " | "}
-              {selectedDate && (
-                <span className="font-medium">Date: {selectedDate}</span>
+              {selectedWarehouse && (startDate || endDate) && " | "}
+              {startDate && (
+                <span className="font-medium">From: {startDate}</span>
               )}
+              {startDate && endDate && " "}
+              {endDate && <span className="font-medium">To: {endDate}</span>}
             </p>
           </div>
         )}
@@ -251,9 +262,8 @@ const page = () => {
         <DataTable
           columns={Columns}
           itemsPerPage={filters.limit ?? 10}
-          data={inventoryLevel ?? []}
+          data={inventoryLevel?.[0][0] ?? []}
           onChange={handlePageChange}
-          // currentPage={filters.page ?? 1}
         />
       )}
     </main>

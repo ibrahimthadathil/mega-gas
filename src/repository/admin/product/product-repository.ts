@@ -1,4 +1,5 @@
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin";
+import supabase from "@/lib/supabase/supabaseClient";
 
 const add_product = async (payload: Record<string, unknown>) => {
   try {
@@ -39,7 +40,7 @@ const getEdit_Product = async (id: string) => {
 };
 
 const edit_Product = async (payload: Record<string, unknown>) => {
-  try {    
+  try {
     const { error } = await supabaseAdmin.rpc(
       "update_product_with_components",
       payload
@@ -47,9 +48,31 @@ const edit_Product = async (payload: Record<string, unknown>) => {
     if (error) throw error;
     return true;
   } catch (error) {
-    console.log((error as Error).message,'ssss');
+    console.log((error as Error).message, "ssss");
 
     throw error;
   }
 };
-export { add_product, getAll_products, getEdit_Product, edit_Product };
+
+const get_All_cylinders = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("products")
+      .select("id, product_name")
+      .eq("product_type", "inventory")
+      .eq("is_composite", false)
+      .or("product_name.ilike.%FULL%,product_name.ilike.%EMPTY%");
+
+    if (error) throw error;
+    return data
+  } catch (error) {
+    console.log((error as Error).message);
+  }
+};
+export {
+  get_All_cylinders,
+  add_product,
+  getAll_products,
+  getEdit_Product,
+  edit_Product,
+};

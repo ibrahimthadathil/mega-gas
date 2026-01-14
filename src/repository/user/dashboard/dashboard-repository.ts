@@ -1,37 +1,46 @@
 import supabase from "@/lib/supabase/supabaseClient";
+import { InventoryFilters } from "@/types/inventory";
 
-type InventoryFilters = {
-  warehouseIds?: string[]; // UUIDs
-  warehouseNames?: string[]; // Names like "Godown"
-  date?: string; // YYYY-MM-DD
+const inventoryRepository = {
+  async getInventoryTransactions(filters: InventoryFilters) {
+    let query = supabase
+      .from("inventory_transactions_view")
+      .select("*", { count: "exact" })
+      .order("transaction_date", { ascending: false });
+
+     query = query.in("product_name", filters.productNames!);
+
+    if (filters.warehouseNames?.length) {
+      const names = filters.warehouseNames.join(",");
+      query = query.or(
+        `from_warehouse_name.in.(${names}),to_warehouse_name.in.(${names})`
+      );
+    }
+
+    // Date range
+    if (filters.startDate) {
+      query = query.gte(
+        "transaction_date",
+        new Date(filters.startDate).toISOString()
+      );
+    }
+
+    if (filters.endDate) {
+      const end = new Date(filters.endDate);
+      end.setHours(23, 59, 59, 999);
+      query = query.lte("transaction_date", end.toISOString());
+    }
+
+    // Pagination
+    const from = (filters.page! - 1) * filters.limit!;
+    const to = from + filters.limit! - 1;
+    query = query.range(from, to);
+
+    const { data, count, error } = await query;
+    if (error) throw error;
+
+    return { data, count };
+  },
 };
-const getInventoryTransactions = async (filters?: InventoryFilters) => {
-  let query = supabase
-    .from("inventory_transactions_view")
-    .select("*")
-    .order("transaction_date", { ascending: false });
 
-  /* ---------------- warehouse id filter ---------------- */
-  if (filters?.warehouseIds?.length) {
-    query = query.contains("warehouses_info", filters.warehouseIds);
-  }
-
-  /* ---------------- warehouse name filter ---------------- */
-  if (filters?.warehouseNames?.length) {
-    query = query.contains("warehouses_info", filters.warehouseNames);
-  }
-
-  /* ---------------- date filter ---------------- */
-  if (filters?.date) {
-    query = query
-      .gte("transaction_date", `${filters.date} 00:00:00`)
-      .lte("transaction_date", `${filters.date} 23:59:59`);
-  }
-
-  const { data, error } = await query;
-
-  if (error) throw error;
-  return data;
-};
-
-export { getInventoryTransactions };
+export { inventoryRepository };
