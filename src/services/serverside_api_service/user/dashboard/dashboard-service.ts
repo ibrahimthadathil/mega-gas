@@ -23,7 +23,8 @@ export const getDasboardData = async (filters: InventoryFilters) => {
     if (data) {
       return {
         success: true,
-        data: [data, products],
+        data,
+        products,
         count,
       };
     } else return { success: false, message: "somthing wrong try later" };

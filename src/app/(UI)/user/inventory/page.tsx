@@ -27,6 +27,12 @@ type InventoryFilters = {
   page?: number;
   limit?: number;
 };
+type dataResponse = {
+  data: TransferedInventory[];
+  success: boolean;
+  products: { id: string; product_name: string }[];
+  count: number;
+};
 
 const page = () => {
   // Default filters with "14 FULL" product
@@ -37,7 +43,7 @@ const page = () => {
   });
 
   const [selectedWarehouse, setSelectedWarehouse] = useState<string>("");
-  const [selectedProduct, setSelectedProduct] = useState<string>("14 FULL");
+  const [selectedProduct, setSelectedProduct] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
@@ -47,11 +53,14 @@ const page = () => {
   >("warehouse", getWarehouse);
 
   // Fetch inventory with filters
-  const { data: inventoryLevel, isLoading } = UseRQ<
-    [[TransferedInventory[], { id: string; product_name: string }[]],success:boolean,count:number]
-  >(["inventoryLevel", filters], () => getDashboardData(filters), {
-    enabled: true,
-  });
+  const { data: inventoryLevel, isLoading } = UseRQ<dataResponse>(
+    ["inventoryLevel", filters],
+    () => getDashboardData(filters),
+    {
+      enabled: true,
+    }
+  );
+
   console.log(inventoryLevel);
 
   // Define columns
@@ -124,7 +133,7 @@ const page = () => {
   // Handle filter reset
   const handleResetFilters = () => {
     setSelectedWarehouse("");
-    setSelectedProduct("14 FULL"); // Reset to default
+    setSelectedProduct(""); // Reset to default
     setStartDate("");
     setEndDate("");
     setFilters({
@@ -144,6 +153,7 @@ const page = () => {
       <h1 className="text-3xl font-semibold mb-6">Inventory Level Stock</h1>
 
       {/* Filters Section */}
+
       <div className="bg-white p-4 rounded-lg shadow-sm mb-6 space-y-4">
         <h2 className="text-lg font-medium mb-4">Filters</h2>
 
@@ -151,22 +161,25 @@ const page = () => {
           {/* Product Filter */}
           <div className="space-y-2">
             <Label htmlFor="product">Filter by Product</Label>
-            <Select
-              value={selectedProduct}
-              onValueChange={setSelectedProduct}
-              disabled={isLoading}
-            >
-              <SelectTrigger id="product">
-                <SelectValue placeholder="Select product" />
-              </SelectTrigger>
-              <SelectContent>
-                {inventoryLevel?.[0][1]?.map((product) => (
-                  <SelectItem key={product.id} value={product.product_name}>
-                    {product.product_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {inventoryLevel && (
+              <Select
+                value={selectedProduct}
+                onValueChange={setSelectedProduct}
+                disabled={isLoading}
+              >
+                <SelectTrigger id="product">
+                  <SelectValue placeholder="14 FULL" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">{"All"}</SelectItem>
+                  {inventoryLevel?.products?.map((product) => (
+                    <SelectItem key={product.id} value={product.product_name}>
+                      {product.product_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* Warehouse Filter */}
@@ -254,15 +267,13 @@ const page = () => {
           </div>
         )}
       </div>
-
-      {/* Data Table */}
       {isLoading ? (
         <Skeleton className="w-full h-96 bg-zinc-50" />
       ) : (
         <DataTable
           columns={Columns}
           itemsPerPage={filters.limit ?? 10}
-          data={inventoryLevel?.[0][0] ?? []}
+          data={inventoryLevel?.data ?? []}
           onChange={handlePageChange}
         />
       )}

@@ -8,7 +8,9 @@ const inventoryRepository = {
       .select("*", { count: "exact" })
       .order("transaction_date", { ascending: false });
 
-     query = query.in("product_name", filters.productNames!);
+    if (filters.productNames?.length && !filters.productNames.includes("ALL")) {
+      query = query.in("product_name", filters.productNames);
+    }
 
     if (filters.warehouseNames?.length) {
       const names = filters.warehouseNames.join(",");

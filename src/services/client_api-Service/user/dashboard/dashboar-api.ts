@@ -1,9 +1,10 @@
 import axios from "axios";
 
 export const getDashboardData = async (filters?: any) => {
-  console.log(filters);
   try {
-    const data = await axios.get("/api/user/dashboard", {
+    console.log(filters,'0000');
+    
+    const  data  = await axios.get("/api/user/dashboard", {
       params: {
         warehouseNames: filters?.warehouseNames?.join(","),
         productNames: filters?.productNames?.join(","),

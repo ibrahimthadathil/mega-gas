@@ -17,10 +17,12 @@ import { Separator } from "@/components/ui/separator";
 import { useSelector } from "react-redux";
 import { selectIsAuthenticated } from "@/redux/store/selectors/authSelectors";
 import { useEffect } from "react";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { HomeIcon } from "lucide-react";
 export default function Layout({ children }: { children: React.ReactNode }) {
   const is_authenticated = useSelector(selectIsAuthenticated);
+  const router = useRouter()
   const {Logout} = useAuth()
   useEffect(() => {
     if (!is_authenticated) {
@@ -33,8 +35,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <AppSidebar />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
+          <div className="flex items-center gap-2 px-4 justify-between w-full">
             <SidebarTrigger className="-ml-1 hover:cursor-pointer" />
+            <HomeIcon className="-ml-1 hover:cursor-pointer w-4 h-4" onClick={()=>router.push('/user/dashboard')} color="orange"/>
             {/* <Separator
               orientation="vertical"
               className="mr-2 data-[orientation=vertical]:h-4"

@@ -20,11 +20,13 @@ export const GET = async (req: NextRequest) => {
         : undefined,
     };
 
-    const { count, data, message, success } = await getDasboardData(filters);
+    const { count, data, message, products, success } = await getDasboardData(
+      filters
+    );
 
     if (success)
       return NextResponse.json(
-        { data, success, count },
+        { data: data, products, success, count },
         { status: STATUS.SUCCESS.code }
       );
     else
