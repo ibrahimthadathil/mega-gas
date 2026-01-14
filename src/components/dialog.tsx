@@ -93,6 +93,7 @@ const UserDialog: React.FC<UserDialogProps> = ({
   const selectedDeliveryBoysObjects = deliveryBoysField
     .map((id) => users.find((u) => u.id === id))
     .filter((u): u is IUser => u !== undefined);
+    
 
   const handleAddDeliveryBoy = (deliveryBoyId: string) => {
     if (!deliveryBoysField.includes(deliveryBoyId)) {
@@ -323,7 +324,7 @@ const UserDialog: React.FC<UserDialogProps> = ({
                                   All delivery boys selected
                                 </div>
                               ) : (
-                                availableDeliveryBoys.map((deliveryBoy) => (
+                                users.map((deliveryBoy) => (
                                   <SelectItem
                                     key={deliveryBoy.id}
                                     value={deliveryBoy.id || ""}

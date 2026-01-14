@@ -3,7 +3,10 @@ import { IUser } from "@/types/types";
 
 const get_All_User = async () => {
   try {
-    const { data, error } = await supabaseAdmin.from("users").select("*");
+    const { data, error } = await supabaseAdmin
+      .from("users")
+      .select("*")
+      .order("user_name", { ascending: true });
     if (error) throw error;
     return data;
   } catch (error) {

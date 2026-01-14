@@ -29,9 +29,9 @@ export const PUT = async (
   try {
     const { id } = await context.params;
     const data = await req.json();
-    const { success } = await editUser(id, data);
+    const { success,message } = await editUser(id, data);
     if (success)
-      return NextResponse.json({ success }, { status: STATUS.CREATED.code });
+      return NextResponse.json({ success,message }, { status: STATUS.CREATED.code });
     else return NextResponse.json({}, { status: STATUS.UNAUTHORIZED.code });
   } catch (error) {
     return NextResponse.json(

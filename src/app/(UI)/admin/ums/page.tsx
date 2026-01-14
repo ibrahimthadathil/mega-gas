@@ -30,6 +30,8 @@ const Page = () => {
     "users",
     getAllUsers
   );
+  console.log(users,'jjj');
+  
   const handelDeleteUser = async(id: string) => {
     try {
       const data = await deleteUser(id);
@@ -45,6 +47,7 @@ const Page = () => {
       data.auth_id=authid
       const datas = await editUser(data,id)
       if(datas.success){
+        toast.success(datas.message)
         queryClient.invalidateQueries({queryKey:['users']})
       }
     } catch (error) {

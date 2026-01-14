@@ -41,7 +41,7 @@ const editUser = async(userId:string,data:IUser)=>{
   try {
     
     const edited = await edit_user(data,userId)
-    if (edited) return {success:true};
+    if (edited) return {success:true,message:'User Edited'};
      else throw Error("User Not found");
   } catch (error) {
     throw error
