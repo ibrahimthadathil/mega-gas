@@ -44,6 +44,8 @@ import {
   deliveryReportSchema,
   onError,
 } from "@/lib/schema/salesSlip";
+import { useSelector } from "react-redux";
+import { Rootstate } from "@/redux/store";
 
 interface DeliveryBoy {
   id: string;
@@ -233,11 +235,14 @@ const ErrorMessage = ({ message }: { message?: string }) => {
 };
 
 export default function Home() {
+  const { delivery_boys, warehouseid } = useSelector(
+    (state: Rootstate) => state.user
+  );
   const searchParams = useSearchParams();
   const reportId = searchParams.get("id");
   const isEditMode = Boolean(reportId);
 
-  const [currentVehicle, setCurrentVehicle] = useState("");
+  const [currentVehicle, setCurrentVehicle] = useState(warehouseid ?? "");
   const [isVerified, setIsVerified] = useState(false);
   const [isSubmit, setSubmit] = useState(false);
   const route = useRouter();
@@ -274,9 +279,9 @@ export default function Home() {
   } = useForm<DeliveryReportFormData>({
     resolver: zodResolver(deliveryReportSchema),
     defaultValues: {
-      date: undefined,
-      vehicleId: "",
-      deliveryBoys: [],
+      date: new Date(),
+      vehicleId: warehouseid ?? "",
+      deliveryBoys: delivery_boys ?? [],
       sales: [],
       salesTransactions: [],
       upiPayments: [],
@@ -494,10 +499,12 @@ export default function Home() {
         currencyDenominations: data.currencyDenominations,
         actualCashCounted,
         expectedCashInHand,
-        mismatch: (Math.round(netSalesWithTransactions / 10) * 10) - netSalesWithTransactions,
+        mismatch:
+          Math.round(netSalesWithTransactions / 10) * 10 -
+          netSalesWithTransactions,
       },
     };
-    
+
     try {
       setSubmit(true);
       let response;
@@ -532,7 +539,7 @@ export default function Home() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit,onError)}>
+        <form onSubmit={handleSubmit(onSubmit, onError)}>
           {!isVerified ? (
             <>
               <div className="space-y-3">

@@ -87,7 +87,7 @@ export default function SalesSection({
   const [formData, setFormData] = useState({
     productId: "",
     rate: 0,
-    quantity: 1,
+    quantity: 0,
     customerId: "",
   });
 
@@ -99,7 +99,7 @@ export default function SalesSection({
       setFilteredProducts([]);
       setSelectedIndex(-1);
       setIsFocused(false);
-      setFormData({ productId: "", rate: 0, quantity: 1, customerId: defaultCustomerId });
+      setFormData({ productId: "", rate: 0, quantity: 0, customerId: defaultCustomerId });
     } else if (isOpen && defaultCustomerId) {
       // Set default customer when dialog opens if not already set
       setFormData((prev) => ({ 
@@ -550,7 +550,7 @@ export default function SalesSection({
 
       {/* Debug button - remove in production */}
       {sales.length > 0 && (
-        <Button onClick={handleSubmit} variant="secondary" className="w-full">
+        <Button type="button" onClick={handleSubmit} variant="secondary" className="w-full">
           Log Formatted Sales (Dev Only)
         </Button>
       )}

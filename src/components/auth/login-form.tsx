@@ -52,6 +52,8 @@ export function UserLoginForm() {
             user_name: data.profile.user_name,
             role: data.profile.role,
             email: data.profile.email,
+            deliveryBoys: data.profile.delivery_boys,
+            warehouse: data.profile.warehouse_id,
           })
         );
         const isAdmin = String(data.profile.role).toLowerCase() === "admin";
