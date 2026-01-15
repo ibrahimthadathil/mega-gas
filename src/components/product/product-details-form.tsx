@@ -214,7 +214,7 @@ export default function ProductDetailsForm({
                   "manager",
                   "accountant",
                   "driver",
-                  "godown_keeper",
+                  "godown_staff",
                   "office_staff",
                   "plan_driver",
                   "14KG"

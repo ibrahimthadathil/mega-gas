@@ -73,7 +73,7 @@ const getPlantLoadRegister = async (authId: string) => {
   try {
     const existUser = await checkUserByAuthId(authId);
     if (existUser) {
-      const data = await getPurchaseRegister(existUser.id);
+      const data = await getPurchaseRegister(existUser.id,existUser.role);
       return { success: true, data };
     } else throw new Error("un-authorized");
   } catch (error) {

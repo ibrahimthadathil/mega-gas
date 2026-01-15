@@ -377,7 +377,7 @@ export default function NetSalesSummarySection({
       {/* ================= CASH SUMMARY ================= */}
       <Card className="p-4 bg-green-50 dark:bg-green-950/20">
         <p className="text-xs text-muted-foreground">
-          Cash Received (Auto-calculated)
+          Cash To Pay (Auto-calculated)
         </p>
         <p className="text-2xl font-bold text-green-700">
           ₹{cashReceived.toLocaleString()}
@@ -387,14 +387,14 @@ export default function NetSalesSummarySection({
         </p>
       </Card>
 
-      <Card className="p-4 bg-muted/50">
+      {/* <Card className="p-4 bg-muted/50">
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium">Total Payments</span>
           <span className="text-xl font-bold">
             ₹{totalPayments.toLocaleString()}
           </span>
         </div>
-      </Card>
+      </Card> */}
     </div>
   );
 }

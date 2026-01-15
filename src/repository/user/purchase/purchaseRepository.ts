@@ -70,14 +70,18 @@ const getProductForPurchase = async () => {
   }
 };
 
-const getPurchaseRegister = async (userId: string) => {
+const getPurchaseRegister = async (userId: string, role: string) => {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from("plant_load_register_view")
       .select("*")
-      .eq("created_by", userId)
       .order("created_at", { ascending: false });
+      
+    if (role === "plant_driver") query = query.eq("created_by", userId);
+
+    const { data, error } = await query;
     if (error) throw error;
+
     return data;
   } catch (error) {
     console.log((error as Error).message);
@@ -85,8 +89,6 @@ const getPurchaseRegister = async (userId: string) => {
     throw (error as Error).message;
   }
 };
-
-
 
 const delete_purchase = async (id: string) => {
   try {
@@ -111,8 +113,8 @@ const edit_Purchased_Load = async (
       p_register: registerPayload,
       p_line_items: lineItemsPayload,
     });
-    if(error) throw error
-    return true
+    if (error) throw error;
+    return true;
   } catch (error) {
     console.log((error as Error).message);
     throw error;
