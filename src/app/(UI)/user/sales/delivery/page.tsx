@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -343,8 +343,17 @@ export default function Home() {
   const totalUpi = upiPayments?.reduce((sum, p) => sum + p.amount, 0) || 0;
   const totalOnline =
     onlinePayments?.reduce((sum, p) => sum + p.amount, 0) || 0;
-  const expectedCashInHand =
-    Math.round(netSalesWithTransactions / 10) * 10 - totalUpi - totalOnline;
+  // const expectedCashInHand =
+  //   Math.round(netSalesWithTransactions / 10) * 10 - totalUpi - totalOnline;
+const expectedCashInHandRaw =
+  netSalesWithTransactions - totalUpi - totalOnline; // new line
+
+  const expectedCashInHand = useMemo(() => {
+  return Math.round(expectedCashInHandRaw / 10) * 10;
+}, [expectedCashInHandRaw]);    // new line
+
+  // const expectedCashInHandRaw =
+  // netSalesWithTransactions - totalUpi - totalOnline;  
 
   const actualCashCounted = Object.entries(currencyDenominations || {}).reduce(
     (sum, [denom, count]) => sum + Number(denom) * count,
