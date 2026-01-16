@@ -26,6 +26,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 const page = () => {
   const { data: unloadedRecord, isLoading } = UseRQ<PlantLoadUnloadView[]>(
@@ -64,7 +66,19 @@ const page = () => {
       },
       {
         header: "Unload Date",
-        render: (row: PlantLoadUnloadView) => <span>{row.unload_date}</span>,
+        render: (row: PlantLoadUnloadView) => (
+          <span className="text-green-800">
+            {row.unload_date || "Not unloaded Yet"}
+          </span>
+        ),
+      },
+      {
+        header: "Unload Status",
+        render: (row: PlantLoadUnloadView) => (
+          <Badge variant="outline" className={cn("text-white bg-red-400",row.unload_details.length > 0&&"bg-green-800")}> 
+            {row.unload_details.length > 0 ? "Unloaded" : "Not Unloaded"}
+          </Badge>
+        ),
       },
       {
         header: "Unload Details",
@@ -95,16 +109,18 @@ const page = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {row.unload_details.map((detail, index) => (
+                    {row?.unload_details?.map((detail, index) => (
                       <TableRow key={detail.id}>
                         <TableCell>{index + 1}</TableCell>
                         <TableCell>{detail.to_warehouse.name}</TableCell>
                         <TableCell>{detail.product.name}</TableCell>
                         <TableCell>{detail.qty}</TableCell>
-                        <TableCell>{detail.return_product?.name||'No return'}</TableCell>
-                        <TableCell>{detail.return_qty||0}</TableCell>
                         <TableCell>
-                          {detail.to_return_warehouse?.name||'-'}
+                          {detail.return_product?.name || "No return"}
+                        </TableCell>
+                        <TableCell>{detail.return_qty || 0}</TableCell>
+                        <TableCell>
+                          {detail.to_return_warehouse?.name || "-"}
                         </TableCell>
                         <TableCell>{detail.trip_type}</TableCell>
                       </TableRow>
@@ -152,6 +168,7 @@ const page = () => {
       },
     ];
   }, [unloadedRecord]);
+
   return (
     <main className="min-h-screen bg-background p-4 sm:p-6">
       <h1 className="text-3xl font-semibold mb-2">Transfered Stock</h1>

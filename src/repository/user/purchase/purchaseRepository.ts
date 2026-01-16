@@ -80,8 +80,7 @@ const getPurchaseRegister = async (userId: string, role: string) => {
     if (role === "plant_driver") query = query.eq("created_by", userId);
 
     const { data, error } = await query;
-    if (error) throw error;
-
+    if (error) throw error;    
     return data;
   } catch (error) {
     console.log((error as Error).message);

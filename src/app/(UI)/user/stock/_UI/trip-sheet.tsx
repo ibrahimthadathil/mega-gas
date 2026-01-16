@@ -187,8 +187,6 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
         }
       }
     }
-    console.log(selectedLineItem, "8888888");
-
     const newRecord: TripLoadRecord = {
       plant_load_line_item_id: selectedLineItem.plant_load_line_item_id,
       trip_type: selectedLineItem.trip_type,
@@ -266,7 +264,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
       const data = await unloadSlip(formData);
       if (data.success) {
         toast.success("Slip created");
-        router.push("/user/stock");
+        router.push("/user/stock/load-slip");
       }
     } catch (error) {
       toast.error("error in unload submission");
