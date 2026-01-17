@@ -31,7 +31,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { deleteDailyReport } from "@/services/client_api-Service/admin/sales/sales_admin_api";
+import { deleteDailyReport, getAllDeliveryReport } from "@/services/client_api-Service/admin/sales/sales_admin_api";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -39,7 +39,7 @@ import { useRouter } from "next/navigation";
 const Home = () => {
   const { data: report, isLoading } = UseRQ<SalesSlipPayload[]>(
     "reports",
-    getDailyReportByUser
+    getAllDeliveryReport
   );
   const queryQlient = useQueryClient();
   const route = useRouter()
@@ -175,7 +175,7 @@ const Home = () => {
       {
         header: "remark",
         render: (row: SalesSlipPayload) => {
-          const remark = "row.remark";
+          const remark = row.remark;
 
           if (!remark || remark.trim() === "") {
             return <div className="text-muted-foreground text-center">—</div>;
@@ -196,22 +196,6 @@ const Home = () => {
             </TooltipProvider>
           );
         },
-      },
-      {
-        header: "Action",
-        render: (row: SalesSlipPayload) => (
-          <AlertModal
-            data={row}
-            contents={[
-              row.status == "Submitted" ? "Close" : "Closed",
-              <>This Slip Will be Closed after this action.</>,
-            ]}
-            disable={row.status !== "Submitted"}
-            varient={row.status == "Submitted" ? "destructive" : "secondary"}
-            style=" hover:text-destructive-foreground p-2"
-            action={() => alert(row.sales_slip_id)}
-          />
-        ),
       },
       {
         header: "Edit",

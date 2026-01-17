@@ -28,7 +28,7 @@ export const GET = async (
     if (user?.id) {
       const { id } = await params;
       const data = await getDeliveryPayload(id, user.id);
-      console.log(JSON.stringify( data.data.currentStock));
+      console.log( data.data.products);
       
       return NextResponse.json({data}, { status: STATUS.SUCCESS.code });
     } else

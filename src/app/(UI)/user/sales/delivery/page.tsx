@@ -93,71 +93,6 @@ interface SaleItem {
   components?: SaleComponent[]; // Changed from "json components"
 }
 
-interface OpeningStockItem {
-  warehouse_id: string;
-  product_id: string;
-  warehouse_name: string;
-  product_name: string;
-  qty: number;
-  is_empty: boolean;
-}
-
-interface ClosingStockItem {
-  "product id": string;
-  qty: number;
-}
-
-// 2. The Corrected Function
-const calculateClosingStock = (
-  salesData: SaleItem[],
-  openingStockData: OpeningStockItem[]
-): ClosingStockItem[] => {
-  const stockMap: Record<string, number> = {};
-
-  // Helper to safely update stock
-  const updateStock = (id: string, amount: number) => {
-    // If ID doesn't exist in map yet, default to 0, then add amount
-    stockMap[id] = (stockMap[id] || 0) + amount;
-  };
-
-  // Step A: Load Opening Stock
-  for (const item of openingStockData) {
-    if (item.product_id) {
-      updateStock(item.product_id, item.qty || 0);
-    }
-  }
-
-  // Step B: Deduct Sales (Using NEW key names)
-  for (const sale of salesData) {
-    const saleQty = sale.quantity || 0; // UPDATED KEY
-
-    if (sale.isComposite && sale.components) {
-      // UPDATED KEYS
-
-      // Loop through components
-      for (const component of sale.components) {
-        const compId = component.child_product_id; // UPDATED KEY
-        const compQtyPerUnit = component.qty || 0;
-
-        // Calculate total to remove: (Sales Count) * (Component usage per unit)
-        const totalDeduction = saleQty * compQtyPerUnit;
-
-        // Subtract from stock
-        updateStock(compId, -totalDeduction);
-      }
-    } else {
-      // Simple product deduction
-      const pId = sale.productId; // UPDATED KEY
-      updateStock(pId, -saleQty);
-    }
-  }
-
-  // Step C: Format Output
-  return Object.entries(stockMap).map(([id, qty]) => ({
-    "product id": id,
-    qty: qty,
-  }));
-};
 //----------------------------------------------------------------------------
 const transformEditDataToForm = (
   editData: any
@@ -343,17 +278,12 @@ export default function Home() {
   const totalUpi = upiPayments?.reduce((sum, p) => sum + p.amount, 0) || 0;
   const totalOnline =
     onlinePayments?.reduce((sum, p) => sum + p.amount, 0) || 0;
-  // const expectedCashInHand =
-  //   Math.round(netSalesWithTransactions / 10) * 10 - totalUpi - totalOnline;
-const expectedCashInHandRaw =
-  netSalesWithTransactions - totalUpi - totalOnline; // new line
+  const expectedCashInHandRaw =
+    netSalesWithTransactions - totalUpi - totalOnline; // new line
 
   const expectedCashInHand = useMemo(() => {
-  return Math.round(expectedCashInHandRaw / 10) * 10;
-}, [expectedCashInHandRaw]);    // new line
-
-  // const expectedCashInHandRaw =
-  // netSalesWithTransactions - totalUpi - totalOnline;  
+    return Math.round(expectedCashInHandRaw / 10) * 10;
+  }, [expectedCashInHandRaw]); // new line
 
   const actualCashCounted = Object.entries(currencyDenominations || {}).reduce(
     (sum, [denom, count]) => sum + Number(denom) * count,
@@ -398,7 +328,8 @@ const expectedCashInHandRaw =
 
   const handleVerify = () => {
     setIsVerified(true);
-  };
+  };  
+console.log('88888',JSON.stringify(payload?.products));
 
   const onSubmit = async (data: DeliveryReportFormData) => {
     // Additional validation with calculations
@@ -420,9 +351,6 @@ const expectedCashInHandRaw =
       );
       return;
     }
-    // console.log(JSON.stringify(calculateClosingStock(data?.sales,payload?.currentStock),null,2),"❤️");
-    // console.log(JSON.stringify((payload?.currentStock),null,2),"❤️❤️❤️");
-    // console.log(JSON.stringify((data?.sales),null,2),"❤️❤️");
 
     // Calculate net sold quantity per product
     const netSoldByProductId: Record<string, number> = {};
@@ -645,6 +573,7 @@ const expectedCashInHandRaw =
                     />
 
                     <ClosingStockSection
+                    products={payload?.products||[]}
                       oldStock={payload?.currentStock}
                       sales={sales || []}
                     />

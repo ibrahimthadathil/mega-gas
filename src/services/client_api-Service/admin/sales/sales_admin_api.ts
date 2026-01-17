@@ -26,3 +26,12 @@ export const updateSalesSlip = async (datas: any, id: string) => {
     throw error;
   }
 };
+
+export const getAllDeliveryReport = async()=>{
+  try {
+    const {data} = await axios.get('/api/admin/sales')
+    return data
+  } catch (error) {
+    throw error
+  }
+}

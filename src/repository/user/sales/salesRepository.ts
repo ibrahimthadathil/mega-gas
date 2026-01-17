@@ -22,7 +22,7 @@ const getAllProductsOptions = async () => {
     const { data, error } = await supabase
       .from("materialized_products_cache")
       .select("*")
-      .eq("is_empty", false)
+      // .eq("is_empty", false)
       .eq("visibility", true);
     if (error) throw error;
     return data;

@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { Cylinder } from "lucide-react";
 
-type OldStockItem = {
+type OpeningStockItem = {
   product_id: string;
   product_name: string;
   qty: number;
@@ -11,7 +11,6 @@ type OldStockItem = {
 
 type SaleComponent = {
   qty: number;
-  sale_price: number;
   child_product_id: string;
 };
 
@@ -20,125 +19,173 @@ type SaleItem = {
   productName: string;
   quantity: number;
   isComposite: boolean;
-  components?: SaleComponent[] | null;
+  components?: SaleComponent[];
 };
 
 interface ClosingStockSectionProps {
-  oldStock: OldStockItem[];
-  sales: SaleItem[];
+  oldStock: OpeningStockItem[] | any;
+  sales: SaleItem[] | any;
+  products: any[];
 }
 
+const calculateClosingStock = (
+  openingStock: OpeningStockItem[],
+  salesData: SaleItem[],
+  products:any[]
+): any[] => {
+
+  const stockMap: Record<string, { qty: number; product_name: string }> = {};
+
+  // A. Initialize stockMap with opening stock
+  openingStock.forEach(item => {
+    stockMap[item.product_id] = {
+      qty: (stockMap[item.product_id]?.qty || 0) + item.qty,
+      product_name: item.product_name
+    };
+  });
+
+  // B. Process Sales7686
+  salesData.forEach(sale => {
+    if (sale.isComposite && sale.components) {
+      sale.components.forEach(comp => {
+        const deduction = sale.quantity * comp.qty;
+        if (!stockMap[comp.child_product_id]) {
+          stockMap[comp.child_product_id] = { qty: 0, product_name: "" };
+        }
+        stockMap[comp.child_product_id].qty -= deduction;
+      });
+    } else {
+      // Handle Simple Product Sale
+      const deduction = sale.quantity;
+      if (!stockMap[sale.productId]) {
+        stockMap[sale.productId] = { qty: 0, product_name: sale.productName };
+      }
+      stockMap[sale.productId].qty -= deduction;
+    }
+  });
+  console.log('@@@',stockMap);
+  
+  // C. Convert back to array format
+ const productMap = Object.fromEntries(
+  products.map(p => [p.id, p])
+);
+
+return Object.entries(stockMap)
+  .map(([id, { qty }]) => {
+    const product = productMap[id];
+    if (!product?.tags?.includes("clossing_stock")) return null;
+
+    return {
+      product_id: id,
+      product_name: product.product_name,
+      qty,
+    };
+  })
+  .filter(Boolean);
+
+};
+
+// const calculateClosingStock = (
+//   openingStock: OpeningStockItem[], 
+//   salesData: SaleItem[],
+//   productMaster: any[]
+// ): any[] => {
+  
+//   // --- PHASE 1: Calculate Stock (Logic remains generic for all items) ---
+
+//   const stockMap: Record<string, number> = {};
+
+//   // A. Process Opening Stock
+//   openingStock.forEach(item => {
+//     const current = stockMap[item.product_id] || 0;
+//     stockMap[item.product_id] = current + item.qty;
+//   });
+
+//   // B. Process Sales
+//   salesData.forEach(sale => {
+//     if (sale.isComposite && sale.components) {
+//       sale.components.forEach(comp => {
+//         const deduction = sale.quantity * comp.qty;
+//         const currentStock = stockMap[comp.child_product_id] || 0;
+//         stockMap[comp.child_product_id] = currentStock - deduction;
+//       });
+//     } else {
+//       const deduction = sale.quantity;
+//       const currentStock = stockMap[sale.productId] || 0;
+//       stockMap[sale.productId] = currentStock - deduction;
+//     }
+//   });
+
+
+//   // --- PHASE 2: Lookup Map & Filtering ---
+
+//   // Create a lookup map for product details from the master list
+//   const productMeta: Record<string, { name: string, tags: string[] }> = {};
+//   productMaster.forEach(p => {
+//     productMeta[p.id] = { name: p.product_name, tags: p.tags || [] };
+//   });
+
+//   // Convert stockMap to array and apply filters
+//   return Object.entries(stockMap).reduce((results, [id, qty]) => {
+    
+//     // 1. Get product details (Name/Tags)
+//     const meta = productMeta[id];
+
+//     // 2. Define Filter Conditions
+//     const isNonZero = qty !== 0;
+//     const hasClosingTag = meta && meta.tags.includes("clossing_stock");
+
+//     // 3. Apply Filters: Must be non-zero AND have the specific tag
+//     if (isNonZero && hasClosingTag) {
+//       results.push({
+//         "product_name": meta.name,
+//         "id": id,
+//         "qty": qty
+//       });
+//     }
+
+//     return results;
+//   }, [] as any[]);
+// };
 export default function ClosingStockSection({
   oldStock,
   sales,
+  products,
 }: ClosingStockSectionProps) {
-  // Calculate sold and returned quantities per product ID
-  const filledSoldByProductId: Record<string, number> = {};
-  const emptiesReturnedByProductId: Record<string, number> = {};
+  // console.log('OLD  :- ',JSON.stringify(  oldStock,null,2));
+  // console.log("SALES :- " ,JSON.stringify( sales,null,2));
 
-  sales.forEach((sale) => {
-    if (sale.isComposite && sale.components && sale.components.length > 0) {
-      // Check if there's any negative component (empty return) in this sale
-      const hasEmptyReturn = sale.components.some(comp => comp.qty < 0);
-      
-      sale.components.forEach((component) => {
-        const productId = component.child_product_id;
-        const qty = component.qty * sale.quantity;
-        
-        if (component.qty > 0) {
-          // Filled cylinders sold
-          filledSoldByProductId[productId] = 
-            (filledSoldByProductId[productId] || 0) + qty;
-          
-          // If this sale has empty return, count this filled sale as having an empty
-          if (hasEmptyReturn) {
-            emptiesReturnedByProductId[productId] = 
-              (emptiesReturnedByProductId[productId] || 0) + qty;
-          }
-        }
-      });
-    } else {
-      // Non-composite products count as filled sold only
-      filledSoldByProductId[sale.productId] = 
-        (filledSoldByProductId[sale.productId] || 0) + sale.quantity;
-      // Non-composite products don't have empties
-    }
-  });
-
-  // Calculate net sold quantity (considering all components)
-  const netSoldByProductId: Record<string, number> = {};
-  
-  sales.forEach((sale) => {
-    if (sale.isComposite && sale.components && sale.components.length > 0) {
-      sale.components.forEach((component) => {
-        const productId = component.child_product_id;
-        const qty = component.qty * sale.quantity;
-        netSoldByProductId[productId] = (netSoldByProductId[productId] || 0) + qty;
-      });
-    } else {
-      netSoldByProductId[sale.productId] = 
-        (netSoldByProductId[sale.productId] || 0) + sale.quantity;
-    }
-  });
-
-  // Calculate closing stock for each product
-  const closingStock = oldStock.map((item) => {
-    const filledSold = filledSoldByProductId[item.product_id] || 0;
-    const emptiesReturned = emptiesReturnedByProductId[item.product_id] || 0;
-    const netSold = netSoldByProductId[item.product_id] || 0;
-    const closing = item.qty - netSold;
-
-    return {
-      product_id: item.product_id,
-      product_name: item.product_name,
-      closingQty: closing,
-      filledSold: filledSold,
-      emptiesReturned: emptiesReturned,
-    };
-  });
+  const closingStock = calculateClosingStock(oldStock, sales, products);
+  console.log(closingStock);
 
   return (
     <div className="space-y-3">
       <h2 className="text-lg font-semibold text-foreground">Closing Stock</h2>
       <div className="overflow-x-auto pb-2">
         <div className="flex gap-3">
-          {closingStock.map((item) => (
-            <Card key={item.product_id} className="p-4 min-w-max">
-              <div className="flex flex-col items-center gap-3 w-32">
-                {/* <Cylinder className="h-8 w-8 text-primary" /> */}
-                <p className="text-md font-medium text-center text-foreground line-clamp-2">
-                  {item.product_name} 
-                </p>
-                
-                {/* Closing Stock - Main Display */}
-                {/* <div className="text-center w-full">
-                  <p className="text-xl font-bold text-primary">
-                    {item.closingQty}
-                  </p>
-                </div> */}
+          {closingStock.map(
+            (item) =>
+              item.qty != 0 && (
+                <Card key={item.id} className="p-4 min-w-max">
+                  <div className="flex flex-col items-center gap-3 w-32">
+                    <p className="text-md font-medium text-center text-foreground line-clamp-2">
+                      {item.product_name}
+                    </p>
 
-                {/* Sold Count */}
-                <div className="w-full pt-2 border-t">  
-                  <div className="flex justify-between items-center">
-                    <span className="text-md font-semibold">Full: <Cylinder className="h-5 w-5"/></span>
-                    <span className="text-sm font-semibold text-red-600">
-                      {item.closingQty}
-                    </span>
+                    <div className="w-full pt-2 border-t">
+                      <div className="flex justify-between items-center">
+                        <span className="text-md font-semibold">
+                          Stock: <Cylinder className="h-5 w-5" />
+                        </span>
+                        <span className="text-sm font-semibold text-red-600">
+                          {item.qty}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-
-                {/* Empty Cylinders Returned */}
-                <div className="w-full">
-                  <div className="flex justify-between items-center">
-                    <span className="text-md font-semibold">Empty:<Cylinder className="h-5 w-5"/></span>
-                    <span className="text-sm font-semibold text-green-600">
-                      {item.emptiesReturned}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
+                </Card>
+              )
+          )}
         </div>
       </div>
     </div>

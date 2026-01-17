@@ -1,23 +1,17 @@
 import {
+  daily_Report_View,
   delete_sales,
   edit_sales_slip,
   get_Sales_Slip_ById,
 } from "@/repository/admin/Dashboard/salesReport- repository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
-import { DeliveryPayload } from "@/types/deliverySlip";
 
 const deleteSaleSlip = async (authid: string, slipId: string) => {
   try {
-    console.log(authid);
-
     const checkUser = await checkUserByAuthId(authid);
-    console.log(checkUser);
 
     if (checkUser) {
-      console.log("666");
-
       const isDeleted = await delete_sales(slipId, checkUser.id);
-      console.log("666ww");
       if (isDeleted) return { success: true, message: "Deleted successfully" };
       else return { success: false, message: "Failed to Delete" };
     } else throw Error("Unauthorized");
@@ -43,11 +37,10 @@ const editSaleSlip = async (data: any, authId: string, slipId: string) => {
     const checkUser = await checkUserByAuthId(authId);
     if (checkUser) {
       const cash = data.cashChest.currencyDenominations;
-
       const payload = {
         sales_slip_id: data.id,
-        "Created by": authId,
-        "Created at": new Date().toISOString(), // Or preserve previous created_at
+        "Created by": checkUser.id,
+        "Created at": new Date().toDateString(),
         Date: data.Date,
         "From Warehouse id": data["From Warehouse id"],
         "Total sales amount": data.totals.totalSales,
@@ -56,9 +49,6 @@ const editSaleSlip = async (data: any, authId: string, slipId: string) => {
         "Total online amount": data.totals.totalOnline,
         "Total Cash amount": data.totals.expectedCashInHand,
         "Total transactions amount": data.totals.netSalesWithTransactions,
-        remark: data.remark || "",
-        round_off: data.cashChest.mismatch || 0,
-
         Sales: data.Sales.map((item: any) => ({
           line_item_id: item.line_item_id || null,
           "product id": item["product id"],
@@ -71,7 +61,6 @@ const editSaleSlip = async (data: any, authId: string, slipId: string) => {
 
         "Delivery boys": data["Delivery boys"] || [],
         Expenses: data.Expenses || [],
-
         "Cash chest": {
           "chest name": data.cashChest.chestName,
           "2000": cash["2000"] || 0,
@@ -83,15 +72,20 @@ const editSaleSlip = async (data: any, authId: string, slipId: string) => {
           "10": cash["10"] || 0,
           "5": cash["5"] || 0,
           remark: data.remark || "",
-          status: data.status || "Submitted",
+          status: data.status,
         },
 
         "UPI payments": data["UPI payments"] || [],
         "Online payments": data["Online payments"] || [],
         Transaction: data.Transaction || [],
       };
-
-      const updated = await edit_sales_slip(data, checkUser.id, slipId);
+      const updated = await edit_sales_slip(
+        payload,
+        data.remark || "",
+        data.cashChest.mismatch || 0,
+        checkUser.id,
+        slipId
+      );
       if (updated) return { success: true, message: "Updated" };
       else throw Error("Failed to update, Try Later");
     } else throw Error("Un-authorized");
@@ -100,4 +94,14 @@ const editSaleSlip = async (data: any, authId: string, slipId: string) => {
   }
 };
 
-export { deleteSaleSlip, getSalesSlipByID, editSaleSlip };
+const getAllSalesReports = async () => {
+  try {
+    const report = await daily_Report_View();
+    if (report) return { success: true, data: report };
+    else return { success: false };
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+};
+
+export { deleteSaleSlip, getSalesSlipByID, getAllSalesReports, editSaleSlip };

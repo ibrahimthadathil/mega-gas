@@ -33,6 +33,7 @@ interface IProduct {
     sale_price: number;
     child_product_id: string;
   }> | null;
+  tags:string[]
 }
 
 interface Sale {
@@ -48,6 +49,7 @@ interface Sale {
     sale_price: number;
     child_product_id: string;
   }> | null;
+  tags?:string[]
 }
 interface Customer {
   id: string;
@@ -128,9 +130,11 @@ export default function SalesSection({
       return;
     }
 
-    const filtered = products.filter((product) =>
-      product.product_name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filtered = products
+      .filter((product) => !product.tags?.includes("full")) // Exclude products with "clossing_stock" tag
+      .filter((product) =>
+        product.product_name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     setFilteredProducts(filtered);
     setSelectedIndex(-1);
   }, [searchQuery, products]);
@@ -212,6 +216,7 @@ export default function SalesSection({
       isComposite: selectedProduct.is_composite,
       customerId: formData.customerId,
       components: selectedProduct.components || null,
+      tags:selectedProduct.tags
     };
 
     onChange([...sales, newSale]);
@@ -249,6 +254,7 @@ export default function SalesSection({
         "sale qty": sale.quantity,
         rate: sale.rate,
         ...(sale.customerId && { "customer id": sale.customerId }),
+        ...(sale.tags && sale.tags.length > 0 && { tags: sale.tags })
       };
 
       if (sale.isComposite && sale.components && sale.components.length > 0) {
