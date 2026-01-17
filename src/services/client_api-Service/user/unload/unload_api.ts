@@ -8,3 +8,12 @@ export const getAllUnloadDetails = async()=>{
         throw error
     }
 }
+
+export const deleteUnloadSlip = async(id:string)=>{
+    try {
+        const {data} = await axios.delete(`/api/user/unload/${id}`)
+        return data
+    } catch (error) {
+        throw error
+    }
+}

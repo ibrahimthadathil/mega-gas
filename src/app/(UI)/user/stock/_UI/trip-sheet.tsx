@@ -89,8 +89,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
   const { data: users, isLoading: isUserLoading } = UseRQ("user", () =>
     get_userByRole("driver")
   );
-    const [isSubmit,setSubmit] = useState<boolean>(false)
-  
+  const [isSubmit, setSubmit] = useState<boolean>(false);
 
   // Initialize state with empty values
   const [formData, setFormData] = useState<TripFormData>({
@@ -187,8 +186,6 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
         }
       }
     }
-    console.log(selectedLineItem, "8888888");
-
     const newRecord: TripLoadRecord = {
       plant_load_line_item_id: selectedLineItem.plant_load_line_item_id,
       trip_type: selectedLineItem.trip_type,
@@ -262,11 +259,11 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 
   const handleProceed = async () => {
     try {
-      setSubmit(true)
+      setSubmit(true);
       const data = await unloadSlip(formData);
       if (data.success) {
         toast.success("Slip created");
-        router.push("/user/stock");
+        router.push("/user/stock/load-slip");
       }
     } catch (error) {
       toast.error("error in unload submission");
@@ -367,8 +364,6 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
           {unloadRecord[0]?.line_items?.map((lineItem: any) => {
-            console.log(lineItem, "@@@@");
-
             return (
               <Card
                 key={lineItem.line_item_id}
@@ -679,7 +674,12 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
       </div>
 
       {/* Submit Button */}
-      <Button disabled={isSubmit} onClick={handleProceed} className="w-full" size="lg">
+      <Button
+        disabled={isSubmit}
+        onClick={handleProceed}
+        className="w-full"
+        size="lg"
+      >
         Proceed
       </Button>
     </div>
@@ -806,7 +806,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 //   );
 
 //   // Single unified form with Zod validation
-//   const { control, handleSubmit, setValue, watch, formState: { errors } } = 
+//   const { control, handleSubmit, setValue, watch, formState: { errors } } =
 //     useForm<TripFormData>({
 //       resolver: zodResolver(tripFormSchema),
 //       defaultValues: {
@@ -886,7 +886,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 
 //   const handleDialogAdd = () => {
 //     const { lineItem, to_warehouse_id, fullQuantity, emptyQuantity, return_warehouse_id } = dialog;
-    
+
 //     if (!to_warehouse_id || !lineItem) {
 //       toast.error("Please select a vehicle/destination warehouse.");
 //       return;
@@ -1350,7 +1350,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 //             No load details added yet. Click on a product card above to start.
 //           </p>
 //         )}
-        
+
 //         {errors.tripLoadRecords && (
 //           <p className="text-red-500 text-sm mt-2">{errors.tripLoadRecords.message}</p>
 //         )}

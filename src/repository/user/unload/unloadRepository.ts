@@ -31,10 +31,10 @@ const edit_unload_slip = async (payload: {
   }
 };
 
-const delete_unload_slip = async (unloadSlipId: string, userId: string) => {
+const delete_unload_slip = async (plantId: string, userId: string) => {
   try {
-    const { error } = await supabase.rpc("delete_unload_slip_rpc", {
-      p_unload_slip_id: unloadSlipId,
+    const { error } = await supabase.rpc("reverse_plant_unloading", {
+      p_plant_load_register_id : plantId,
       p_user_id: userId,
     });
 

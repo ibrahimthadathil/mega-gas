@@ -246,7 +246,7 @@ const Home = () => {
   }, [report]);
   return (
     <main className="min-h-screen bg-background p-4 sm:p-6">
-      <h1 className="text-3xl font-semibold mb-2">Transfered Stock</h1>
+      <h1 className="text-3xl font-semibold mb-2">Daily Sales Report Stock</h1>
       {isLoading ? (
         <Skeleton className="w-full h-24 bg-zinc-50" />
       ) : (

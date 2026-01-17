@@ -28,15 +28,15 @@ export const navItems = [
     title: "User Dashboard",
     url: "/user/dashboard",
     icon: LayoutDashboardIcon,
-    roles: ["admin", "manager", "accountant", "driver", "plant_driver", "godown_keeper"],
+    roles: ["admin", "manager", "accountant", "driver", "plant_driver", "godown_staff"],
   },
   {
     title: "Sales",
     url: "/user/sales",
     icon: ClipboardCheck,
-    roles: ["admin", "manager", "accountant", "driver", "godown_keeper"],
+    roles: ["admin", "manager", "accountant", "driver", "godown_staff"],
     items: [
-      { title: "Delivery", url: "/user/sales/delivery", roles: ["admin", "manager", "accountant", "driver", "godown_keeper"] },
+      { title: "Delivery", url: "/user/sales/delivery", roles: ["admin", "manager", "accountant", "driver", "godown_staff"] },
     ],
   },
   {
@@ -49,7 +49,7 @@ export const navItems = [
     title: "Purchase",
     url: "/user/purchase",
     icon: BookOpen,
-    roles: ["admin", "manager", "accountant", "plant_driver"],
+    roles: ["admin", "manager", "accountant", "plant_driver","godown_staff"],
     items: [
       { title: "Plant Load", url: "/user/purchase/plant-load", roles: ["admin", "manager", "accountant", "plant_driver"] },
     ],
@@ -58,31 +58,31 @@ export const navItems = [
     title:'Warehouse',
     url:'/user/warehouses',
     icon: Warehouse,
-    roles : ["admin","manager","accountant","godown_keeper",]
+    roles : ["admin","manager","accountant","godown_staff",]
   },
   {
     title: "Stock",
     url: "/user/stock",
     icon: Settings2,
-    roles: ["admin", "manager", "accountant", "godown_keeper"],
+    roles: ["admin", "manager", "accountant", "godown_staff"],
     items: [
-      { title: "unload Slip", url: "/user/stock/load-slip", roles: ["admin", "manager", "accountant", "godown_keeper"] },
-      { title: "Stock Transfer", url: "/user/stock/transfer", roles: ["admin", "manager", "accountant", "godown_keeper"] },
+      { title: "unload Slip", url: "/user/stock/load-slip", roles: ["admin", "manager", "accountant", "godown_staff"] },
+      { title: "Stock Transfer", url: "/user/stock/transfer", roles: ["admin", "manager", "accountant", "godown_staff"] },
     ],
   },
   {
     title: "Expenses",
     url: "/user/expenses",
     icon: BookOpen,
-    roles: ["admin", "manager", "accountant", "driver", "plant_driver", "godown_keeper"],
+    roles: ["admin", "manager", "accountant", "driver", "plant_driver", "godown_staff"],
   },
   {
     title:'Accounts',
     url:'/user/accounts',
     icon:BookAIcon,
-    roles: ["admin", "manager", "accountant", "godown_keeper"],
+    roles: ["admin", "manager", "accountant", "godown_staff"],
     items:[
-      {title:'Transactions',url:'/user/accounts/transactions',roles:["admin", "manager", "accountant", "godown_keeper"]}
+      {title:'Transactions',url:'/user/accounts/transactions',roles:["admin", "manager", "accountant", "godown_staff"]}
     ]
   },
  
@@ -130,9 +130,10 @@ export const roleRouteConfig = {
     "/user/purchase",
     "/user/expenses",
   ],
-  godown_keeper: [
+  godown_staff: [
     "/user/dashboard",
     "/user/sales",
+    "/user/purchase",
     "/user/warehouses",
     "/user/stock",
     "/user/expenses",

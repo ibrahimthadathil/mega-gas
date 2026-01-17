@@ -13,6 +13,8 @@ import { ChevronDown, Pencil, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useSelector } from "react-redux";
+import { Rootstate } from "@/redux/store";
 
 export default function PlantLoadPage() {
   const { data, isLoading } = UseRQ<PlantLoadRecord[]>(
@@ -22,6 +24,7 @@ export default function PlantLoadPage() {
   const queryClient = useQueryClient()
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const router = useRouter();
+  const {role} = useSelector((state:Rootstate)=>state.user)
   const toggleExpanded = (id: string) => {
     setExpandedIds((prev) => {
       const newSet = new Set(prev);
@@ -128,7 +131,7 @@ export default function PlantLoadPage() {
                               >
                                 <Button
                                   onClick={() => handleUnload(record)}
-                                  disabled={record?.is_unloaded}
+                                  disabled={record?.is_unloaded||role==="plant_driver"}
                                   className={`${
                                     record?.is_unloaded
                                       ? "bg-red-600"
@@ -141,7 +144,7 @@ export default function PlantLoadPage() {
                             </div>
                           </div>
                         </div>
-                        {!record.is_unloaded && (
+                        {!record.is_unloaded &&role==="admin"&& (
                           <>
                             <Button variant="ghost" onClick={()=>handleEdit(record)}>
                               <Pencil color="skyblue" />

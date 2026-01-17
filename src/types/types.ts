@@ -147,7 +147,7 @@ export interface PlantLoadRecord {
   id: string;
   sap_number: string;
   bill_date: string;
-  unloading_date: string | null;
+  unloading_date: Date ;
   total_full_qty: number;
   unloaded_qty: number;
   balance: number;
