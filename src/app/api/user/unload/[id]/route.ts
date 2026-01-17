@@ -9,6 +9,8 @@ export const DELETE = async (
 ) => {
   try {
     const { id } = await params;
+    console.log('👀👀👀',id);
+    
     const { user, error: authError } = await getAuthUser();
     const { message, success } = await deleteUnloadSlipById(id, user?.id as string);
     if (success)
