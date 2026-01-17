@@ -33,10 +33,9 @@ const delete_sales = async (slipId: string, userId: string) => {
 
 const edit_sales_slip = async (payload:DeliveryPayload,userId:string,slipId:string) => {
   try {
-    const { error } = await supabaseAdmin.rpc("update_sales_slip_safe", {
+    const { error } = await supabaseAdmin.rpc("edit_sales_slip", {
       p_sales_slip_id: slipId,
       payload: payload,
-      p_updated_by: userId,
     });
     if(error) throw error
     return true
