@@ -108,7 +108,7 @@ const {warehouseid} = useSelector((state:Rootstate)=>state.user)
       {inventoryLoading ? (
         <Skeleton className="w-full h-24 bg-zinc-50" />
       ) : (
-        <DataTable rowClassName={getRowClassName}  columns={columns} itemsPerPage={10} data={pivotData ?? []} />
+        <DataTable rowClassName={getRowClassName}  columns={columns} itemsPerPage={13} data={pivotData ?? []} />
       )}
     </main>
   );

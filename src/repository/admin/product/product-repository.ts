@@ -5,8 +5,11 @@ const add_product = async (payload: Record<string, unknown>) => {
   try {
     const { error } = await supabaseAdmin.rpc(
       "create_product_with_components",
-      payload
+      payload,
     );
+    if (!error) {
+      await supabase.rpc("refresh_materialized_products_cache");
+    }
     if (error) throw error;
     return true;
   } catch (error) {
@@ -43,8 +46,9 @@ const edit_Product = async (payload: Record<string, unknown>) => {
   try {
     const { error } = await supabaseAdmin.rpc(
       "update_product_with_components",
-      payload
+      payload,
     );
+    if (!error) await supabase.rpc("refresh_materialized_products_cache");
     if (error) throw error;
     return true;
   } catch (error) {
@@ -64,7 +68,7 @@ const get_All_cylinders = async () => {
       .or("product_name.ilike.%FULL%,product_name.ilike.%EMPTY%");
 
     if (error) throw error;
-    return data
+    return data;
   } catch (error) {
     console.log((error as Error).message);
   }

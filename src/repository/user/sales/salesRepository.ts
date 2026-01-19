@@ -6,8 +6,6 @@ const getDeliveryPayloadByVehicle = async (vehicleId: string) => {
       .from("current_inventory_levels")
       .select("*")
       .eq("warehouse_id", vehicleId)
-      .eq("is_empty", false);
-
     if (error) throw error;
     return data;
   } catch (error) {
