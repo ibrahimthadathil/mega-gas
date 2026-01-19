@@ -27,14 +27,12 @@ const getDeliverableProduct = async () => {
 
 const getDeliveryPayload = async (vehicleId: string, authId: string) => {
   try {
-    console.log(authId);
     const user = await checkUserByAuthId(authId);
-    console.log(user);
     if (user) {
       
       const [drivers, currentStock, expenses, products, customers, Qrcode] =
         await Promise.all([
-          getUserByRole("driver"),
+          getUserByRole(["driver","godown_staff"]),
           getDeliveryPayloadByVehicle(vehicleId),
           getExpensesByStatus(user.id),
           getAllProductsOptions(),

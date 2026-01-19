@@ -31,12 +31,12 @@ const findUserById = async (userId: string) => {
   }
 };
 
-const getUserByRole = async (role: string) => {
+const getUserByRole = async (roles: string[]) => {
   try {
     const { data, error } = await supabase
       .from("users")
       .select("*")
-      .eq("role", role);
+      .in("role", roles);
     if (error) throw error;
     return data;
   } catch (error) {
