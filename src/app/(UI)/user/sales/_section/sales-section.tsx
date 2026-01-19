@@ -967,7 +967,6 @@ export default function SalesSection({
                     <NumberInput
                       value={field.value}
                       onChange={field.onChange}
-                      min={1}
                       placeholder="1"
                     />
                   )}

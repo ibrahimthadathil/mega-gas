@@ -46,6 +46,7 @@ import {
 } from "@/lib/schema/salesSlip";
 import { useSelector } from "react-redux";
 import { Rootstate } from "@/redux/store";
+import { Input } from "@/components/ui/input";
 
 interface DeliveryBoy {
   id: string;
@@ -203,7 +204,7 @@ export default function Home() {
     },
     { enabled: !!isEditMode }
   );
-
+  
   const {
     control,
     handleSubmit,
@@ -329,7 +330,6 @@ export default function Home() {
   const handleVerify = () => {
     setIsVerified(true);
   };  
-console.log('88888',JSON.stringify(payload?.products));
 
   const onSubmit = async (data: DeliveryReportFormData) => {
     // Additional validation with calculations
@@ -408,6 +408,7 @@ console.log('88888',JSON.stringify(payload?.products));
 
     const report = {
       ...(isEditMode && reportId ? { id: reportId } : {}),
+      ...(isEditMode && reportId ? { created_by: (editReport as any)?.sales_slip?.created_by } : {}),
       Date: formatDate(data.date as Date),
       "From Warehouse id": currentVehicle,
       "Delivery boys": data.deliveryBoys,
@@ -441,9 +442,10 @@ console.log('88888',JSON.stringify(payload?.products));
           netSalesWithTransactions,
       },
     };
-
+    
     try {
       setSubmit(true);
+      
       let response;
       if (!isEditMode) {
         response = await recordDelivery(report);
@@ -715,7 +717,6 @@ console.log('88888',JSON.stringify(payload?.products));
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-
               <div className="pt-10 space-y-4">
                 <Controller
                   name="currencyDenominations"

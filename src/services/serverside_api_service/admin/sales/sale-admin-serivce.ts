@@ -39,7 +39,7 @@ const editSaleSlip = async (data: any, authId: string, slipId: string) => {
       const cash = data.cashChest.currencyDenominations;
       const payload = {
         sales_slip_id: data.id,
-        "Created by": checkUser.id,
+        "Created by": data.created_by,
         "Created at": new Date().toDateString(),
         Date: data.Date,
         "From Warehouse id": data["From Warehouse id"],

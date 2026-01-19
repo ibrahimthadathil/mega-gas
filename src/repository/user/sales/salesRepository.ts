@@ -6,6 +6,7 @@ const getDeliveryPayloadByVehicle = async (vehicleId: string) => {
       .from("current_inventory_levels")
       .select("*")
       .eq("warehouse_id", vehicleId)
+      
     if (error) throw error;
     return data;
   } catch (error) {
@@ -181,6 +182,8 @@ const daily_Report_View = async (
       .eq("created_by", userId)
       .range(offset, offset + limit - 1);
     if (error) throw error;
+    console.log(data);
+    
     return data;
   } catch (error) {
     throw error;
