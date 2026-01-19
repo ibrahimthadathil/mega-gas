@@ -445,15 +445,15 @@ export default function Home() {
     
     try {
       setSubmit(true);
-      
       let response;
       if (!isEditMode) {
         response = await recordDelivery(report);
+        route.push("/user/sales");
       } else {
         response = await updateSalesSlip(report, report.id as string);
+        route.push("/admin/sales-report");
       }
       if (response.success) {
-        route.push("/user/sales");
         toast.success(response.message);
       } else {
         toast.warning(response.message);
