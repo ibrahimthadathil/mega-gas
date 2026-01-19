@@ -21,7 +21,7 @@ const userLoginService = async (credential: {
 
 const get_UserByRole = async (role: string) => {
   try {
-    const result = await getUserByRole(role);
+    const result = await getUserByRole([role,"plant_driver","godown_staff"]);
     if(result) return {success:true,result}
     else return {success:false}
   } catch (error) {
