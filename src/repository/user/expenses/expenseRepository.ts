@@ -2,7 +2,7 @@ import supabase from "@/lib/supabase/supabaseClient";
 import { Expense } from "@/types/types";
 
 const add_Expense = async (datas: Expense) => {
-  const { expenses_type, amount, created_by, image } = datas;
+  const { expenses_type, amount, created_by, image,description } = datas;
   try {
     const { data, error } = await supabase
       .from("expenses")
@@ -12,7 +12,7 @@ const add_Expense = async (datas: Expense) => {
           expenses_type: expenses_type,
           image,
           amount,
-          description: "test expenses",
+          description
         },
       ])
       .select();

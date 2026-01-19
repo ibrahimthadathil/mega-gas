@@ -63,7 +63,6 @@ const calculateClosingStock = (
       stockMap[sale.productId].qty -= deduction;
     }
   });
-  console.log('@@@',stockMap);
   
   // C. Convert back to array format
  const productMap = Object.fromEntries(
@@ -152,11 +151,8 @@ export default function ClosingStockSection({
   sales,
   products,
 }: ClosingStockSectionProps) {
-  // console.log('OLD  :- ',JSON.stringify(  oldStock,null,2));
-  // console.log("SALES :- " ,JSON.stringify( sales,null,2));
 
   const closingStock = calculateClosingStock(oldStock, sales, products);
-  console.log(closingStock);
 
   return (
     <div className="space-y-3">
@@ -166,7 +162,7 @@ export default function ClosingStockSection({
           {closingStock.map(
             (item) =>
               item.qty != 0 && (
-                <Card key={item.id} className="p-4 min-w-max">
+                <Card key={item.product_id} className="p-4 min-w-max">
                   <div className="flex flex-col items-center gap-3 w-32">
                     <p className="text-md font-medium text-center text-foreground line-clamp-2">
                       {item.product_name}

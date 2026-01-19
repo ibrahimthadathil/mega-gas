@@ -542,7 +542,7 @@ export default function PlantLoadSection({ recordId }: { recordId?: string }) {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
-
+  const [isSubmit,setIsSubmit] = useState<boolean>(false)
   // Populate form when in edit mode
   useEffect(() => {
     if (isEditMode && editData && data) {
@@ -607,7 +607,7 @@ export default function PlantLoadSection({ recordId }: { recordId?: string }) {
 
   const handleProceed = async () => {
     const formData = watchMain();
-
+    setIsSubmit(true)
     if (!formData.invoiceNumber) {
       toast.error("Please enter TAX Invoice Number");
       return;
@@ -646,8 +646,6 @@ export default function PlantLoadSection({ recordId }: { recordId?: string }) {
     };
 
     try {
-      console.log("❤️", purchaseData);
-
       let result;
       if (isEditMode) {
         result = await editPurchase(recordId!, purchaseData);
@@ -669,8 +667,8 @@ export default function PlantLoadSection({ recordId }: { recordId?: string }) {
         // Invalidate queries to refresh data
         queryClient.invalidateQueries({ queryKey: ["newLoad", recordId] });
       }
+      setIsSubmit(false)
     } catch (error) {
-      console.log(error);
       toast.error(
         (error as Error).message +
           " error in " +
@@ -939,7 +937,7 @@ export default function PlantLoadSection({ recordId }: { recordId?: string }) {
       {/* Proceed Button */}
       <Button
         onClick={handleProceed}
-        disabled={isProceedDisabled}
+        disabled={isProceedDisabled || isSubmit}
         size="lg"
         className="w-full md:w-full"
       >

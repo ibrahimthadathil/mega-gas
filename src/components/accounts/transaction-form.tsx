@@ -268,6 +268,7 @@ export function TransactionForm({
             <div className="grid gap-2">
               <Label htmlFor="date">Date</Label>
               <Controller
+              disabled={true}
                 name="line_Item.date"
                 control={control}
                 render={({ field }) => (
