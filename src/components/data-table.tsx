@@ -19,12 +19,14 @@ interface TableProps<T> {
   columns: IColumns<T>[];
   itemsPerPage?: number;
   onChange?: (page: number) => void;
+  rowClassName?: (item: T, index: number) => string;
 }
 export default function DataTable<T extends Record<string, any>>({
   data,
   columns,
   itemsPerPage = 5,
   onChange,
+  rowClassName
 }: TableProps<T>) {
   const [currentPage, setCurrentpage] = useState(1);
   const totalPages = Math.ceil(data.length / itemsPerPage);
@@ -58,7 +60,7 @@ export default function DataTable<T extends Record<string, any>>({
               currentData.map((item, ind) => (
                 <TableRow
                   key={(item as T)._id || ind}
-                  className="bg-card hover:bg-muted/50 dark:hover:bg-muted/50"
+                  className={`bg-card hover:bg-muted/50 dark:hover:bg-muted/50 ${rowClassName ? rowClassName(item, ind) : ""}`}
                 >
                   {columns.map((e, i) => (
                     <TableCell key={i} className={`font-medium text-black'}`}>
@@ -72,7 +74,7 @@ export default function DataTable<T extends Record<string, any>>({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow >
                 <TableCell
                   colSpan={columns.length}
                   className="h-14 text-center text-yellow-800 "
