@@ -15,7 +15,7 @@ export interface SalesSlipPayload {
   total_upi_amount: number;
   total_online_amount: number;
   total_cash_amount: number;
-
+  created_by_name : string
   status: string;
   remark: string;
 

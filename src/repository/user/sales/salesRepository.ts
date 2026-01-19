@@ -181,9 +181,7 @@ const daily_Report_View = async (
       .select("*", { count: "exact" })
       .eq("created_by", userId)
       .range(offset, offset + limit - 1);
-    if (error) throw error;
-    console.log(data);
-    
+    if (error) throw error;    
     return data;
   } catch (error) {
     throw error;

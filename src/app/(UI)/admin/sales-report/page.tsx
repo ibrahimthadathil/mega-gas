@@ -149,6 +149,10 @@ const Home = () => {
         ),
       },
       {
+        header :'Created By',
+        render : (row:SalesSlipPayload)=>(<p>{row?.created_by_name}</p>)
+      },
+      {
         header: "Status",
         render: (row: SalesSlipPayload) => {
           const status = row.status?.toLowerCase() || "";
