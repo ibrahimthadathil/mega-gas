@@ -163,6 +163,45 @@ export default function DashboardGrid() {
             </CardHeader>
           </Card>
 
+          {/* Sales Slip */}
+          <Card
+            onClick={() => handleCardClick("/user/sales/delivery")}
+            className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105"
+          >
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <FileText className="w-5 h-5" />
+                </div>
+              </div>
+              <CardTitle className="text-base mt-3">Sales Slip</CardTitle>
+              <CardDescription className="text-xs">
+                Generate invoices
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          {/* Current Stock */}
+          <Card
+            onClick={() => handleCardClick("/user/current-stock")}
+            className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105"
+          >
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Database className="w-5 h-5" />
+                </div>
+                <Badge variant="secondary" className="text-sm font-bold">
+                  247
+                </Badge>
+              </div>
+              <CardTitle className="text-base mt-3">Current Stock</CardTitle>
+              <CardDescription className="text-xs">
+                Available cylinders
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
           {/* Inventory Transaction */}
           <Card
             onClick={() => handleCardClick("/user/inventory")}
@@ -215,44 +254,6 @@ export default function DashboardGrid() {
               <CardTitle className="text-base mt-3">Expenses</CardTitle>
               <CardDescription className="text-xs">
                 Track your spending
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          {/* Current Stock */}
-          <Card
-          onClick={() => handleCardClick("/user/current-stock")} 
-          className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Database className="w-5 h-5" />
-                </div>
-                <Badge variant="secondary" className="text-sm font-bold">
-                  247
-                </Badge>
-              </div>
-              <CardTitle className="text-base mt-3">Current Stock</CardTitle>
-              <CardDescription className="text-xs">
-                Available cylinders
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          {/* Sales Slip */}
-          <Card
-            onClick={() => handleCardClick("/user/sales/delivery")}
-            className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105"
-          >
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <FileText className="w-5 h-5" />
-                </div>
-              </div>
-              <CardTitle className="text-base mt-3">Sales Slip</CardTitle>
-              <CardDescription className="text-xs">
-                Generate invoices
               </CardDescription>
             </CardHeader>
           </Card>
