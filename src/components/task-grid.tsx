@@ -132,7 +132,7 @@ export default function DashboardGrid() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {/* User Profile Card */}
           <Card
-            onClick={() => handleCardClick("/profile")}
+            // onClick={() => alert("/profile")}
             className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105 col-span-2 md:col-span-1"
           >
             <CardHeader className="pb-3">
@@ -220,7 +220,9 @@ export default function DashboardGrid() {
           </Card>
 
           {/* Current Stock */}
-          <Card className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105">
+          <Card
+          onClick={() => handleCardClick("/user/current-stock")} 
+          className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
