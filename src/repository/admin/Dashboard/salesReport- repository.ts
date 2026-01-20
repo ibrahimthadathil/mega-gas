@@ -9,7 +9,7 @@ const daily_Report_View = async ({
     const { data, error } = await supabaseAdmin
       .from("daily_sales_report_view")
       .select("*", { count: "exact" })
-      .range(offset, offset + limit - 1);
+      // .range(offset, offset + limit - 1);
     if (error) throw error;
     return data;
   } catch (error) {
