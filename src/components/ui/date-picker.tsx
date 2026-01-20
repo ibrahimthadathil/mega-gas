@@ -1,4 +1,7 @@
+
+
 "use client";
+
 import { format } from "date-fns";
 import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,23 +36,35 @@ export function DatePicker({
           {date ? format(date, "PPP") : "Pick a date"}
         </Button>
       </PopoverTrigger>
+
       <PopoverContent className="w-auto p-0" align="start">
         <CalendarComponent
           mode="single"
           selected={date}
-          onSelect={(d) =>
-            onDateChange(
-              d
-                ? new Date(d.getTime() - d.getTimezoneOffset() * 60000)
-                : undefined
-            )
-          }
-          disabled={(date) => {
-            if (allowFutureDates) {
-              return date < new Date("1900-01-01");
-            } else {
-              return date > new Date() || date < new Date("1900-01-01");
+          onSelect={(d) => {
+            if (!d) {
+              onDateChange(undefined);
+              return;
             }
+
+            // ✅ LOCAL DATE ONLY (no time, no timezone shift)
+            const localDate = new Date(
+              d.getFullYear(),
+              d.getMonth(),
+              d.getDate()
+            );
+
+            onDateChange(localDate);
+          }}
+          disabled={(d) => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (allowFutureDates) {
+              return d < new Date("1900-01-01");
+            }
+
+            return d > today || d < new Date("1900-01-01");
           }}
           initialFocus
         />

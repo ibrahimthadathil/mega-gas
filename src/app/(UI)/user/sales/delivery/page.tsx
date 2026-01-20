@@ -481,11 +481,14 @@ export default function Home() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit, 
-    //     (errors) => {
-    // console.log('❌ FORM VALIDATION FAILED:', errors);
-    // alert('Validation errors: ' + JSON.stringify(errors, null, 2));}
-  )}>
+        <form
+          onSubmit={handleSubmit(
+            onSubmit,
+            //     (errors) => {
+            // console.log('❌ FORM VALIDATION FAILED:', errors);
+            // alert('Validation errors: ' + JSON.stringify(errors, null, 2));}
+          )}
+        >
           {!isVerified ? (
             <>
               <div className="space-y-3">
@@ -828,11 +831,7 @@ export default function Home() {
 
                 <Button
                   type="submit"
-                  // disabled={isSubmit}
-                  onClick={(e) => {
-                    console.log("Button clicked!", e); // Does this log?
-                    alert("llll");
-                  }}
+                  disabled={isSubmit}
                   className="w-full h-12 text-base"
                 >
                   {isSubmit
