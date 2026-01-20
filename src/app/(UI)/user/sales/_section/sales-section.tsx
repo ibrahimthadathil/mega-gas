@@ -21,6 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useSelector } from "react-redux";
+import { Rootstate } from "@/redux/store";
 
 interface IProduct {
   id: string;
@@ -79,6 +81,7 @@ export default function SalesSection({
   customers,
 }: SalesSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { role } = useSelector((state: Rootstate) => state.user);
   const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredProducts, setFilteredProducts] = useState<IProduct[]>([]);
@@ -137,7 +140,6 @@ export default function SalesSection({
     }
   }, [selectedProduct, setValue]);
 
-  // Filter products based on search query
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredProducts([]);
@@ -146,7 +148,10 @@ export default function SalesSection({
 
     const filtered = products
       .filter((product) => !product.tags?.includes("full"))
-      .filter((product) => !product.tags.includes("service"))
+      .filter((product) => {
+        if (role === "driver") return !product.tags.includes("service");
+        return product
+      })
       .filter((product) =>
         product.product_name.toLowerCase().includes(searchQuery.toLowerCase()),
       );

@@ -171,7 +171,7 @@ const getGSTCustomer = async () => {
 };
 
 const daily_Report_View = async (
-  userId: string,
+  users: string[],
  { page = 1, limit = 7 }: { page?: number; limit?: number } = {}
 ) => {
   const offset = (page - 1) * limit;
@@ -179,7 +179,7 @@ const daily_Report_View = async (
     const { data, error } = await supabase
       .from("daily_sales_report_view")
       .select("*", { count: "exact" })
-      .eq("created_by", userId)
+      .in("created_by", users)
       .range(offset, offset + limit - 1);
     if (error) throw error;    
     return data;

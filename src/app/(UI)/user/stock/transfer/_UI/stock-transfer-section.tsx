@@ -93,6 +93,7 @@ export default function StockTransferSection() {
         route.push("/user/stock");
       }
     } catch (error) {
+      setSubmit(false);
       toast.error("error in expense");
     }
   };

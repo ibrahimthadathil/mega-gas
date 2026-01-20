@@ -78,6 +78,12 @@ interface oldStock {
 }
 
 export default function OldStockSection({openingStock,loading}:{openingStock:oldStock[],loading:boolean}) {
+
+console.log(openingStock,'pppp');
+
+  // const currentOldstock = openingStock.filter((product)=>product.)
+
+
   return (
     <div className="space-y-3">
       <h2 className="text-lg font-semibold text-foreground">Old Stock</h2>

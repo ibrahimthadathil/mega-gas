@@ -1,4 +1,3 @@
-import supabase from "@/lib/supabase/supabaseClient";
 import { getExpensesByStatus } from "@/repository/user/expenses/expenseRepository";
 import {
   daily_Report_View,
@@ -29,10 +28,9 @@ const getDeliveryPayload = async (vehicleId: string, authId: string) => {
   try {
     const user = await checkUserByAuthId(authId);
     if (user) {
-      
       const [drivers, currentStock, expenses, products, customers, Qrcode] =
         await Promise.all([
-          getUserByRole(["driver","godown_staff"]),
+          getUserByRole(["driver", "godown_staff"]),
           getDeliveryPayloadByVehicle(vehicleId),
           getExpensesByStatus(user.id),
           getAllProductsOptions(),
@@ -53,7 +51,7 @@ const getDeliveryPayload = async (vehicleId: string, authId: string) => {
     } else throw new Error(STATUS.FORBIDDEN.message);
   } catch (error) {
     console.log((error as Error).message);
-    
+
     throw error;
   }
 };
@@ -94,7 +92,7 @@ const recordDelivery = async (data: DeliveryPayload, authId: string) => {
       const result = await reportDailyDelivery(
         payload,
         data.remark as string,
-        data.cashChest.mismatch
+        data.cashChest.mismatch,
       );
       if (result) return { success: true };
       else throw new Error("Failed to add slip");
@@ -104,14 +102,14 @@ const recordDelivery = async (data: DeliveryPayload, authId: string) => {
   }
 };
 
-const dailyReport = async (authId:string) => {
+const dailyReport = async (authId: string) => {
   try {
-    const user = await checkUserByAuthId(authId)
-    if(user){
-      const data = await daily_Report_View(user.id)
-      if(data)return {success:true,data}
-      else return {success:false,message:'Not found'}
-    }else throw Error('Unauthorized')
+    const user = await checkUserByAuthId(authId);
+    if (user) {
+      const data = await daily_Report_View(user?.delivery_boys);
+      if (data) return { success: true, data };
+      else return { success: false, message: "Not found" };
+    } else throw Error("Unauthorized");
   } catch (error) {
     return { success: false, message: (error as Error).message };
   }
