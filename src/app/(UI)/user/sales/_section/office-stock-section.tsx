@@ -56,7 +56,7 @@ export default function OfficeStockSection({ stock, onChange }: OfficeStockSecti
               Add
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent aria-describedby={undefined}>
             <DialogHeader>
               <DialogTitle>Add Office Stock</DialogTitle>
             </DialogHeader>

@@ -126,7 +126,7 @@ export default function TransactionsPage() {
                   Cash Received
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+              <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto" aria-describedby={undefined}>
                 <DialogHeader>
                   <DialogTitle>Add Cash Received</DialogTitle>
                 </DialogHeader>
@@ -147,7 +147,7 @@ export default function TransactionsPage() {
                   Cash Paid
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+              <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto" aria-describedby={undefined}>
                 <DialogHeader>
                   <DialogTitle>Add Cash Paid</DialogTitle>
                 </DialogHeader>
@@ -172,7 +172,7 @@ export default function TransactionsPage() {
             }
           }}
         >
-          <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+          <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto" aria-describedby={undefined}>
             <DialogHeader>
               <DialogTitle>Edit Transaction</DialogTitle>
             </DialogHeader>

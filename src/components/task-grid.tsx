@@ -109,7 +109,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
 export default function DashboardGrid() {
-  const { user } = useSelector((state: Rootstate) => state);
+  const  user  = useSelector((state: Rootstate) => state.user);
   const { Logout } = useAuth();
   const route = useRouter();
   const handleCardClick = (url: string) => {

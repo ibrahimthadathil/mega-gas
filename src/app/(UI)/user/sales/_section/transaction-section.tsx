@@ -329,7 +329,7 @@ export default function TransactionsPage({
                   <span className="whitespace-nowrap">Cash Received</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className="w-[95vw] sm:w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto">
+              <DialogContent className="w-[95vw] sm:w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
                 <DialogHeader>
                   <DialogTitle className="text-sm sm:text-base md:text-lg">
                     Add Cash Received

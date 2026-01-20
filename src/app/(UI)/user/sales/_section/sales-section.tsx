@@ -612,7 +612,7 @@ interface Sale {
   customerId?: string;
   components?: Array<{
     qty: number;
-    sale_price: number;
+    sale_price?: number;
     child_product_id: string;
   }> | null;
   tags?: string[];
@@ -771,7 +771,9 @@ export default function SalesSection({
 
   const onSubmit = (data: SaleFormData) => {
     if (!selectedProduct || data.quantity <= 0) return;
-
+    alert('kkkk')
+    console.log(selectedProduct);
+    
     const newSale: Sale = {
       id: Date.now().toString(),
       productId: selectedProduct.id,
@@ -830,7 +832,7 @@ export default function SalesSection({
               Add
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-md w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto" aria-describedby={undefined}>
             <DialogHeader>
               <DialogTitle>Add Sale</DialogTitle>
             </DialogHeader>
@@ -1104,5 +1106,6 @@ export default function SalesSection({
         </div>
       )}
     </div>
+    
   );
 }

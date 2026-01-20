@@ -187,7 +187,7 @@ const ExpenseSection = (): ReactElement => {
       
       {/* Dialog section for add/edit expense */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[425px]" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>
               {editingId ? "Edit Expense" : "Add Expense"}

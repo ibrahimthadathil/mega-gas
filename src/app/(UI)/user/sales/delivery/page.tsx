@@ -47,6 +47,7 @@ import {
 import { useSelector } from "react-redux";
 import { Rootstate } from "@/redux/store";
 import { Input } from "@/components/ui/input";
+import Loading from "@/loading";
 
 interface DeliveryBoy {
   id: string;
@@ -96,7 +97,7 @@ interface SaleItem {
 
 //----------------------------------------------------------------------------
 const transformEditDataToForm = (
-  editData: any
+  editData: any,
 ): Partial<DeliveryReportFormData> => {
   if (!editData) return {};
 
@@ -172,7 +173,7 @@ const ErrorMessage = ({ message }: { message?: string }) => {
 
 export default function Home() {
   const { delivery_boys, warehouseid } = useSelector(
-    (state: Rootstate) => state.user
+    (state: Rootstate) => state.user,
   );
   const searchParams = useSearchParams();
   const reportId = searchParams.get("id");
@@ -185,13 +186,13 @@ export default function Home() {
 
   const { data: wareHouses, isLoading: wareHouseLoading } = UseRQ<Warehouse[]>(
     "warehouse",
-    getWarehouse
+    getWarehouse,
   );
 
   const { data: payload, isLoading: payloadLoading } = UseRQ<any>(
     ["payload", currentVehicle],
     () => getVehiclePayload(currentVehicle),
-    { enabled: !!currentVehicle }
+    { enabled: !!currentVehicle },
   );
 
   const { data: editReport, isLoading: editLoading } = UseRQ(
@@ -202,9 +203,9 @@ export default function Home() {
       }
       return await getDeliveryDetailsById(reportId);
     },
-    { enabled: !!isEditMode }
+    { enabled: !!isEditMode },
   );
-  
+
   const {
     control,
     handleSubmit,
@@ -267,7 +268,7 @@ export default function Home() {
   const totalCashReceivedTxn =
     salesTransactions?.reduce(
       (sum, t) => sum + (t["amount received"] ?? 0),
-      0
+      0,
     ) || 0;
 
   const totalCashPaidTxn =
@@ -288,7 +289,7 @@ export default function Home() {
 
   const actualCashCounted = Object.entries(currencyDenominations || {}).reduce(
     (sum, [denom, count]) => sum + Number(denom) * count,
-    0
+    0,
   );
 
   const cashMismatch = actualCashCounted - expectedCashInHand;
@@ -310,7 +311,7 @@ export default function Home() {
     const current = watch("salesTransactions") || [];
     setValue(
       "salesTransactions",
-      current.filter((_, i) => i !== index)
+      current.filter((_, i) => i !== index),
     );
   };
 
@@ -329,15 +330,15 @@ export default function Home() {
 
   const handleVerify = () => {
     setIsVerified(true);
-  };  
+  };
 
   const onSubmit = async (data: DeliveryReportFormData) => {
     // Additional validation with calculations
     if (Math.abs(cashMismatch) > 10) {
       toast.error(
         `Cash mismatch is ₹${cashMismatch.toFixed(
-          2
-        )}. Maximum allowed difference is ±₹10`
+          2,
+        )}. Maximum allowed difference is ±₹10`,
       );
       return;
     }
@@ -346,8 +347,8 @@ export default function Home() {
     if (difference > 10) {
       toast.error(
         `Difference between counted cash (₹${actualCashCounted.toFixed(
-          2
-        )}) and expected cash (₹${expectedCashInHand.toFixed(2)}) exceeds ±₹10`
+          2,
+        )}) and expected cash (₹${expectedCashInHand.toFixed(2)}) exceeds ±₹10`,
       );
       return;
     }
@@ -408,7 +409,9 @@ export default function Home() {
 
     const report = {
       ...(isEditMode && reportId ? { id: reportId } : {}),
-      ...(isEditMode && reportId ? { created_by: (editReport as any)?.sales_slip?.created_by } : {}),
+      ...(isEditMode && reportId
+        ? { created_by: (editReport as any)?.sales_slip?.created_by }
+        : {}),
       Date: formatDate(data.date as Date),
       "From Warehouse id": currentVehicle,
       "Delivery boys": data.deliveryBoys,
@@ -442,7 +445,7 @@ export default function Home() {
           netSalesWithTransactions,
       },
     };
-    
+
     try {
       setSubmit(true);
       let response;
@@ -478,7 +481,11 @@ export default function Home() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit, onError)}>
+        <form onSubmit={handleSubmit(onSubmit, 
+    //     (errors) => {
+    // console.log('❌ FORM VALIDATION FAILED:', errors);
+    // alert('Validation errors: ' + JSON.stringify(errors, null, 2));}
+  )}>
           {!isVerified ? (
             <>
               <div className="space-y-3">
@@ -516,7 +523,7 @@ export default function Home() {
                 <div className="self-center">Select your vehicle</div>
               ) : payloadLoading || editLoading ? (
                 <div>
-                  <p className="text-muted-foreground">Loading...</p>
+                  <Loading />
                 </div>
               ) : (
                 payload && (
@@ -575,7 +582,7 @@ export default function Home() {
                     />
 
                     <ClosingStockSection
-                    products={payload?.products||[]}
+                      products={payload?.products || []}
                       oldStock={payload?.currentStock}
                       sales={sales || []}
                     />
@@ -622,7 +629,7 @@ export default function Home() {
                                   {formatCurrency(
                                     transaction["amount received"] ||
                                       transaction["amount paid"] ||
-                                      0
+                                      0,
                                   )}
                                 </p>
                               </CardContent>
@@ -669,7 +676,7 @@ export default function Home() {
                                       ? errors.upiPayments
                                           .map(
                                             (err: any) =>
-                                              err?.["UPI Id"]?.message
+                                              err?.["UPI Id"]?.message,
                                           )
                                           .filter(Boolean)
                                           .join(", ")
@@ -684,7 +691,7 @@ export default function Home() {
                                       ? errors.onlinePayments
                                           .map(
                                             (err: any) =>
-                                              err?.["consumer no"]?.message
+                                              err?.["consumer no"]?.message,
                                           )
                                           .filter(Boolean)
                                           .join(", ")
@@ -821,14 +828,18 @@ export default function Home() {
 
                 <Button
                   type="submit"
-                  disabled={isSubmit}
+                  // disabled={isSubmit}
+                  onClick={(e) => {
+                    console.log("Button clicked!", e); // Does this log?
+                    alert("llll");
+                  }}
                   className="w-full h-12 text-base"
                 >
                   {isSubmit
                     ? "Submitting..."
                     : isEditMode
-                    ? "Update Report"
-                    : "Submit Report"}
+                      ? "Update Report"
+                      : "Submit Report"}
                 </Button>
               </div>
             </div>

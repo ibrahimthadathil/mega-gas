@@ -191,7 +191,7 @@ export default function NetSalesSummarySection({
               </Button>
             </DialogTrigger>
 
-            <DialogContent>
+            <DialogContent aria-describedby={undefined}>
               <DialogHeader>
                 <DialogTitle>Add UPI Payment</DialogTitle>
               </DialogHeader>

@@ -87,7 +87,7 @@ export default function Home() {
                 View Details
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-scroll [&>button]:hidden">
+            <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-scroll [&>button]:hidden" aria-describedby={undefined}>
               <DialogHeader>
                 <DialogTitle>Unload Details</DialogTitle>
               </DialogHeader>

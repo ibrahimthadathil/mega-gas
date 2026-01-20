@@ -15,7 +15,7 @@ const saleSchema = z.object({
     .array(
       z.object({
         qty: z.number(),
-        sale_price: z.number(),
+        sale_price: z.number().optional(),
         child_product_id: z.string(),
       })
     )
