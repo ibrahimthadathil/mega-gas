@@ -483,6 +483,8 @@ import Loading from "@/loading";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { Rootstate } from "@/redux/store";
 
 export interface Product {
   id: string;
@@ -502,6 +504,7 @@ interface DialogFormData {
 
 export default function PlantLoadSection({ recordId }: { recordId?: string }) {
   const { data, isLoading } = UseRQ("credential", getPurchaseCredentials);
+  const {warehouseid} = useSelector((state:Rootstate)=>state.user)
   const queryClient = useQueryClient();
   const router = useRouter()
   const editData = useMemo(() => {
@@ -520,8 +523,8 @@ export default function PlantLoadSection({ recordId }: { recordId?: string }) {
     defaultValues: {
       invoiceNumber: "",
       sapNumber: "",
-      date: undefined,
-      warehouse: "",
+      date: new Date(),
+      warehouse: warehouseid??"",
     },
   });
 
