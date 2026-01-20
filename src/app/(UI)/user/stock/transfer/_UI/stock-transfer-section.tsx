@@ -28,6 +28,7 @@ import { getAllProducts } from "@/services/client_api-Service/admin/product/prod
 import { IProduct } from "@/types/types";
 import { toast } from "sonner";
 import { transferStock } from "@/services/client_api-Service/user/stock/unload_slip_transfer_api";
+import { useRouter } from "next/navigation";
 
 export type StockTransferFormData = {
   product: string;
@@ -43,17 +44,17 @@ export type StockTransferFormData = {
 export default function StockTransferSection() {
   const { data: warehouses, isLoading: warehouseLoading } = UseRQ<Warehouse[]>(
     "warehouse",
-    getWarehouse
+    getWarehouse,
   );
   const { data: products, isLoading: productLoading } = UseRQ(
     "products",
-    getAllProducts
+    getAllProducts,
   );
-
+  const [isSubmit, setSubmit] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [fromLocation, setFromLocation] = useState<string>("");
   const [toLocation, setToLocation] = useState<string>("");
-
+  const route = useRouter();
   const {
     register,
     handleSubmit,
@@ -63,7 +64,7 @@ export default function StockTransferSection() {
   } = useForm<StockTransferFormData>({
     defaultValues: {
       return_product_id: null,
-      withEmpty:false
+      withEmpty: false,
     },
   });
 
@@ -76,7 +77,7 @@ export default function StockTransferSection() {
     });
   };
 
-  const onSubmit = async(data: StockTransferFormData) => {
+  const onSubmit = async (data: StockTransferFormData) => {
     const formData = {
       ...data,
       date: selectedDate,
@@ -84,12 +85,15 @@ export default function StockTransferSection() {
       to: toLocation,
     };
     try {
-      const data = await transferStock(formData)
-      if(data.success){
-        toast.success('stock transfered')
+      setSubmit(true);
+      const data = await transferStock(formData);
+      if (data.success) {
+        setSubmit(false);
+        toast.success("stock transfered");
+        route.push("/user/stock");
       }
     } catch (error) {
-      toast.error('error in expense')
+      toast.error("error in expense");
     }
   };
 
@@ -234,13 +238,14 @@ export default function StockTransferSection() {
           </div>
 
           {/* Submit */}
-          <Button type="submit">Record Transfer</Button>
+          <Button type="submit" disabled={isSubmit}>
+            Record Transfer
+          </Button>
         </form>
       </CardContent>
     </Card>
   );
 }
-
 
 // "use client";
 
@@ -334,7 +339,7 @@ export default function StockTransferSection() {
 //       setValue("remarks", editData.remarks || "");
 //       setValue("withEmpty", editData.empty_inclusive);
 //       setValue("return_product_id", editData.return_product_id || null);
-      
+
 //       setSelectedDate(new Date(editData.transfer_date));
 //       setFromLocation(editData.from_warehouse_id);
 //       setToLocation(editData.to_warehouse_id);
