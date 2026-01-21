@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { format } from "date-fns";
@@ -51,9 +49,15 @@ export function DatePicker({
             const localDate = new Date(
               d.getFullYear(),
               d.getMonth(),
-              d.getDate()
+              d.getDate(),
+              12, // noon
+              0,
+              0,
+              0,
             );
-
+            console.log(localDate);
+            
+            
             onDateChange(localDate);
           }}
           disabled={(d) => {
