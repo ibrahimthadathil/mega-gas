@@ -93,7 +93,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 
   // Initialize state with empty values
   const [formData, setFormData] = useState<TripFormData>({
-    date: undefined,
+    date: new Date(),
     plant_load_register_id: "",
     sapNumber: "",
     qty: "",
