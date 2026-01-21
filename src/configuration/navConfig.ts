@@ -52,18 +52,19 @@ export const navItems = [
       "driver",
       "plant_driver",
       "godown_staff",
+      "office_staff"
     ],
   },
   {
     title: "Sales",
     url: "/user/sales",
     icon: ClipboardCheck,
-    roles: ["admin", "manager", "accountant", "driver", "godown_staff"],
+    roles: ["admin", "manager", "accountant", "driver", "godown_staff","office_staff"],
     items: [
       {
         title: "Delivery",
         url: "/user/sales/delivery",
-        roles: ["admin", "manager", "accountant", "driver", "godown_staff"],
+        roles: ["admin", "manager", "accountant", "driver", "godown_staff","office_staff"],
       },
     ],
   },
@@ -71,7 +72,7 @@ export const navItems = [
     title: "Inventory Level",
     url: "/user/inventory",
     icon: History,
-    roles: ["admin", "manager", "accountant", "driver"],
+    roles: ["admin", "manager", "accountant", "driver","office_staff"],
   },
   {
     title: "Current Stock",
@@ -84,6 +85,7 @@ export const navItems = [
       "godown_staff",
       "driver",
       "plant_driver",
+      "office_staff"
     ],
   },
   {
@@ -109,7 +111,7 @@ export const navItems = [
     title: "Stock",
     url: "/user/stock",
     icon: Settings2,
-    roles: ["admin", "manager", "accountant", "godown_staff"],
+    roles: ["admin", "manager", "accountant", "godown_staff","office_staff"],
     items: [
       {
         title: "unload Slip",
@@ -119,7 +121,7 @@ export const navItems = [
       {
         title: "Stock Transfer",
         url: "/user/stock/transfer",
-        roles: ["admin", "manager", "accountant", "godown_staff"],
+        roles: ["admin", "manager", "accountant", "godown_staff","office_staff"],
       },
     ],
   },
@@ -134,6 +136,7 @@ export const navItems = [
       "driver",
       "plant_driver",
       "godown_staff",
+      "office_staff"
     ],
   },
 
@@ -141,12 +144,12 @@ export const navItems = [
     title: "Accounts",
     url: "/user/accounts",
     icon: BookAIcon,
-    roles: ["admin", "manager", "accountant", "godown_staff"],
+    roles: ["admin", "manager", "accountant", "godown_staff","office_staff"],
     items: [
       {
         title: "Transactions",
         url: "/user/accounts/transactions",
-        roles: ["admin", "manager", "accountant", "godown_staff"],
+        roles: ["admin", "manager", "accountant", "godown_staff","office_staff"],
       },
     ],
   },
@@ -206,6 +209,16 @@ export const roleRouteConfig = {
     "/user/inventory",
     "/user/current-stock",
   ],
+  office_staff:[
+    "/user/dashboard",
+    "/user/sales",
+    "/user/expenses",
+    "/user/inventory",
+    "/user/current-stock",
+    "/user/accounts",
+    "/user/stock",
+
+  ]
 };
 
 export const filterByRole = (items: NavItem[], role: string): NavItem[] => {
