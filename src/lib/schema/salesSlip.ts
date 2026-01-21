@@ -140,7 +140,7 @@ export const validateDeliveryReportWithCalculations = (
 export type DeliveryReportFormData = z.infer<typeof deliveryReportSchema>;
 
 
-export const onError = (errors: FieldErrors<DeliveryReportFormData>) => {
+export const onError = (errors: FieldErrors<DeliveryReportFormData|any>) => {
   Object.values(errors).forEach((error) => {
     if (error?.message) {
       toast.error(error.message as string);

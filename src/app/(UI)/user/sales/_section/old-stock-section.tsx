@@ -75,15 +75,20 @@ interface oldStock {
   warehouse_name: string;
   product_name: string;
   qty: number;
+  tags: string[];
 }
 
-export default function OldStockSection({openingStock,loading}:{openingStock:oldStock[],loading:boolean}) {
-
-console.log(openingStock,'pppp');
-
-  // const currentOldstock = openingStock.filter((product)=>product.)
-
-
+export default function OldStockSection({
+  openingStock,
+  loading,
+}: {
+  openingStock: oldStock[];
+  loading: boolean;
+}) {
+  const currentOldstock = openingStock?.filter(
+    (product) =>
+      !product.tags.includes("DC") && !product.tags.includes("service"),
+  );
   return (
     <div className="space-y-3">
       <h2 className="text-lg font-semibold text-foreground">Old Stock</h2>
@@ -92,17 +97,18 @@ console.log(openingStock,'pppp');
           {loading ? (
             <Skeleton className="h-[80px] w-2/5 rounded-xl" />
           ) : (
-          openingStock?.map((item) => (
-            <Card key={item.product_id} className="p-3 min-w-max">
-              <div className="flex flex-col items-center gap-2 w-24">
-                <Cylinder className="h-6 w-6 text-primary" />
-                <p className="text-xs font-medium text-center text-foreground line-clamp-2">
-                  {item.product_name}
-                </p>
-                <p className="text-xl font-bold text-primary">{item.qty}</p>
-              </div>
-            </Card>
-          )))}
+            currentOldstock?.map((item) => (
+              <Card key={item?.product_id} className="p-3 min-w-max">
+                <div className="flex flex-col items-center gap-2 w-24">
+                  <Cylinder className="h-6 w-6 text-primary" />
+                  <p className="text-xs font-medium text-center text-foreground line-clamp-2">
+                    {item?.product_name}
+                  </p>
+                  <p className="text-xl font-bold text-primary">{item?.qty}</p>
+                </div>
+              </Card>
+            ))
+          )}
         </div>
       </div>
     </div>

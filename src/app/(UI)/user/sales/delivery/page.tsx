@@ -2,7 +2,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { DatePicker } from "@/components/ui/date-picker";
 import DeliveryPartnerSection from "@/app/(UI)/user/sales/_section/delivery-partner-section";
 import OldStockSection from "@/app/(UI)/user/sales/_section/old-stock-section";
