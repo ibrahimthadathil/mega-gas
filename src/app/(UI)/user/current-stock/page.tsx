@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import DataTable from "@/components/data-table";
@@ -19,6 +17,7 @@ interface InventoryItem {
   warehouse_name: string;
   net_qty_change: number;
   cumulative_qty: number;
+  tags: string[];
 }
 
 interface PivotRow {
@@ -31,7 +30,7 @@ const Page = () => {
   const { data: Inventory, isLoading: inventoryLoading } = UseRQ<
     InventoryItem[]
   >("inventory", getInventoryDetails);
-const {warehouseid} = useSelector((state:Rootstate)=>state.user)
+  const { warehouseid } = useSelector((state: Rootstate) => state.user);
 
   // Transform data into pivot format - Group by warehouse only
   const pivotData = useMemo(() => {
@@ -64,7 +63,10 @@ const {warehouseid} = useSelector((state:Rootstate)=>state.user)
     if (!Inventory || !Array.isArray(Inventory)) return [];
 
     const names = new Set<string>();
-    Inventory.forEach((item) => {
+    Inventory.filter(
+      (product) =>
+        !product.tags.includes("service") && !product.tags.includes("DC"),
+    ).forEach((item) => {
       names.add(item.product_name);
     });
 
@@ -98,8 +100,8 @@ const {warehouseid} = useSelector((state:Rootstate)=>state.user)
     return [...baseColumns, ...productColumns];
   }, [productNames]);
   const getRowClassName = (row: PivotRow) => {
-    return row.warehouse_id === warehouseid 
-      ? "bg-lime-200  hover:bg-green-200" 
+    return row.warehouse_id === warehouseid
+      ? "bg-lime-200  hover:bg-green-200"
       : "";
   };
   return (
@@ -108,7 +110,12 @@ const {warehouseid} = useSelector((state:Rootstate)=>state.user)
       {inventoryLoading ? (
         <Skeleton className="w-full h-24 bg-zinc-50" />
       ) : (
-        <DataTable rowClassName={getRowClassName}  columns={columns} itemsPerPage={13} data={pivotData ?? []} />
+        <DataTable
+          rowClassName={getRowClassName}
+          columns={columns}
+          itemsPerPage={13}
+          data={pivotData ?? []}
+        />
       )}
     </main>
   );
