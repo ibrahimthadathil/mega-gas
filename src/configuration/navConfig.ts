@@ -6,11 +6,9 @@ import {
   LayoutDashboardIcon,
   Warehouse,
   BookAIcon,
-  Power,
   History,
   Cylinder,
 } from "lucide-react";
-import { title } from "process";
 export const navItems = [
   {
     title: "Dashboard",
@@ -26,7 +24,7 @@ export const navItems = [
       {
         title: "Daily Sales Report",
         url: "/admin/sales-report",
-        roles: ["admin", "manager"],
+        roles: ["admin", "manager","accountant"],
       },
       // { title: "Inventory Level", url: "/admin/inventory", roles: ["admin", "manager"] },
       {
@@ -175,6 +173,7 @@ export const roleRouteConfig = {
   ],
   accountant: [
     "/admin/dashboard",
+    "admin/sales-report",
     "/user/dashboard",
     "/user/sales",
     "/user/purchase",

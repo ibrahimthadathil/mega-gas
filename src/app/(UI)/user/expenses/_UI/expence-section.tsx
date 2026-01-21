@@ -213,7 +213,7 @@ const ExpenseSection = (): ReactElement => {
               </Select>
             </div>
 
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label>Upload Photo (Optional)</Label>
               <div className="flex gap-2">
                 <Button
@@ -242,7 +242,7 @@ const ExpenseSection = (): ReactElement => {
                   </button>
                 </div>
               )}
-            </div>
+            </div> */}
 
             <div className="space-y-2">
               <Label htmlFor="price">Price</Label>
