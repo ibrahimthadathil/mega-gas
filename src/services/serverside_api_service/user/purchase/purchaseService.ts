@@ -11,14 +11,14 @@ import { PurchaseRegisterPayload } from "@/types/types";
 
 const addPurchase_Register = async (
   data: PurchaseRegisterPayload,
-  userId: string
+  userId: string,
 ) => {
   try {
     const existUser = await checkUserByAuthId(userId);
     if (existUser) {
       const totalQuantity = data.products.reduce(
         (acc, val) => acc + val.quantity,
-        0
+        0,
       );
       const p_line_items = data.products.map((product) => ({
         product_id: product.id,
@@ -69,15 +69,19 @@ const getPlantLoadCredential = async () => {
   }
 };
 
-const getPlantLoadRegister = async (authId: string) => {
+const getPlantLoadRegister = async (authId: string, ...rest: any) => {
   try {
     const existUser = await checkUserByAuthId(authId);
     if (existUser) {
-      const data = await getPurchaseRegister(existUser.id,existUser.role);
-      return { success: true, data };
+      const { data, message, success, total, totalPages } =
+        await getPurchaseRegister(existUser.id, existUser.role, rest);
+        console.log(success,data);
+        
+      if (success) return { success, data, total, totalPages, message };
+      else throw new Error(message);
     } else throw new Error("un-authorized");
   } catch (error) {
-    throw (error as Error).message;
+    return { message: (error as Error).message, success: false };
   }
 };
 
@@ -94,44 +98,43 @@ const deletePurchaseRecord = async (id: string) => {
 const editPurchasedLoad = async (
   id: string,
   userId: string,
-  data: PurchaseRegisterPayload
+  data: PurchaseRegisterPayload,
 ) => {
   try {
     const existUser = await checkUserByAuthId(userId);
-    if(existUser){
-
+    if (existUser) {
       const registerPayload = {
         sap_number: data.sapNumber,
-      bill_date: data.date,
-      warehouse_id: data.warehouse,
-      tax_invoice_number: data.invoiceNumber,
-      created_by: existUser.id,
-    };
-    const lineItemPayload = data.products.map((product) => ({
-      product_id: product.id,
-      full_qty: product.quantity,
-      trip_type: product.tripType,
-      return_qty: product.quantity,
-      warehouse_id: data.warehouse,
-      composite: product.is_composite,
-      return_product_id: product.return_product_id,
-      created_by: existUser.id,
-      product_component: product.is_composite
-        ? product.components?.map((child) => ({
-            child_product_id: child.child_product_id,
-            qty: child.qty,
-          })) || []
+        bill_date: data.date,
+        warehouse_id: data.warehouse,
+        tax_invoice_number: data.invoiceNumber,
+        created_by: existUser.id,
+      };
+      const lineItemPayload = data.products.map((product) => ({
+        product_id: product.id,
+        full_qty: product.quantity,
+        trip_type: product.tripType,
+        return_qty: product.quantity,
+        warehouse_id: data.warehouse,
+        composite: product.is_composite,
+        return_product_id: product.return_product_id,
+        created_by: existUser.id,
+        product_component: product.is_composite
+          ? product.components?.map((child) => ({
+              child_product_id: child.child_product_id,
+              qty: child.qty,
+            })) || []
           : [],
-    }));
-    
-    const isEdited = await edit_Purchased_Load(
-      id,
-      registerPayload,
-      lineItemPayload
-    );
-    if (isEdited) return { success: true, message: "Purchase Updated" };
-    else return { success: false, message: "Updation Failed" };
-  } else throw Error('Un-authorized')
+      }));
+
+      const isEdited = await edit_Purchased_Load(
+        id,
+        registerPayload,
+        lineItemPayload,
+      );
+      if (isEdited) return { success: true, message: "Purchase Updated" };
+      else return { success: false, message: "Updation Failed" };
+    } else throw Error("Un-authorized");
   } catch (error) {
     return { success: false, message: (error as Error).message };
   }

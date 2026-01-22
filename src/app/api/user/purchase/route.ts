@@ -17,27 +17,73 @@ export const POST = async (req: NextRequest) => {
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: STATUS.SERVER_ERROR.code }
+      { status: STATUS.SERVER_ERROR.code },
     );
   }
 };
 
+// export const GET = async (req: NextRequest) => {
+//   try {
+//     const { user, error: authError } = await getAuthUser();
+//     if (user?.id) {
+//       const { data, success } = await getPlantLoadRegister(user?.id);
+//       return NextResponse.json(
+//         { data, success },
+//         { status: STATUS.SUCCESS.code }
+//       );
+//     } else return NextResponse.json({}, { status: STATUS.UNAUTHORIZED.code });
+//   } catch (error) {
+//     return NextResponse.json(
+//       { error: (error as Error).message },
+//       { status: STATUS.SERVER_ERROR.code }
+//     );
+//   }
+// };
+
 export const GET = async (req: NextRequest) => {
   try {
     const { user, error: authError } = await getAuthUser();
-    if (user?.id) {
-      const { data, success } = await getPlantLoadRegister(user?.id);
-      console.log(data[0]);
-      
-      return NextResponse.json(
-        { data, success },
-        { status: STATUS.SUCCESS.code }
-      );
-    } else return NextResponse.json({}, { status: STATUS.UNAUTHORIZED.code });
+
+    if (!user?.id) {
+      return NextResponse.json({}, { status: STATUS.UNAUTHORIZED.code });
+    }
+
+    // Extract query parameters
+    const searchParams = req.nextUrl.searchParams;
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+    const warehouse = searchParams.get("warehouse");
+    const isUnloaded = searchParams.get("isUnloaded");
+    const page = searchParams.get("page");
+    const limit = searchParams.get("limit");
+
+    // Pass filters to the database function
+    const { data, success, total, totalPages } = await getPlantLoadRegister(
+      user.id,
+      {
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        warehouse: warehouse || undefined,
+        isUnloaded: isUnloaded || undefined,
+        page: page ? parseInt(page) : 1,
+        limit: limit ? parseInt(limit) : 10,
+      },
+    );
+
+    return NextResponse.json(
+      {
+        data,
+        success,
+        total,
+        page: page ? parseInt(page) : 1,
+        totalPages,
+      },
+      { status: STATUS.SUCCESS.code },
+    );
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: STATUS.SERVER_ERROR.code }
+      { status: STATUS.SERVER_ERROR.code },
     );
   }
 };
