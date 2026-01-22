@@ -1,21 +1,95 @@
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin";
+import { FilterParams } from "@/types/admin/salesReportView";
+
+// const daily_Report_View = async ({
+//   page = 1,
+//   limit = 7,
+// }: { page?: number; limit?: number } = {}) => {
+//   const offset = (page - 1) * limit;
+//   try {
+//     const { data, error } = await supabaseAdmin
+//       .from("daily_sales_report_view")
+//       .select("*", { count: "exact" })
+//       // .range(offset, offset + limit - 1);
+//     if (error) throw error;
+//     return data;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
 
 const daily_Report_View = async ({
+  startDate,
+  endDate,
+  status,
+  warehouse,
+  chest,
   page = 1,
-  limit = 7,
-}: { page?: number; limit?: number } = {}) => {
+  limit = 20,
+}: FilterParams = {}) => {
   const offset = (page - 1) * limit;
+
   try {
-    const { data, error } = await supabaseAdmin
+    // Start building the query
+    let query = supabaseAdmin
       .from("daily_sales_report_view")
-      .select("*", { count: "exact" })
-      // .range(offset, offset + limit - 1);
+      .select("*", { count: "exact" });
+
+    // Apply date filters
+    if (startDate && endDate) {
+      // If both dates are the same, filter for that specific date
+      if (startDate === endDate) {
+        query = query.eq("date", startDate);
+      } else {
+        // Otherwise, filter for the date range
+        query = query.gte("date", startDate).lte("date", endDate);
+      }
+    } else if (startDate) {
+      // Only start date provided
+      query = query.gte("date", startDate);
+    } else if (endDate) {
+      // Only end date provided
+      query = query.lte("date", endDate);
+    }
+
+    // Apply status filter (case-insensitive)
+    if (status) {
+      query = query.ilike("status", status);
+    }
+    if(chest) query = query.eq("chest_name", chest);
+    // Apply warehouse filter (chest_name column)
+    if (warehouse) {
+      query = query.eq("created_by", warehouse);
+    }
+
+    // Order by date descending (most recent first)
+    query = query.order("date", { ascending: false });
+
+    // Apply pagination if needed
+    query = query.range(offset, offset + limit - 1);
+
+    const { data, error, count } = await query;
+
     if (error) throw error;
-    return data;
+
+    return {
+      success: true,
+      data,
+      count,
+      message: "Sales reports retrieved successfully",
+    };
   } catch (error) {
-    throw error;
+    console.error("Error fetching sales reports:", error);
+    return {
+      success: false,
+      data: null,
+      message: (error as Error).message,
+    };
   }
 };
+
+
+
 
 const delete_sales = async (slipId: string, userId: string) => {
   try {

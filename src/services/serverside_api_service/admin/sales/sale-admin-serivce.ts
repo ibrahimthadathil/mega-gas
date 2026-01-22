@@ -5,6 +5,7 @@ import {
   get_Sales_Slip_ById,
 } from "@/repository/admin/Dashboard/salesReport- repository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
+import { FilterParams } from "@/types/admin/salesReportView";
 
 const deleteSaleSlip = async (authid: string, slipId: string) => {
   try {
@@ -94,10 +95,10 @@ const editSaleSlip = async (data: any, authId: string, slipId: string) => {
   }
 };
 
-const getAllSalesReports = async () => {
+const getAllSalesReports = async (filters:FilterParams) => {
   try {
-    const report = await daily_Report_View();
-    if (report) return { success: true, data: report };
+    const {data,success,count} = await daily_Report_View(filters);
+    if (success) return { success, data};
     else return { success: false };
   } catch (error) {
     return { success: false, message: (error as Error).message };
