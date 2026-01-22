@@ -300,7 +300,7 @@ export interface FilterParams {
   dayFilter?: string;
   status?: string;
   users?: string;
-  chest?: "office" | "godown";
+  chest?: string;
 }
 
 const Home = () => {
@@ -315,7 +315,6 @@ const Home = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  // Extract unique warehouses from data
   const warehouses = useMemo(() => {
     if (!report) return [];
     return Array.from(
@@ -672,15 +671,15 @@ const Home = () => {
 
               {/* User Filter */}
               <div className="space-y-2">
-                <Label htmlFor="warehouse">Users</Label>
+                <Label htmlFor="users">Users</Label>
                 <Select
                   value={tempFilters.users || ""}
                   onValueChange={(value) =>
-                    setTempFilters((prev) => ({ ...prev, warehouse: value }))
+                    setTempFilters((prev) => ({ ...prev, users: value }))
                   }
                 >
-                  <SelectTrigger id="warehouse">
-                    <SelectValue placeholder="Select warehouse" />
+                  <SelectTrigger id="users">
+                    <SelectValue placeholder="Select users" />
                   </SelectTrigger>
                   <SelectContent>
                     {warehouses.map((warehouse) => (

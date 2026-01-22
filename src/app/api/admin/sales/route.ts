@@ -2,63 +2,34 @@ import { getAllSalesReports } from "@/services/serverside_api_service/admin/sale
 import { STATUS } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
 
-// export const GET = async (
-//   req: NextRequest) => {
-//   try {
-//     const { success, data, message } = await getAllSalesReports()
-//     if (success)
-//       return NextResponse.json(
-//         { success, data },
-//         { status: STATUS.SUCCESS.code }
-//       );
-//     else
-//       return NextResponse.json(
-//         { message, success },
-//         { status: STATUS.NO_CONTENT.code }
-//       );
-//   } catch (error) {
-//     return NextResponse.json(
-//       { message: (error as Error).message },
-//       { status: STATUS.SERVER_ERROR.code }
-//     );
-//   }
-// };
-
 export const GET = async (req: NextRequest) => {
   try {
-    // Extract query parameters
     const searchParams = req.nextUrl.searchParams;
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
-    const status = searchParams.get('status');
-    const warehouse = searchParams.get('users');
-    const chest = searchParams.get('chest');
+    const filters = {
+      startDate: searchParams.get("startDate") ?? undefined,
+      endDate: searchParams.get("endDate") ?? undefined,
+      status: searchParams.get("status") ?? undefined,
+      warehouse: searchParams.get("users") ?? undefined,
+      chest: searchParams.get("chest") ?? undefined
+    };
 
-    // Pass filters to the database function
-    const { success, data, message } = await getAllSalesReports({
-      startDate: startDate || undefined,
-      endDate: endDate || undefined,
-      status: status || undefined,
-      warehouse: warehouse || undefined,
-      chest: (chest ?? "office") as "office" | "godown"
-
-    });
+    const { success, data, message } = await getAllSalesReports(filters);
 
     if (success) {
       return NextResponse.json(
         { success, data },
-        { status: STATUS.SUCCESS.code }
+        { status: STATUS.SUCCESS.code },
       );
     } else {
       return NextResponse.json(
         { message, success },
-        { status: STATUS.NO_CONTENT.code }
+        { status: STATUS.NO_CONTENT.code },
       );
     }
   } catch (error) {
     return NextResponse.json(
       { message: (error as Error).message },
-      { status: STATUS.SERVER_ERROR.code }
+      { status: STATUS.SERVER_ERROR.code },
     );
   }
 };

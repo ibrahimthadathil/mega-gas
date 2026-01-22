@@ -1,9 +1,7 @@
 import axios from "axios";
 
 export const getDashboardData = async (filters?: any) => {
-  try {
-    console.log(filters,'0000');
-    
+  try {    
     const  data  = await axios.get("/api/user/dashboard", {
       params: {
         warehouseNames: filters?.warehouseNames?.join(","),

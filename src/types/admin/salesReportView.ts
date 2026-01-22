@@ -4,7 +4,7 @@ export interface FilterParams {
   endDate?: string;
   status?: string;
   warehouse?: string;
-  chest?: "office" | "godown";
+  chest?: string;
   page?: number;
   limit?: number;
 }
