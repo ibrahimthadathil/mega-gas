@@ -83,7 +83,7 @@ const recordDelivery = async (data: DeliveryPayload, authId: string) => {
         "Online payments": data["Online payments"],
         "Cash chest": {
           ...data.cashChest.currencyDenominations,
-          status: "submitted",
+          status: "Submitted",
           "chest name": data.cashChest.chestName,
         },
       };
