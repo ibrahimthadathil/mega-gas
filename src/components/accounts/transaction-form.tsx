@@ -268,11 +268,10 @@ export function TransactionForm({
             <div className="grid gap-2">
               <Label htmlFor="date">Date</Label>
               <Controller
-              disabled={true}
                 name="line_Item.date"
                 control={control}
                 render={({ field }) => (
-                  <Input id="date" type="date" {...field} />
+                  <Input id="date" type="date" {...field}  readOnly={isSales}/>
                 )}
               />
               {errors.line_Item?.date && (

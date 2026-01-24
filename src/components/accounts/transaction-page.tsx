@@ -69,7 +69,6 @@ export default function TransactionsPage() {
     type: "received" | "paid"
   ) => {
     try {
-      console.log(transaction);
       
       const data = await createNewLineItem(transaction);
       if (data.success) {

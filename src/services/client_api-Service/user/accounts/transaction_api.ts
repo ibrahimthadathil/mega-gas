@@ -11,7 +11,6 @@ export const getAllTransactions = async () => {
 
 export const deleteTransaction = async (id: string) => {
   try {
-    alert(id)
     const result = await axios.delete(`/api/user/accounts/transactions/${id}`);
     return result.data;
   } catch (error) {
