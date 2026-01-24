@@ -17,7 +17,7 @@ const saleSchema = z.object({
         qty: z.number(),
         sale_price: z.number().optional(),
         child_product_id: z.string(),
-      })
+      }),
     )
     .nullable()
     .optional(),
@@ -62,6 +62,16 @@ export const deliveryReportSchema = z
       .refine((sales) => sales.every((sale) => sale.quantity > 0), {
         message: "All sales must have quantity greater than 0",
       }),
+    expenses: z
+      .array(
+        z.object({
+          id: z.string(),
+          expenses_type: z.string(),
+          amount: z.number(),
+          description: z.string().optional(),
+        }),
+      )
+      .optional(),
     salesTransactions: z.array(transactionSchema),
     upiPayments: z.array(upiPaymentSchema),
     onlinePayments: z.array(onlinePaymentSchema),
@@ -103,7 +113,7 @@ export const validateDeliveryReportWithCalculations = (
     expectedCashInHand: number;
     actualCashCounted: number;
     cashMismatch: number;
-  }
+  },
 ) => {
   const errors: string[] = [];
 
@@ -111,22 +121,22 @@ export const validateDeliveryReportWithCalculations = (
   if (Math.abs(calculations.cashMismatch) > 10) {
     errors.push(
       `Cash mismatch is ₹${calculations.cashMismatch.toFixed(
-        2
-      )}. Maximum allowed difference is ±₹10`
+        2,
+      )}. Maximum allowed difference is ±₹10`,
     );
   }
 
   // Check difference between total cash and net sales (requirement 8)
   const difference = Math.abs(
-    calculations.actualCashCounted - calculations.expectedCashInHand
+    calculations.actualCashCounted - calculations.expectedCashInHand,
   );
   if (difference > 10) {
     errors.push(
       `Difference between counted cash (₹${calculations.actualCashCounted.toFixed(
-        2
+        2,
       )}) and expected cash (₹${calculations.expectedCashInHand.toFixed(
-        2
-      )}) exceeds ±₹10`
+        2,
+      )}) exceeds ±₹10`,
     );
   }
 
@@ -139,8 +149,7 @@ export const validateDeliveryReportWithCalculations = (
 // Type exports
 export type DeliveryReportFormData = z.infer<typeof deliveryReportSchema>;
 
-
-export const onError = (errors: FieldErrors<DeliveryReportFormData|any>) => {
+export const onError = (errors: FieldErrors<DeliveryReportFormData | any>) => {
   Object.values(errors).forEach((error) => {
     if (error?.message) {
       toast.error(error.message as string);

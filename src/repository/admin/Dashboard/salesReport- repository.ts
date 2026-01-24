@@ -123,7 +123,8 @@ const get_Sales_Slip_ById = async (slipId: string) => {
     );
 
     if (error) throw error;
-
+    console.log(JSON.stringify(data,null,2));
+    
     return data;
   } catch (error) {
     console.log((error as Error).message);

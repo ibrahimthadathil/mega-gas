@@ -42,7 +42,7 @@ export const STATUS = {
   NO_CONTENT :{code:204,message:"No Content"}
 } as const;
 
-export interface Expense {
+export interface  Expense {
   id: string;
   created_by?: string;
   expenses_type: "Recharge" | "Workshop" | "Other";
