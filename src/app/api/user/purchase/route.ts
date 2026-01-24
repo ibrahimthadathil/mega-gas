@@ -17,7 +17,7 @@ export const POST = async (req: NextRequest) => {
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: STATUS.SERVER_ERROR.code }
+      { status: STATUS.SERVER_ERROR.code },
     );
   }
 };
@@ -25,19 +25,37 @@ export const POST = async (req: NextRequest) => {
 export const GET = async (req: NextRequest) => {
   try {
     const { user, error: authError } = await getAuthUser();
-    if (user?.id) {
-      const { data, success } = await getPlantLoadRegister(user?.id);
-      console.log(data[0]);
-      
-      return NextResponse.json(
-        { data, success },
-        { status: STATUS.SUCCESS.code }
-      );
-    } else return NextResponse.json({}, { status: STATUS.UNAUTHORIZED.code });
+
+    if (!user?.id) {
+      return NextResponse.json({}, { status: STATUS.UNAUTHORIZED.code });
+    }
+    const searchParams = req.nextUrl.searchParams;
+    const { data, success, total, totalPages } = await getPlantLoadRegister(
+      user.id,
+      {
+        startDate: searchParams.get("startDate") || undefined,
+        endDate: searchParams.get("endDate") || undefined,
+        warehouse: searchParams.get("warehouse") || undefined,
+        isUnloaded: searchParams.get("isUnloaded") || undefined,
+        page: parseInt(searchParams.get("page") || "1"),
+        limit: parseInt(searchParams.get("limit") || "10"),
+      },
+    );
+
+    return NextResponse.json(
+      {
+        data,
+        success,
+        total,
+        page: parseInt(searchParams.get("page") || "1"),
+        totalPages,
+      },
+      { status: STATUS.SUCCESS.code },
+    );
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error).message },
-      { status: STATUS.SERVER_ERROR.code }
+      { status: STATUS.SERVER_ERROR.code },
     );
   }
 };

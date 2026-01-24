@@ -18,10 +18,29 @@ export const addPurchaseRegister = async (data: Record<string, unknown>) => {
   }
 };
 
-export const getPlantLoadRegister = async () => {
+interface FilterParams {
+  startDate?: string;
+  endDate?: string;
+  warehouse?: string;
+  isUnloaded?: string;
+  page?: number;
+  limit?: number;
+}
+
+export const getPlantLoadRegister = async (filters?: FilterParams) => {
   try {
-    const result = await axios.get("/api/user/purchase");
-    return result.data;
+    const result = await axios.get("/api/user/purchase", {
+      params: {
+        sartDate: filters?.startDate,
+        endDate: filters?.endDate,
+        page: filters?.page,
+        limit: filters?.limit,
+        isUnloaded: filters?.isUnloaded,
+        warehouse: filters?.warehouse,
+      },
+    });
+
+    return result;
   } catch (error) {
     throw error;
   }
@@ -38,7 +57,7 @@ export const deletePurchasedRecord = async (id: string) => {
 
 export const editPurchase = async (
   id: string,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
 ) => {
   try {
     const result = await axios.put(`/api/user/purchase/${id}`, data);
