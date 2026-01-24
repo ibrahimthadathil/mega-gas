@@ -29,9 +29,11 @@ interface FilterParams {
 
 export const getPlantLoadRegister = async (filters?: FilterParams) => {
   try {
+    console.log(filters);
+    
     const result = await axios.get("/api/user/purchase", {
       params: {
-        sartDate: filters?.startDate,
+        startDate: filters?.startDate,
         endDate: filters?.endDate,
         page: filters?.page,
         limit: filters?.limit,

@@ -1,22 +1,7 @@
 import supabaseAdmin from "@/lib/supabase/supabaseAdmin";
 import { FilterParams } from "@/types/admin/salesReportView";
 
-// const daily_Report_View = async ({
-//   page = 1,
-//   limit = 7,
-// }: { page?: number; limit?: number } = {}) => {
-//   const offset = (page - 1) * limit;
-//   try {
-//     const { data, error } = await supabaseAdmin
-//       .from("daily_sales_report_view")
-//       .select("*", { count: "exact" })
-//       // .range(offset, offset + limit - 1);
-//     if (error) throw error;
-//     return data;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
+
 
 const daily_Report_View = async ({
   startDate,
@@ -25,7 +10,7 @@ const daily_Report_View = async ({
   warehouse,
   chest,
   page = 1,
-  limit = 20,
+  limit = 16,
 }: FilterParams = {}) => {
   const offset = (page - 1) * limit;
 
