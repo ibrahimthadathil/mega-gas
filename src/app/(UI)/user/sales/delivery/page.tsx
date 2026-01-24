@@ -77,22 +77,7 @@ interface TransactionItem {
 }
 //----------------------------------------------------------------------
 // 1. Updated Interfaces to match the NEW JSON structure
-interface SaleComponent {
-  qty: number;
-  sale_price: number;
-  child_product_id: string; // Changed from "composite product id"
-}
 
-interface SaleItem {
-  id: string;
-  productId: string; // Changed from "product id"
-  productName: string;
-  quantity: number; // Changed from "sale qty"
-  rate: number;
-  isComposite: boolean; // Changed from "is composite"
-  customerId: string;
-  components?: SaleComponent[]; // Changed from "json components"
-}
 
 //----------------------------------------------------------------------------
 const transformEditDataToForm = (
@@ -177,7 +162,7 @@ export default function Home() {
   const searchParams = useSearchParams();
   const reportId = searchParams.get("id");
   const isEditMode = Boolean(reportId);
-
+  const [isFormReady, setIsFormReady] = useState(false);
   const [currentVehicle, setCurrentVehicle] = useState(warehouseid ?? "");
   const [isVerified, setIsVerified] = useState(false);
   const [isSubmit, setSubmit] = useState(false);
@@ -194,7 +179,7 @@ export default function Home() {
     { enabled: !!currentVehicle },
   );
 
-  const { data: editReport, isLoading: editLoading } = UseRQ(
+  const { data: editReport, isLoading: editLoading } = UseRQ<any>(
     ["delivery-report", reportId],
     async () => {
       if (!reportId) {
@@ -204,6 +189,8 @@ export default function Home() {
     },
     { enabled: !!isEditMode },
   );
+  console.log("001",editReport);
+  
 
   const {
     control,
@@ -243,19 +230,36 @@ export default function Home() {
   const onlinePayments = watch("onlinePayments");
   const currencyDenominations = watch("currencyDenominations");
 
-  // Populate form with edit data
-  useEffect(() => {
-    if (isEditMode && editReport && !editLoading) {
-      const transformedData = transformEditDataToForm(editReport);
-      reset(transformedData as DeliveryReportFormData);
+  // // Populate form with edit data
+  // useEffect(() => {
+  //   if (isEditMode && editReport && !editLoading) {
+  //     const transformedData = transformEditDataToForm(editReport);
+  //     reset(transformedData as DeliveryReportFormData);
 
-      if ((editReport as any).sales_slip?.warehouse_id) {
-        setCurrentVehicle((editReport as any).sales_slip.warehouse_id);
-        setValue("vehicleId", (editReport as any).sales_slip.warehouse_id);
+  //     if ((editReport as any).sales_slip?.warehouse_id) {
+  //       setCurrentVehicle((editReport as any).sales_slip.warehouse_id);
+  //       setValue("vehicleId", (editReport as any).sales_slip.warehouse_id);
+  //     }
+  //   }
+  // }, [editReport, editLoading, isEditMode, reset, setValue]);
+useEffect(() => {
+    if (isEditMode) {
+      if (editReport && !editLoading) {
+        const transformedData = transformEditDataToForm(editReport);
+        reset(transformedData as DeliveryReportFormData);
+        
+        if (editReport?.sales_slip?.warehouse_id) {
+          setCurrentVehicle(editReport.sales_slip.warehouse_id);
+          setValue("vehicleId", editReport.sales_slip.warehouse_id);
+        }
+        
+        setIsFormReady(true);
       }
+    } else {
+      setIsFormReady(true);
     }
   }, [editReport, editLoading, isEditMode, reset, setValue]);
-
+  
   // Calculations
   const totalSales =
     sales?.reduce((sum, sale) => sum + sale.rate * sale.quantity, 0) || 0;
@@ -292,7 +296,13 @@ export default function Home() {
   );
 
   const cashMismatch = actualCashCounted - expectedCashInHand;
-
+if (isEditMode && !isFormReady) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loading />
+      </div>
+    );
+  }
   const handleSalesTransaction = (transaction: any) => {
     const formattedTransaction: TransactionItem = {
       "account id": transaction.line_Item.account_id,
