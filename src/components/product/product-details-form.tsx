@@ -217,7 +217,9 @@ export default function ProductDetailsForm({
                   "godown_staff",
                   "office_staff",
                   "plan_driver",
-                  "14KG"
+                  "14KG",
+                  "service",
+                  
                 ];
                 return (
                   <div className="border rounded-md p-4">
