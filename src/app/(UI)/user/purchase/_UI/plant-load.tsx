@@ -537,7 +537,7 @@ export default function PlantLoadSection({ recordId }: { recordId?: string }) {
   } = useForm<DialogFormData>({
     defaultValues: {
       product: "",
-      tripType: "oneway",
+      tripType: "two_way",
       quantity: "",
       return_product_id: "",
     },
