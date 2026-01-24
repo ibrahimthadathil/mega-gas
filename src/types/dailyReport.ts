@@ -18,6 +18,6 @@ export interface SalesSlipPayload {
   created_by_name : string
   status: string;
   remark: string;
-
+  warehouse_name:string;
   sale_items: SaleItem[];
 }

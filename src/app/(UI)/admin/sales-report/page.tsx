@@ -314,7 +314,6 @@ const Home = () => {
   );
   const queryClient = useQueryClient();
   const router = useRouter();
-console.log(report);
 
   const warehouses = useMemo(() => {
     if (!report) return [];
@@ -483,6 +482,10 @@ console.log(report);
       {
         header: "Created By",
         render: (row: SalesSlipPayload) => <p>{row?.created_by_name}</p>,
+      },
+      {
+        header: "🚚",
+        render: (row: SalesSlipPayload) => <p className="bg-orange-100 border rounded">{row?.warehouse_name}</p>,
       },
       {
         header: "Status",
