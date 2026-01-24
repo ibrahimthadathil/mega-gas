@@ -22,24 +22,6 @@ export const POST = async (req: NextRequest) => {
   }
 };
 
-// export const GET = async (req: NextRequest) => {
-//   try {
-//     const { user, error: authError } = await getAuthUser();
-//     if (user?.id) {
-//       const { data, success } = await getPlantLoadRegister(user?.id);
-//       return NextResponse.json(
-//         { data, success },
-//         { status: STATUS.SUCCESS.code }
-//       );
-//     } else return NextResponse.json({}, { status: STATUS.UNAUTHORIZED.code });
-//   } catch (error) {
-//     return NextResponse.json(
-//       { error: (error as Error).message },
-//       { status: STATUS.SERVER_ERROR.code }
-//     );
-//   }
-// };
-
 export const GET = async (req: NextRequest) => {
   try {
     const { user, error: authError } = await getAuthUser();
@@ -47,26 +29,16 @@ export const GET = async (req: NextRequest) => {
     if (!user?.id) {
       return NextResponse.json({}, { status: STATUS.UNAUTHORIZED.code });
     }
-
-    // Extract query parameters
     const searchParams = req.nextUrl.searchParams;
-    const startDate = searchParams.get("startDate");
-    const endDate = searchParams.get("endDate");
-    const warehouse = searchParams.get("warehouse");
-    const isUnloaded = searchParams.get("isUnloaded");
-    const page = searchParams.get("page");
-    const limit = searchParams.get("limit");
-
-    // Pass filters to the database function
     const { data, success, total, totalPages } = await getPlantLoadRegister(
       user.id,
       {
-        startDate: startDate || undefined,
-        endDate: endDate || undefined,
-        warehouse: warehouse || undefined,
-        isUnloaded: isUnloaded || undefined,
-        page: page ? parseInt(page) : 1,
-        limit: limit ? parseInt(limit) : 10,
+        startDate: searchParams.get("startDate") || undefined,
+        endDate: searchParams.get("endDate") || undefined,
+        warehouse: searchParams.get("warehouse") || undefined,
+        isUnloaded: searchParams.get("isUnloaded") || undefined,
+        page: parseInt(searchParams.get("page") || "1"),
+        limit: parseInt(searchParams.get("limit") || "10"),
       },
     );
 
@@ -75,7 +47,7 @@ export const GET = async (req: NextRequest) => {
         data,
         success,
         total,
-        page: page ? parseInt(page) : 1,
+        page: parseInt(searchParams.get("page") || "1"),
         totalPages,
       },
       { status: STATUS.SUCCESS.code },

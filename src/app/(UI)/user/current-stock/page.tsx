@@ -31,7 +31,7 @@ const Page = () => {
     InventoryItem[]
   >("inventory", getInventoryDetails);
   const { warehouseid } = useSelector((state: Rootstate) => state.user);
-
+  
   // Transform data into pivot format - Group by warehouse only
   const pivotData = useMemo(() => {
     if (!Inventory || !Array.isArray(Inventory)) return [];

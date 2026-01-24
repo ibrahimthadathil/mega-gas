@@ -314,6 +314,7 @@ const Home = () => {
   );
   const queryClient = useQueryClient();
   const router = useRouter();
+console.log(report);
 
   const warehouses = useMemo(() => {
     if (!report) return [];

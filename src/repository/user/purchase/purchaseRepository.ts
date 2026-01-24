@@ -108,9 +108,9 @@ const getPurchaseRegister = async (
 ) => {
   try {
     // console.log("=== Purchase Register Query Start ===");
-    // console.log("User ID:", userId);
-    // console.log("Role:", role);
-    // console.log("Filters:", JSON.stringify(filter, null, 2));
+    console.log("User ID:", userId);
+    console.log("Role:", role);
+    console.log("Filters:", JSON.stringify(filter, null, 2));
 
     // Set default values for pagination
     const page = filter.page || 1;
@@ -191,7 +191,8 @@ const getPurchaseRegister = async (
     }
 
     const totalPages = Math.ceil((count || 0) / limit);
-
+    console.log(data.length , );
+    
     return {
       success: true,
       data: data || [],

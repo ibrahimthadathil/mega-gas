@@ -519,7 +519,7 @@ console.log(response);
       )}
 
       {/* Records List */}
-      <div className="space-y-3">
+      <div className="space-y-3 h-[30rem] max-h-[30rem] overflow-y-scroll">
         <p className="text-sm font-medium text-muted-foreground">
           Total Records: {totalRecords} | Showing: {data?.length || 0}
         </p>

@@ -69,13 +69,12 @@ const getPlantLoadCredential = async () => {
   }
 };
 
-const getPlantLoadRegister = async (authId: string, ...rest: any) => {
+const getPlantLoadRegister = async (authId: string, {...rest}: any) => {
   try {
     const existUser = await checkUserByAuthId(authId);
     if (existUser) {
       const { data, message, success, total, totalPages } =
         await getPurchaseRegister(existUser.id, existUser.role, rest);
-        console.log(success,data);
         
       if (success) return { success, data, total, totalPages, message };
       else throw new Error(message);

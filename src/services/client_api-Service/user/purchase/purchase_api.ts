@@ -18,16 +18,6 @@ export const addPurchaseRegister = async (data: Record<string, unknown>) => {
   }
 };
 
-// export const getPlantLoadRegister = async () => {
-//   try {
-//     const result = await axios.get("/api/user/purchase");
-//     return result.data;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
-// services/client_api-Service/user/purchase/purchase_api.ts
-
 interface FilterParams {
   startDate?: string;
   endDate?: string;
@@ -39,39 +29,22 @@ interface FilterParams {
 
 export const getPlantLoadRegister = async (filters?: FilterParams) => {
   try {
-    const params = new URLSearchParams();
+    const result = await axios.get("/api/user/purchase", {
+      params: {
+        sartDate: filters?.startDate,
+        endDate: filters?.endDate,
+        page: filters?.page,
+        limit: filters?.limit,
+        isUnloaded: filters?.isUnloaded,
+        warehouse: filters?.warehouse,
+      },
+    });
 
-    if (filters?.startDate) {
-      params.append("startDate", filters.startDate);
-    }
-    if (filters?.endDate) {
-      params.append("endDate", filters.endDate);
-    }
-    if (filters?.warehouse) {
-      params.append("warehouse", filters.warehouse);
-    }
-    if (filters?.isUnloaded !== undefined && filters?.isUnloaded !== "") {
-      params.append("isUnloaded", filters.isUnloaded);
-    }
-    if (filters?.page) {
-      params.append("page", filters.page.toString());
-    }
-    if (filters?.limit) {
-      params.append("limit", filters.limit.toString());
-    }
-
-    const queryString = params.toString();
-    const url = `/api/user/purchase${queryString ? `?${queryString}` : ""}`;
-
-    const result = await axios.get(url);
-    
-    return result
+    return result;
   } catch (error) {
     throw error;
   }
 };
-
-
 
 export const deletePurchasedRecord = async (id: string) => {
   try {
@@ -84,7 +57,7 @@ export const deletePurchasedRecord = async (id: string) => {
 
 export const editPurchase = async (
   id: string,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
 ) => {
   try {
     const result = await axios.put(`/api/user/purchase/${id}`, data);
