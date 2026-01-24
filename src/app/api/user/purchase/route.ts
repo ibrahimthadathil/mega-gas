@@ -30,6 +30,7 @@ export const GET = async (req: NextRequest) => {
       return NextResponse.json({}, { status: STATUS.UNAUTHORIZED.code });
     }
     const searchParams = req.nextUrl.searchParams;
+
     const { data, success, total, totalPages } = await getPlantLoadRegister(
       user.id,
       {
@@ -41,7 +42,6 @@ export const GET = async (req: NextRequest) => {
         limit: parseInt(searchParams.get("limit") || "10"),
       },
     );
-
     return NextResponse.json(
       {
         data,
