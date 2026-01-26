@@ -78,7 +78,6 @@ interface TransactionItem {
 //----------------------------------------------------------------------
 // 1. Updated Interfaces to match the NEW JSON structure
 
-
 //----------------------------------------------------------------------------
 const transformEditDataToForm = (
   editData: any,
@@ -125,6 +124,7 @@ const transformEditDataToForm = (
       "amount received": txn.amount_received || 0,
       remark: txn.remark || "Transaction",
     })) || [];
+  const expenses: Expense[] = editData.expenses || [];
 
   return {
     date: editData.sales_slip?.date
@@ -132,6 +132,7 @@ const transformEditDataToForm = (
       : undefined,
     deliveryBoys: editData.delivery_boys || [],
     sales,
+    expenses,
     salesTransactions,
     upiPayments:
       editData.upi_payments?.map((upi: any) => ({
@@ -189,8 +190,7 @@ export default function Home() {
     },
     { enabled: !!isEditMode },
   );
-  console.log("001",editReport);
-  
+  console.log("001", editReport);
 
   const {
     control,
@@ -206,6 +206,7 @@ export default function Home() {
       vehicleId: warehouseid ?? "",
       deliveryBoys: delivery_boys ?? [],
       sales: [],
+      expenses: [],
       salesTransactions: [],
       upiPayments: [],
       onlinePayments: [],
@@ -229,8 +230,9 @@ export default function Home() {
   const upiPayments = watch("upiPayments");
   const onlinePayments = watch("onlinePayments");
   const currencyDenominations = watch("currencyDenominations");
-
+  const formExpenses = watch("expenses");
   // // Populate form with edit data
+
   // useEffect(() => {
   //   if (isEditMode && editReport && !editLoading) {
   //     const transformedData = transformEditDataToForm(editReport);
@@ -242,30 +244,41 @@ export default function Home() {
   //     }
   //   }
   // }, [editReport, editLoading, isEditMode, reset, setValue]);
-useEffect(() => {
+  useEffect(() => {
     if (isEditMode) {
       if (editReport && !editLoading) {
         const transformedData = transformEditDataToForm(editReport);
         reset(transformedData as DeliveryReportFormData);
-        
+
         if (editReport?.sales_slip?.warehouse_id) {
           setCurrentVehicle(editReport.sales_slip.warehouse_id);
           setValue("vehicleId", editReport.sales_slip.warehouse_id);
         }
-        
+
         setIsFormReady(true);
       }
     } else {
       setIsFormReady(true);
     }
   }, [editReport, editLoading, isEditMode, reset, setValue]);
-  
+
+  const totalExpenses = useMemo(() => {
+    // new line
+    const expensesToUse = isEditMode ? formExpenses : payload?.expenses || [];
+    return (
+      expensesToUse?.reduce((sum: number, exp: any) => sum + exp.amount, 0) || 0
+    );
+  }, [isEditMode, formExpenses, payload?.expenses]);
   // Calculations
+  // const totalSales =
+  //   sales?.reduce((sum, sale) => sum + sale.rate * sale.quantity, 0) || 0;
+  // // const totalExpenses =
+  // //   payload?.expenses?.reduce((sum: number, exp: any) => sum + exp.amount, 0) ||
+  // //   0;
+
+  // const netSales = totalSales - totalExpenses;
   const totalSales =
     sales?.reduce((sum, sale) => sum + sale.rate * sale.quantity, 0) || 0;
-  const totalExpenses =
-    payload?.expenses?.reduce((sum: number, exp: any) => sum + exp.amount, 0) ||
-    0;
   const netSales = totalSales - totalExpenses;
 
   const totalCashReceivedTxn =
@@ -296,7 +309,7 @@ useEffect(() => {
   );
 
   const cashMismatch = actualCashCounted - expectedCashInHand;
-if (isEditMode && !isFormReady) {
+  if (isEditMode && !isFormReady) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loading />
@@ -427,7 +440,10 @@ if (isEditMode && !isFormReady) {
       "Opening stock": openingStockForReport,
       "Closing stock": closingStockForReport,
       Sales: formattedSales,
-      Expenses: payload?.expenses?.map((expense: Expense) => expense.id) ?? [],
+      // Expenses: payload?.expenses?.map((expense: Expense) => expense.id) ?? [],
+      Expenses: isEditMode
+        ? data.expenses?.map((exp) => exp.id) || [] // Extract IDs in edit mode
+        : (payload?.expenses?.map((expense: Expense) => expense.id) ?? []),
       Transaction: data.salesTransactions,
       totals: {
         totalSales,
@@ -599,10 +615,16 @@ if (isEditMode && !isFormReady) {
                       sales={sales || []}
                     />
 
-                    <ExpensesSection
+                    {/* <ExpensesSection
                       expenses={payload?.expenses as Expense[]}
+                    /> */}
+                    <ExpensesSection
+                      expenses={
+                        (isEditMode
+                          ? formExpenses
+                          : payload?.expenses) as Expense[]
+                      }
                     />
-
                     <TransactionsPage
                       isSales={true}
                       onSalesSubmit={handleSalesTransaction}
