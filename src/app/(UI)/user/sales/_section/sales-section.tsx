@@ -396,7 +396,7 @@ export default function SalesSection({
                         }
                         field.onChange(value);
                       }}
-                      min={0}
+                      min={-Infinity}
                     />
                   )}
                 />
