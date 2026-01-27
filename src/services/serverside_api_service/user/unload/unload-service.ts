@@ -1,3 +1,4 @@
+import { getpurchasedLoad } from "@/repository/user/stock/stockRepository";
 import { delete_unload_slip, get_All_Unload_Details } from "@/repository/user/unload/unloadRepository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
 
@@ -34,4 +35,14 @@ const editUnloadSlip = async(data:any,slipId:String)=>{
     return {success:false, message:(error as Error).message}
   }
 }
-export { getAllUnloadDetails, deleteUnloadSlipById, editUnloadSlip };
+
+const getunloadData = async (id: string) => {
+  try {
+    const result = await getpurchasedLoad(id);
+    if (result) return { success: true, result };
+    else return { success: false };
+  } catch (error) {
+    throw error;
+  }
+};
+export {getunloadData, getAllUnloadDetails, deleteUnloadSlipById, editUnloadSlip };

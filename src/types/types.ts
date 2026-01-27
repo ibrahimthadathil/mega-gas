@@ -1,4 +1,5 @@
 import { LucideIcon } from "lucide-react";
+import { UnloadDetail } from "./unloadSlip";
 
 export type NavItem = {
   title: string;
@@ -158,6 +159,8 @@ export interface PlantLoadRecord {
   total_return_qty: number;
   warehouse_name: string;
   line_items: LineItem[];
+  unloading_staff:{id:string,name:string}[];
+  unload_details:UnloadDetail[]
   is_unloaded:boolean
 }
 

@@ -2,6 +2,7 @@ import { getAuthUser } from "@/lib/auth/jwt";
 import {
   deleteUnloadSlipById,
   editUnloadSlip,
+  getunloadData,
 } from "@/services/serverside_api_service/user/unload/unload-service";
 import { STATUS } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
@@ -55,3 +56,26 @@ export const PUT = async (
     );
   }
 };
+
+export const GET = async(
+   req: NextRequest,
+  { params }: { params: { id: string } },
+) =>{
+  try {
+      const { user, error: authError } = await getAuthUser();
+    if (user?.id) {
+      const { id } = await params;
+      const {result,success} = await getunloadData(id);                  
+      return NextResponse.json({data:result,success}, { status: STATUS.SUCCESS.code });
+    } else
+      return NextResponse.json(
+        { message: STATUS.FORBIDDEN.message },
+        { status: STATUS.FORBIDDEN.code }
+      );
+  } catch (error) {
+     return NextResponse.json(
+      { message: STATUS.SERVER_ERROR.message },
+      { status: STATUS.SERVER_ERROR.code },
+    );
+  }
+}

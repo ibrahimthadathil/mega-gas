@@ -77,15 +77,7 @@ const transferStock = async (data: StockTransferFormData, userId: string) => {
   }
 };
 
-const getunloadData = async (id: string) => {
-  try {
-    const result = await getpurchasedLoad(id);
-    if (result) return { success: true, result };
-    else return { success: false };
-  } catch (error) {
-    throw error;
-  }
-};
+
 
 // this function currently not using
 const getTransferedView = async (id: string) => {
@@ -143,7 +135,6 @@ const EditStockTranfer = async (
 export {
   unloadSlipRegister,
   transferStock,
-  getunloadData,
   getTransferedView,
   displayStockTransfer,
   deleteTransferStock,
