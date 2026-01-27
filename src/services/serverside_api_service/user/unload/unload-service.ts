@@ -24,9 +24,12 @@ const deleteUnloadSlipById = async (id:string,authId:string) => {
   }
 };
 
-const editUnloadSlip = async()=>{
+const editUnloadSlip = async(data:any,slipId:String)=>{
   try {
+    console.log("slipId",slipId);
+    console.log("data from front",data);
     
+    return {succes:true,message:'slip updated'}
   } catch (error) {
     return {success:false, message:(error as Error).message}
   }
