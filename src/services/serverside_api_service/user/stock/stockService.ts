@@ -1,5 +1,5 @@
 import { TripFormData } from "@/app/(UI)/user/stock/_UI/trip-sheet";
-import { StockTransferFormData } from "@/app/(UI)/user/stock/transfer/_UI/stock-transfer-section";
+import { StockTransferFormData } from "@/lib/schema/stock";
 import {
   delete_stock_transfer,
   Edit_stock_transfer,
