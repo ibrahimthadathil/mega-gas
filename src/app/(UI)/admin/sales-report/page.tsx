@@ -385,6 +385,12 @@ const Home = () => {
   const columns = useMemo(() => {
     return [
       {
+        header:'No',
+        render :(_row: SalesSlipPayload, index: number) => (
+        <span className="font-medium">{index + 1}</span>
+      ),
+      },
+      {
         header: "Date",
         render: (row: SalesSlipPayload) => <span>{row.date}</span>,
       },
@@ -569,7 +575,7 @@ const Home = () => {
   }, [report]);
 
   return (
-    <main className="min-h-screen bg-background p-4 sm:p-6">
+    <main className="h-auto bg-background p-4 sm:p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <h1 className="text-2xl sm:text-3xl font-semibold">
           Daily Sales Report Stock
@@ -732,7 +738,7 @@ const Home = () => {
       {isLoading ? (
         <Skeleton className="w-full h-24 bg-zinc-50" />
       ) : (
-        <DataTable columns={columns} itemsPerPage={10} data={report ?? []} />
+        <DataTable columns={columns} itemsPerPage={16} data={report ?? []} />
       )}
     </main>
   );

@@ -26,7 +26,7 @@ export default function DataTable<T extends Record<string, any>>({
   columns,
   itemsPerPage = 5,
   onChange,
-  rowClassName
+  rowClassName,
 }: TableProps<T>) {
   const [currentPage, setCurrentpage] = useState(1);
   const totalPages = Math.ceil(data.length / itemsPerPage);
@@ -44,18 +44,18 @@ export default function DataTable<T extends Record<string, any>>({
   };
   return (
     <>
-      <div className="rounded-lg border bg-card text-card-foreground shadow">
-        <Table>
-          <TableHeader className="bg-muted/50 ">
-            <TableRow className="hover:bg-transparent ">
+      <div>
+        <Table >
+          <TableHeader className="bg-muted/50 sticky top-0 z-10">
+            <TableRow className="hover:bg-transparent">
               {columns.map((e, i) => (
-                <TableHead key={i} className=" text-center">
+                <TableHead key={i} className="text-center">
                   {e.header}
                 </TableHead>
               ))}
             </TableRow>
           </TableHeader>
-          <TableBody className="text-center">
+          <TableBody className="text-center bg-cyan-100">
             {currentData.length ? (
               currentData.map((item, ind) => (
                 <TableRow
@@ -67,14 +67,14 @@ export default function DataTable<T extends Record<string, any>>({
                       {e.render
                         ? e.render(item, ind)
                         : e.key
-                        ? item[e.key]
-                        : "Not found"}
+                          ? item[e.key]
+                          : "Not found"}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
-              <TableRow >
+              <TableRow>
                 <TableCell
                   colSpan={columns.length}
                   className="h-14 text-center text-yellow-800 "

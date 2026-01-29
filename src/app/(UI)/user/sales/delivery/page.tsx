@@ -195,7 +195,6 @@ export default function Home() {
     },
     { enabled: !!isEditMode },
   );
-  console.log("001", editReport);
 
   const {
     control,
@@ -484,7 +483,8 @@ export default function Home() {
         route.push("/user/sales");
       } else {
         response = await updateSalesSlip(report, report.id as string);
-        route.push("/admin/sales-report");
+        // route.push("/admin/sales-report");
+        route.back()
       }
       if (response.success) {
         toast.success(response.message);
@@ -642,6 +642,7 @@ export default function Home() {
                     />
 
                     <TransactionsPage
+                    slipDate={editReport?.sales_slip?.date}
                       isSales={true}
                       onSalesSubmit={handleSalesTransaction}
                     />

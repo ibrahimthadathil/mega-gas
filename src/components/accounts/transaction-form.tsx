@@ -53,6 +53,7 @@ type Transaction = {
 type TransactionFormProps = {
   onEdit?: (transaction: Transaction) => void;
   onSubmit: (transaction: Transaction) => void;
+  slipDate?:string
   transactionType: "received" | "paid";
   isSales?: boolean;
   initialData?: ApiTransaction;
@@ -134,6 +135,7 @@ export function TransactionForm({
   isSales = false,
   initialData,
   transactionId,
+  slipDate,
   onEdit,
 }: TransactionFormProps) {
   const { data: accountName, isLoading } = UseRQ<Accounts[]>(
@@ -145,7 +147,7 @@ export function TransactionForm({
     if (!data) {
       return {
         line_Item: {
-          date: new Date().toISOString().split("T")[0],
+          date: slipDate ?? new Date().toISOString().split("T")[0],
           account_name: "",
           account_id: "",
           amount_received: 0,
