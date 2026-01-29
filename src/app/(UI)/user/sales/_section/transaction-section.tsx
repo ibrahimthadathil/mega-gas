@@ -338,6 +338,7 @@ export default function TransactionsPage({
                   </DialogTitle>
                 </DialogHeader>
                 <TransactionForm
+                slipDate={slipDate}
                   isSales={isSales}
                   transactionType="received"
                   onSubmit={(transaction) =>

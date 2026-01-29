@@ -235,6 +235,8 @@ export default function Home() {
   const onlinePayments = watch("onlinePayments");
   const currencyDenominations = watch("currencyDenominations");
   const formExpenses = watch("expenses");
+  const selectedDate = watch("date");
+
   // // Populate form with edit data
 
   // useEffect(() => {
@@ -361,9 +363,7 @@ export default function Home() {
   const onSubmit = async (data: DeliveryReportFormData) => {
     // Additional validation with calculations
     if (Math.abs(cashMismatch) !== 0) {
-      toast.error(
-        `Cash mismatch `,
-      );
+      toast.error(`Cash mismatch `);
       return;
     }
 
@@ -482,7 +482,7 @@ export default function Home() {
       } else {
         response = await updateSalesSlip(report, report.id as string);
         // route.push("/admin/sales-report");
-        route.back()
+        route.back();
       }
       if (response.success) {
         toast.success(response.message);
@@ -628,7 +628,7 @@ export default function Home() {
                           : payload?.expenses) as Expense[]
                       }
                     /> */}
-                    <Controller
+                    {/* <Controller
                       name="expenses"
                       control={control}
                       render={({ field }) => (
@@ -637,10 +637,27 @@ export default function Home() {
                           onChange={field.onChange}
                         />
                       )}
-                    />
+                    /> */}
+
+                    {isEditMode ? (
+                      <Controller
+                        name="expenses"
+                        control={control}
+                        render={({ field }) => (
+                          <ExpensesSection
+                            expenses={field.value as Expense[]}
+                            onChange={field.onChange}
+                          />
+                        )}
+                      />
+                    ) : (
+                      <ExpensesSection
+                        expenses={payload?.expenses as Expense[]}
+                      />
+                    )}
 
                     <TransactionsPage
-                    slipDate={editReport?.sales_slip?.date}
+                      slipDate={selectedDate ? selectedDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
                       isSales={true}
                       onSalesSubmit={handleSalesTransaction}
                     />

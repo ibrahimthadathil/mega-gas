@@ -223,7 +223,12 @@ export function TransactionForm({
     (transactionType === "received"
       ? watchedFields.line_Item.amount_received > 0
       : watchedFields.line_Item.amount_paid > 0);
-
+// 🔥 NEW: Update date when slipDate prop changes
+// useEffect(() => {
+//   if (slipDate && !initialData) {
+//     setValue("line_Item.date", slipDate);
+//   }
+// }, [slipDate, setValue, initialData]);
   useEffect(() => {
     if (initialData) {
       reset(transformInitialData(initialData));
