@@ -293,6 +293,8 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { getWarehouse } from "@/services/client_api-Service/user/warehouse/wareHouse_api";
+import { Warehouse } from "../../user/warehouses/page";
 
 export interface FilterParams {
   startDate?: string;
@@ -312,20 +314,24 @@ const Home = () => {
     ["reports", filters],
     () => getAllDeliveryReport(filters),
   );
+  const { data: warehousesData } = UseRQ<Warehouse[]>(
+    "warehouse",
+    getWarehouse,
+  );
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  const warehouses = useMemo(() => {
-    if (!report) return [];
-    return Array.from(
-      new Map(
-        report.map((r) => [
-          r.created_by,
-          { id: r.created_by, name: r.created_by_name },
-        ]),
-      ).values(),
-    );
-  }, [report]);
+  // const warehouses = useMemo(() => {
+  //   if (!report) return [];
+  //   return Array.from(
+  //     new Map(
+  //       report.map((r) => [
+  //         r.warehouse_name,
+  //         { id: r.created_by, name: r.created_by_name },
+  //       ]),
+  //     ).values(),
+  //   );
+  // }, [report]);
 
   const handleDelete = async (id: string) => {
     const data = await deleteDailyReport(id);
@@ -385,10 +391,10 @@ const Home = () => {
   const columns = useMemo(() => {
     return [
       {
-        header:'No',
-        render :(_row: SalesSlipPayload, index: number) => (
-        <span className="font-medium">{index + 1}</span>
-      ),
+        header: "No",
+        render: (_row: SalesSlipPayload, index: number) => (
+          <span className="font-medium">{index + 1}</span>
+        ),
       },
       {
         header: "Date",
@@ -491,7 +497,9 @@ const Home = () => {
       },
       {
         header: "🚚",
-        render: (row: SalesSlipPayload) => <p className="bg-orange-100 border rounded">{row?.warehouse_name}</p>,
+        render: (row: SalesSlipPayload) => (
+          <p className="bg-orange-100 border rounded">{row?.warehouse_name}</p>
+        ),
       },
       {
         header: "Status",
@@ -681,7 +689,7 @@ const Home = () => {
 
               {/* User Filter */}
               <div className="space-y-2">
-                <Label htmlFor="users">Users</Label>
+                <Label htmlFor="users">Warehouse</Label>
                 <Select
                   value={tempFilters.users || ""}
                   onValueChange={(value) =>
@@ -689,11 +697,11 @@ const Home = () => {
                   }
                 >
                   <SelectTrigger id="users">
-                    <SelectValue placeholder="Select users" />
+                    <SelectValue placeholder="Select Warehouse" />
                   </SelectTrigger>
                   <SelectContent>
-                    {warehouses.map((warehouse) => (
-                      <SelectItem key={warehouse.id} value={warehouse.id}>
+                    {warehousesData?.map((warehouse) => (
+                      <SelectItem key={warehouse.id} value={warehouse?.name as string}>
                         {warehouse.name}
                       </SelectItem>
                     ))}

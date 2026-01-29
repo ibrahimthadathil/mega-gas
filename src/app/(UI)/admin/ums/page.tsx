@@ -30,7 +30,6 @@ const Page = () => {
     "users",
     getAllUsers
   );
-  console.log(users,'jjj');
   
   const handelDeleteUser = async(id: string) => {
     try {

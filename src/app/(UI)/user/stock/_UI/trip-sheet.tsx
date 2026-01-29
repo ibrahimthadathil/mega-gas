@@ -1878,7 +1878,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                         validate: {
                           positive: (value) => {
                             const num = Number.parseInt(value);
-                            return num > 0 || "Must be greater than 0";
+                            return num >= 0 || "Must be positive";
                           },
                           notExceed: (value) => {
                             const num = Number.parseInt(value) || 0;

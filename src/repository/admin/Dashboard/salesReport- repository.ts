@@ -44,7 +44,7 @@ const daily_Report_View = async ({
     if(chest) query = query.eq("chest_name", chest);
     // Apply warehouse filter (chest_name column)
     if (warehouse) {
-      query = query.eq("created_by", warehouse);
+      query = query.eq("warehouse_name", warehouse);
     }
 
     // Order by date descending (most recent first)
