@@ -607,7 +607,6 @@
 //   );
 // }
 
-
 // "use client";
 
 // import { useState, useEffect, useMemo } from "react";
@@ -702,7 +701,7 @@
 //     () => getLoadslipByLoad(loadSlipId)
 //   );
 //   console.log(unloadRecord);
-  
+
 //   const { data: warehouses, isLoading: isWarehouseLoading } = UseRQ<Warehouse[]>(
 //     "warehouse",
 //     getWarehouse
@@ -1151,8 +1150,8 @@
 //                 >
 //                   Cancel
 //                 </Button>
-//                 <Button 
-//                   type="button" 
+//                 <Button
+//                   type="button"
 //                   onClick={handleDialogSubmit(onDialogSubmit)}
 //                 >
 //                   Add Load
@@ -1293,17 +1292,6 @@
 //   );
 // }
 
-
-
-
-
-
-
-
-
-
-
-
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
@@ -1389,29 +1377,32 @@ interface UnloadLineItem {
 }
 
 // Helper function to generate unique IDs
-const generateId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const generateId = () =>
+  `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
   const router = useRouter();
   const { delivery_boys } = useSelector((state: Rootstate) => state.user);
 
-  const { data: unloadRecord, isLoading: isUnloadData } = UseRQ<PlantLoadRecord[]>(
-    "plant_load",
-    () => getLoadslipByLoad(loadSlipId)
+  const { data: unloadRecord, isLoading: isUnloadData } = UseRQ<
+    PlantLoadRecord[]
+  >("plant_load", () => getLoadslipByLoad(loadSlipId));
+
+  const { data: warehouses, isLoading: isWarehouseLoading } = UseRQ<
+    Warehouse[]
+  >("warehouse", getWarehouse);
+  const { data: products, isLoading: isProductLoading } = UseRQ(
+    "products",
+    getAllProducts,
   );
-  
-  const { data: warehouses, isLoading: isWarehouseLoading } = UseRQ<Warehouse[]>(
-    "warehouse",
-    getWarehouse
-  );
-  const { data: products, isLoading: isProductLoading } = UseRQ("products", getAllProducts);
   const { data: users, isLoading: isUserLoading } = UseRQ<IUser[]>("user", () =>
-    get_userByRole("driver")
+    get_userByRole("driver"),
   );
 
   const [isSubmit, setSubmit] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedLineItem, setSelectedLineItem] = useState<UnloadLineItem | null>(null);
+  const [selectedLineItem, setSelectedLineItem] =
+    useState<UnloadLineItem | null>(null);
 
   // Main form using react-hook-form
   const {
@@ -1478,6 +1469,12 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
     return new Map((users as IUser[]).map((u) => [u.id, u.user_name]));
   }, [users]);
 
+  const hasTwoWay = useMemo(
+    () => tripLoadRecords.some((r) => r.trip_type === "two_way"),
+    [tripLoadRecords],
+  );
+
+  
   // Calculate remaining quantities per line item
   const lineItemBalances = useMemo(() => {
     if (!unloadRecord?.[0]?.line_items) return new Map();
@@ -1487,7 +1484,10 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
     unloadRecord[0].line_items.forEach((lineItem: any) => {
       const totalQty = lineItem.qty || 0;
       const allocated = tripLoadRecords
-        .filter((record) => record.plant_load_line_item_id === lineItem.plant_load_line_item_id)
+        .filter(
+          (record) =>
+            record.plant_load_line_item_id === lineItem.plant_load_line_item_id,
+        )
         .reduce((sum, record) => sum + record.fullQuantity, 0);
 
       balances.set(lineItem.plant_load_line_item_id, {
@@ -1502,7 +1502,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
   // Check if all quantities are fully allocated
   const isFullyAllocated = useMemo(() => {
     if (!unloadRecord?.[0]?.line_items) return false;
-    
+
     return unloadRecord[0].line_items.every((lineItem: any) => {
       const balance = lineItemBalances.get(lineItem.plant_load_line_item_id);
       return balance && balance.remaining === 0;
@@ -1527,7 +1527,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 
   const handleLineItemClick = (lineItem: UnloadLineItem) => {
     const remaining = getRemainingBalance(lineItem.plant_load_line_item_id);
-    
+
     if (remaining === 0) {
       toast.info("This product is fully allocated");
       return;
@@ -1537,11 +1537,11 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 
     if (lineItem.trip_type === "oneway" && !returnProductId && products) {
       const matchedProduct = (products as IProduct[]).find(
-        (p: any) => p.id === lineItem.product_id
+        (p: any) => p.id === lineItem.product_id,
       );
       returnProductId = matchedProduct?.return_product_id || null;
     }
-
+    
     setSelectedLineItem({
       ...lineItem,
       return_product_id: returnProductId,
@@ -1550,7 +1550,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
     resetDialog();
     setDialogOpen(true);
   };
-
+  
   const onDialogSubmit = (data: DialogFormData) => {
     if (!data.to_warehouse_id || !selectedLineItem) {
       toast.error("Please select a vehicle/destination warehouse.");
@@ -1560,26 +1560,41 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
     const fullQty = Number.parseInt(data.fullQuantity) || 0;
     const emptyQty = Number.parseInt(data.emptyQuantity) || 0;
 
-    // Validation: Check for negative or zero values
+    // Validation: Check for negative values
     if (fullQty < 0 || emptyQty < 0) {
       toast.error("Quantities cannot be negative.");
       return;
     }
 
+    // Validation: At least one quantity must be greater than zero
     if (fullQty === 0 && emptyQty === 0) {
-      toast.error("Full quantity or Empty quantity must be greater than zero.");
+      toast.error(
+        "At least one quantity (Full or Empty) must be greater than zero.",
+      );
       return;
     }
 
+    // Validation: Only one field can have value greater than 0 (not both)
+    if (fullQty > 0 && emptyQty > 0) {
+      toast.error(
+        "Either Full quantity or Empty quantity should be filled, not both.",
+      );
+      return;
+    }
+    
     // Validation: Check if full quantity exceeds remaining balance
-    const remaining = getRemainingBalance(selectedLineItem.plant_load_line_item_id);
+    const remaining = getRemainingBalance(
+      selectedLineItem.plant_load_line_item_id,
+    );
     if (fullQty > remaining) {
-      toast.error(`Cannot allocate ${fullQty}. Only ${remaining} items remaining.`);
+      toast.error(
+        `Cannot allocate ${fullQty}. Only ${remaining} items remaining.`,
+      );
       return;
     }
-
+    
     let finalReturnWarehouseId: string | null = null;
-
+    
     if (selectedLineItem.trip_type === "two_way") {
       finalReturnWarehouseId = warehouseId || null;
     } else if (selectedLineItem.trip_type === "oneway" && emptyQty > 0) {
@@ -1612,7 +1627,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
   const handleDeleteTripLoad = (id: string) => {
     setValue(
       "tripLoadRecords",
-      tripLoadRecords.filter((record) => record.id !== id)
+      tripLoadRecords.filter((record) => record.id !== id),
     );
     toast.success("Load removed");
   };
@@ -1626,18 +1641,35 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
   const handleRemoveHelper = (helperId: string) => {
     setValue(
       "helpers",
-      helpers.filter((h) => h !== helperId)
+      helpers.filter((h) => h !== helperId),
     );
   };
 
   // Memoized totals
   const { totalEmpty, totalFull } = useMemo(() => {
-    const totalEmpty = tripLoadRecords.reduce((sum, r) => sum + r.emptyQuantity, 0);
-    const totalFull = tripLoadRecords.reduce((sum, r) => sum + r.fullQuantity, 0);
+    const totalEmpty = tripLoadRecords.reduce(
+      (sum, r) => sum + r.emptyQuantity,
+      0,
+    );
+    const totalFull = tripLoadRecords.reduce(
+      (sum, r) => sum + r.fullQuantity,
+      0,
+    );
     return { totalEmpty, totalFull };
   }, [tripLoadRecords]);
 
   const onSubmit = async (data: TripFormData) => {
+    const hasTwoWay = data.tripLoadRecords.some(
+      (r) => r.trip_type === "two_way",
+    );
+
+    if (hasTwoWay && totalFull !== totalEmpty) {
+      toast.error(
+        "For two-way trips, Total Full quantity must equal Total Empty quantity.",
+      );
+      return;
+    }
+
     // Final validation before submit
     if (!isFullyAllocated) {
       toast.error("Please allocate all quantities before submitting.");
@@ -1658,7 +1690,8 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
     }
   };
 
-  const isLoading = isUnloadData || isWarehouseLoading || isProductLoading || isUserLoading;
+  const isLoading =
+    isUnloadData || isWarehouseLoading || isProductLoading || isUserLoading;
 
   if (isLoading) {
     return <Skeleton className="h-screen w-full" />;
@@ -1670,7 +1703,9 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
         <div className="max-w-4xl mx-auto">
           <Card>
             <CardContent className="pt-6 text-center">
-              <p className="text-muted-foreground mb-4">Unload items not found</p>
+              <p className="text-muted-foreground mb-4">
+                Unload items not found
+              </p>
               <Link href="/user/purchase">
                 <Button>Go Back</Button>
               </Link>
@@ -1702,14 +1737,23 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                 name="date"
                 control={control}
                 render={({ field }) => (
-                  <DatePicker date={field.value} onDateChange={field.onChange} />
+                  <DatePicker
+                    date={field.value}
+                    onDateChange={field.onChange}
+                  />
                 )}
               />
             </div>
 
             <div className="flex-1">
-              <Label className="text-sm font-medium mb-1 block">Origin Warehouse</Label>
-              <Input value={currentRecord.warehouse_name || ""} disabled className="bg-muted" />
+              <Label className="text-sm font-medium mb-1 block">
+                Origin Warehouse
+              </Label>
+              <Input
+                value={currentRecord.warehouse_name || ""}
+                disabled
+                className="bg-muted"
+              />
             </div>
           </div>
 
@@ -1727,14 +1771,22 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
               />
             </div>
             <div className="flex-1">
-              <Label htmlFor="cylinders" className="text-sm font-medium mb-1 block">
+              <Label
+                htmlFor="cylinders"
+                className="text-sm font-medium mb-1 block"
+              >
                 Total Full Quantity (From SAP)
               </Label>
               <Controller
                 name="qty"
                 control={control}
                 render={({ field }) => (
-                  <Input id="cylinders" {...field} disabled className="bg-muted" />
+                  <Input
+                    id="cylinders"
+                    {...field}
+                    disabled
+                    className="bg-muted"
+                  />
                 )}
               />
             </div>
@@ -1762,7 +1814,9 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
             {currentRecord.line_items?.map((lineItem: any, ind) => {
-              const balance = lineItemBalances.get(lineItem.plant_load_line_item_id);
+              const balance = lineItemBalances.get(
+                lineItem.plant_load_line_item_id,
+              );
               const remaining = balance?.remaining ?? 0;
               const total = balance?.total ?? 0;
               const isFullyAllocatedItem = remaining === 0;
@@ -1780,7 +1834,9 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                   <div className="space-y-2">
                     <div>
                       <p className="text-xs text-muted-foreground">Product</p>
-                      <p className="font-medium text-sm truncate">{lineItem.product_name}</p>
+                      <p className="font-medium text-sm truncate">
+                        {lineItem.product_name}
+                      </p>
                       <div className="flex items-center justify-between mt-1">
                         <p className="text-sm">Total: {total}</p>
                         <p
@@ -1788,8 +1844,8 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                             remaining === 0
                               ? "text-green-600"
                               : remaining < total
-                              ? "text-orange-600"
-                              : "text-blue-600"
+                                ? "text-orange-600"
+                                : "text-blue-600"
                           }`}
                         >
                           Remaining: {remaining}
@@ -1804,7 +1860,9 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                             : "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-100"
                         }`}
                       >
-                        {lineItem.trip_type === "two_way" ? "Two Way" : "One Way"}
+                        {lineItem.trip_type === "two_way"
+                          ? "Two Way"
+                          : "One Way"}
                       </div>
                       {lineItem.return_qty > 0 && (
                         <p className="text-xs text-muted-foreground">
@@ -1812,7 +1870,9 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                         </p>
                       )}
                       {isFullyAllocatedItem && (
-                        <span className="text-xs text-green-600 font-medium">✓ Complete</span>
+                        <span className="text-xs text-green-600 font-medium">
+                          ✓ Complete
+                        </span>
                       )}
                     </div>
                   </div>
@@ -1833,24 +1893,45 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                   <span className="block mt-2 text-sm font-medium text-orange-600">
                     Remaining to allocate: {currentRemainingBalance}
                   </span>
+                  {selectedLineItem?.trip_type === "two_way" && (
+                    <span className="block mt-1 text-sm font-medium text-blue-600">
+                      ⚠️ Two-way trip: Empty quantity must equal total plant
+                      load ({selectedLineItem.qty}). Fill either Full OR Empty,
+                      not both.
+                    </span>
+                  )}
+                  {selectedLineItem?.trip_type === "oneway" && (
+                    <span className="block mt-1 text-sm font-medium text-green-600">
+                      ℹ️ One-way trip: Fill either Full OR Empty quantity, not
+                      both.
+                    </span>
+                  )}
                 </DialogDescription>
               </DialogHeader>
 
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="load-vehicle">Destination Vehicle/Warehouse</Label>
+                  <Label htmlFor="load-vehicle">
+                    Destination Vehicle/Warehouse
+                  </Label>
                   <Controller
                     name="to_warehouse_id"
                     control={dialogControl}
                     rules={{ required: "Please select a destination" }}
                     render={({ field }) => (
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
                         <SelectTrigger id="load-vehicle">
                           <SelectValue placeholder="Select vehicle/warehouse..." />
                         </SelectTrigger>
                         <SelectContent>
                           {warehouses?.map((warehouse) => (
-                            <SelectItem key={warehouse.id} value={warehouse.id as string}>
+                            <SelectItem
+                              key={warehouse.id}
+                              value={warehouse.id as string}
+                            >
                               {warehouse.name}
                             </SelectItem>
                           ))}
@@ -1867,21 +1948,42 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="grid gap-2">
-                    <Label htmlFor="load-full">
-                      Full Quantity <span className="text-red-500">*</span>
-                    </Label>
+                    <Label htmlFor="load-full">Full Quantity</Label>
                     <Controller
                       name="fullQuantity"
                       control={dialogControl}
+                      // rules={{
+                      //   validate: {
+                      //     nonNegative: (value) => {
+                      //       const num = Number.parseInt(value) || 0;
+                      //       return num >= 0 || "Cannot be negative";
+                      //     },
+                      //     notExceed: (value) => {
+                      //       const num = Number.parseInt(value) || 0;
+                      //       return (
+                      //         num <= currentRemainingBalance ||
+                      //         `Cannot exceed ${currentRemainingBalance}`
+                      //       );
+                      //     },
+                      //     onlyOneField: (value) => {
+                      //       const fullNum = Number.parseInt(value) || 0;
+                      //       const emptyNum =
+                      //         Number.parseInt(dialogEmptyQuantity) || 0;
+                      //       if (fullNum > 0 && emptyNum > 0) {
+                      //         return "Fill either Full or Empty, not both";
+                      //       }
+                      //       return true;
+                      //     },
+                      //   },
+                      // }}
                       rules={{
-                        required: "Required",
                         validate: {
-                          positive: (value) => {
-                            const num = Number.parseInt(value);
-                            return num >= 0 || "Must be positive";
+                          nonNegative: (value) => {
+                            const num = Number(value || 0);
+                            return num >= 0 || "Cannot be negative";
                           },
                           notExceed: (value) => {
-                            const num = Number.parseInt(value) || 0;
+                            const num = Number(value || 0);
                             return (
                               num <= currentRemainingBalance ||
                               `Cannot exceed ${currentRemainingBalance}`
@@ -1894,7 +1996,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                           id="load-full"
                           type="number"
                           placeholder="0"
-                          min="1"
+                          min="0"
                           max={currentRemainingBalance}
                           {...field}
                         />
@@ -1911,10 +2013,36 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                     <Controller
                       name="emptyQuantity"
                       control={dialogControl}
+                      // rules={{
+                      //   validate: {
+                      //     nonNegative: (value) => {
+                      //       const num = Number.parseInt(value) || 0;
+                      //       return num >= 0 || "Cannot be negative";
+                      //     },
+                      //     matchTotalForTwoWay: (value) => {
+                      //       if (selectedLineItem?.trip_type === "two_way") {
+                      //         const emptyNum = Number.parseInt(value) || 0;
+                      //         const totalPlantLoadQty = selectedLineItem.qty;
+                      //         if (emptyNum > 0 && emptyNum !== totalPlantLoadQty) {
+                      //           return `Must equal total plant load (${totalPlantLoadQty}) for two-way trips`;
+                      //         }
+                      //       }
+                      //       return true;
+                      //     },
+                      //     onlyOneField: (value) => {
+                      //       const fullNum = Number.parseInt(dialogFullQuantity) || 0;
+                      //       const emptyNum = Number.parseInt(value) || 0;
+                      //       if (fullNum > 0 && emptyNum > 0) {
+                      //         return "Fill either Full or Empty, not both";
+                      //       }
+                      //       return true;
+                      //     },
+                      //   },
+                      // }}
                       rules={{
                         validate: {
                           nonNegative: (value) => {
-                            const num = Number.parseInt(value) || 0;
+                            const num = Number(value || 0);
                             return num >= 0 || "Cannot be negative";
                           },
                         },
@@ -1950,7 +2078,9 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                       control={dialogControl}
                       rules={{
                         validate: (value) => {
-                          const emptyQty = Number.parseInt(dialogEmptyQuantity || "0");
+                          const emptyQty = Number.parseInt(
+                            dialogEmptyQuantity || "0",
+                          );
                           if (emptyQty > 0 && !value) {
                             return "Return warehouse required for empty loads";
                           }
@@ -1971,7 +2101,10 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                           </SelectTrigger>
                           <SelectContent>
                             {warehouses?.map((warehouse) => (
-                              <SelectItem key={warehouse.id} value={warehouse.id as string}>
+                              <SelectItem
+                                key={warehouse.id}
+                                value={warehouse.id as string}
+                              >
                                 {warehouse.name}
                               </SelectItem>
                             ))}
@@ -2010,7 +2143,10 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                 >
                   Cancel
                 </Button>
-                <Button type="button" onClick={handleDialogSubmit(onDialogSubmit)}>
+                <Button
+                  type="button"
+                  onClick={handleDialogSubmit(onDialogSubmit)}
+                >
                   Add Load
                 </Button>
               </DialogFooter>
@@ -2023,7 +2159,10 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                 <h3 className="text-sm font-semibold mb-3">Added Loads</h3>
                 <div className="overflow-x-auto flex gap-2 snap-x mb-4 pb-2">
                   {tripLoadRecords.map((record) => (
-                    <Card key={record.id} className="flex-shrink-0 min-w-[220px] p-3 relative">
+                    <Card
+                      key={record.id}
+                      className="flex-shrink-0 min-w-[220px] p-3 relative"
+                    >
                       <button
                         type="button"
                         onClick={() => handleDeleteTripLoad(record.id)}
@@ -2034,7 +2173,9 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                       </button>
                       <div className="space-y-1.5">
                         <div>
-                          <p className="text-xs text-muted-foreground">Destination</p>
+                          <p className="text-xs text-muted-foreground">
+                            Destination
+                          </p>
                           <p className="font-medium text-xs">
                             {getWarehouseName(record.to_warehouse_id)}
                           </p>
@@ -2042,7 +2183,9 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
 
                         {record.return_warehouse_id && (
                           <div>
-                            <p className="text-xs text-muted-foreground">Return Warehouse</p>
+                            <p className="text-xs text-muted-foreground">
+                              Return Warehouse
+                            </p>
                             <p className="font-medium text-xs text-blue-500">
                               {getWarehouseName(record.return_warehouse_id)}
                             </p>
@@ -2052,7 +2195,9 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                         <div className="flex gap-2 text-xs pt-1">
                           {record.fullQuantity > 0 && (
                             <div className="flex-1 bg-green-100 dark:bg-green-900 rounded px-2 py-1">
-                              <p className="text-muted-foreground text-xs">Full</p>
+                              <p className="text-muted-foreground text-xs">
+                                Full
+                              </p>
                               <p className="font-semibold text-green-700 dark:text-green-100">
                                 {record.fullQuantity}
                               </p>
@@ -2060,7 +2205,9 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                           )}
                           {record.emptyQuantity > 0 && (
                             <div className="flex-1 bg-blue-100 dark:bg-blue-900 rounded px-2 py-1">
-                              <p className="text-muted-foreground text-xs">Empty</p>
+                              <p className="text-muted-foreground text-xs">
+                                Empty
+                              </p>
                               <p className="font-semibold text-blue-700 dark:text-blue-100">
                                 {record.emptyQuantity}
                               </p>
@@ -2076,11 +2223,15 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
               <div className="flex gap-6 text-sm bg-muted/30 rounded p-3">
                 <div>
                   <p className="text-muted-foreground">Total Full Loaded:</p>
-                  <p className="font-semibold text-lg text-green-600">{totalFull}</p>
+                  <p className="font-semibold text-lg text-green-600">
+                    {totalFull}
+                  </p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Total Empty Returned:</p>
-                  <p className="font-semibold text-lg text-blue-600">{totalEmpty}</p>
+                  <p className="font-semibold text-lg text-blue-600">
+                    {totalEmpty}
+                  </p>
                 </div>
               </div>
             </>
@@ -2096,7 +2247,10 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
           <h2 className="text-lg font-semibold mb-4">👷 Helpers</h2>
 
           <div className="mb-4">
-            <Label htmlFor="helpers-select" className="text-sm font-medium mb-2 block">
+            <Label
+              htmlFor="helpers-select"
+              className="text-sm font-medium mb-2 block"
+            >
               Select Helper
             </Label>
             <Select onValueChange={handleAddHelper}>
@@ -2136,7 +2290,9 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground italic">No helpers added yet.</p>
+            <p className="text-sm text-muted-foreground italic">
+              No helpers added yet.
+            </p>
           )}
         </Card>
 
@@ -2150,13 +2306,14 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
           {isSubmit
             ? "Processing..."
             : !isFullyAllocated
-            ? "Complete All Allocations to Proceed"
-            : "Proceed"}
+              ? "Complete All Allocations to Proceed"
+              : "Proceed"}
         </Button>
 
         {!isFullyAllocated && tripLoadRecords.length > 0 && (
           <p className="text-center text-sm text-orange-600">
-            Please ensure all product quantities are fully allocated before submitting
+            Please ensure all product quantities are fully allocated before
+            submitting
           </p>
         )}
       </form>
