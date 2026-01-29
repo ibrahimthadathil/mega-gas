@@ -179,13 +179,21 @@ export default function Home() {
     getWarehouse,
   );
 
-  const { data: payload, isLoading: payloadLoading } = UseRQ<any>(
+  const {
+    data: payload,
+    isLoading: payloadLoading,
+    refetch: reloadData,
+  } = UseRQ<any>(
     ["payload", currentVehicle],
     () => getVehiclePayload(currentVehicle),
     { enabled: !!currentVehicle },
   );
 
-  const { data: editReport, isLoading: editLoading } = UseRQ<any>(
+  const {
+    data: editReport,
+    isLoading: editLoading,
+    refetch: reloadEdit,
+  } = UseRQ<any>(
     ["delivery-report", reportId],
     async () => {
       if (!reportId) {
@@ -549,7 +557,6 @@ export default function Home() {
                 />
                 <ErrorMessage message={errors.vehicleId?.message} />
               </div>
-
               {!currentVehicle && !payload ? (
                 <div className="self-center">Select your vehicle</div>
               ) : payloadLoading || editLoading ? (
@@ -566,8 +573,8 @@ export default function Home() {
                         control={control}
                         render={({ field }) => (
                           <DatePicker
-                            date={field.value}
-                            onDateChange={field.onChange}
+                          date={field.value}
+                          onDateChange={field.onChange}
                           />
                         )}
                       />
@@ -586,10 +593,11 @@ export default function Home() {
                           />
                           <ErrorMessage
                             message={errors.deliveryBoys?.message}
-                          />
+                            />
                         </>
                       )}
                     />
+                      <Button type="button" className="m-1" onClick={() => reloadData()}>Reset</Button>
 
                     <OldStockSection
                       loading={payloadLoading}
@@ -657,7 +665,11 @@ export default function Home() {
                     )}
 
                     <TransactionsPage
-                      slipDate={selectedDate ? selectedDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
+                      slipDate={
+                        selectedDate
+                          ? selectedDate.toISOString().split("T")[0]
+                          : new Date().toISOString().split("T")[0]
+                      }
                       isSales={true}
                       onSalesSubmit={handleSalesTransaction}
                     />
