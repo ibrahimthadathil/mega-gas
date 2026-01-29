@@ -124,7 +124,12 @@ const transformEditDataToForm = (
       "amount received": txn.amount_received || 0,
       remark: txn.remark || "Transaction",
     })) || [];
-  const expenses: Expense[] = editData.expenses || [];
+  // const expenses: Expense[] = editData.expenses || [];
+  const expenses: Expense[] =
+    editData.expenses?.map((exp: any) => ({
+      ...exp,
+      description: exp.description ?? "", // 🔥 FIX
+    })) || [];
 
   return {
     date: editData.sales_slip?.date
@@ -618,13 +623,24 @@ export default function Home() {
                     {/* <ExpensesSection
                       expenses={payload?.expenses as Expense[]}
                     /> */}
-                    <ExpensesSection
+                    {/* <ExpensesSection
                       expenses={
                         (isEditMode
                           ? formExpenses
                           : payload?.expenses) as Expense[]
                       }
+                    /> */}
+                    <Controller
+                      name="expenses"
+                      control={control}
+                      render={({ field }) => (
+                        <ExpensesSection
+                          expenses={field.value as Expense[]}
+                          onChange={field.onChange}
+                        />
+                      )}
                     />
+
                     <TransactionsPage
                       isSales={true}
                       onSalesSubmit={handleSalesTransaction}

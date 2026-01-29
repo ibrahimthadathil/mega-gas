@@ -7,6 +7,8 @@ import { Expense } from "@/types/types";
 
 interface ExpensesSectionProps {
   expenses: Expense[];
+  onChange?: (expenses: Expense[]) => void;
+
 }
 
 export default function ExpensesSection({
