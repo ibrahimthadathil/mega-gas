@@ -360,17 +360,15 @@ export default function Home() {
 
   const onSubmit = async (data: DeliveryReportFormData) => {
     // Additional validation with calculations
-    if (Math.abs(cashMismatch) > 10) {
+    if (Math.abs(cashMismatch) !== 0) {
       toast.error(
-        `Cash mismatch is ₹${cashMismatch.toFixed(
-          2,
-        )}. Maximum allowed difference is ±₹10`,
+        `Cash mismatch `,
       );
       return;
     }
 
     const difference = Math.abs(actualCashCounted - expectedCashInHand);
-    if (difference > 10) {
+    if (difference !== 0) {
       toast.error(
         `Difference between counted cash (₹${actualCashCounted.toFixed(
           2,
@@ -788,7 +786,7 @@ export default function Home() {
                   )}
                 />
 
-                {Math.abs(cashMismatch) > 10 && (
+                {/* {Math.abs(cashMismatch) > 10 && (
                   <div className="p-4 border border-red-500 bg-red-50 rounded-md">
                     <p className="text-sm text-red-600 font-medium">
                       ⚠️ Cash Mismatch Alert
@@ -802,7 +800,7 @@ export default function Home() {
                       before submitting.
                     </p>
                   </div>
-                )}
+                )} */}
 
                 <div className="space-y-2">
                   <Label htmlFor="chestName" className="text-md font-medium">
