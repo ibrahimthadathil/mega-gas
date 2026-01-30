@@ -39,7 +39,7 @@ import { get_userByRole } from "@/services/client_api-Service/user/user_api";
 import { useSelector } from "react-redux";
 import { Rootstate } from "@/redux/store";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { getLoadslipByLoad, unloadSlip } from "@/services/client_api-Service/user/unload/unload_api";
+import { getLoadslipByLoad, unloadSlip } from "@/services/client_api-Service/user/stock/unload_slip_transfer_api";
 
 // --- INTERFACES ---
 interface TripLoadRecord {
@@ -624,7 +624,7 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
                           placeholder="0"
                           min="1"
                           max={currentRemainingBalance}
-                          {...field}
+                          {...field||0}
                         />
                       )}
                     />
