@@ -15,6 +15,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useState } from "react";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import { Search } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { UseRQ } from "@/hooks/useReactQuery";
 import { getAllAccountsParty } from "@/services/client_api-Service/user/accounts/accounts_api";
@@ -53,6 +60,7 @@ type Transaction = {
 type TransactionFormProps = {
   onEdit?: (transaction: Transaction) => void;
   onSubmit: (transaction: Transaction) => void;
+  slipDate?: string;
   transactionType: "received" | "paid";
   isSales?: boolean;
   initialData?: ApiTransaction;
@@ -62,7 +70,7 @@ type TransactionFormProps = {
 // Create validation schema
 const createTransactionSchema = (
   transactionType: "received" | "paid",
-  isSales: boolean
+  isSales: boolean,
 ) => {
   return z
     .object({
@@ -124,7 +132,7 @@ const createTransactionSchema = (
           transactionType === "received" ? "received" : "paid"
         } amount`,
         path: ["cash_chest"],
-      }
+      },
     );
 };
 
@@ -134,26 +142,26 @@ export function TransactionForm({
   isSales = false,
   initialData,
   transactionId,
+  slipDate,
   onEdit,
 }: TransactionFormProps) {
   const { data: accountName, isLoading } = UseRQ<Accounts[]>(
     "accounts",
-    getAllAccountsParty
+    getAllAccountsParty,
   );
 
   const transformInitialData = (data?: ApiTransaction): Transaction => {
     if (!data) {
       return {
         line_Item: {
-          date: new Date().toISOString().split("T")[0],
+          date: slipDate ?? new Date().toISOString().split("T")[0],
           account_name: "",
           account_id: "",
           amount_received: 0,
           amount_paid: 0,
-          source_form: "Transaction "  + transactionType,
+          source_form: "Transaction " + transactionType,
           source_form_reference_id: null,
           remarks: "",
-          
         },
         cash_chest: {
           note_500: 0,
@@ -164,7 +172,6 @@ export function TransactionForm({
           note_10: 0,
           coin_5: 0,
           source_reference_type: "payments-receipts",
-          
         },
       };
     }
@@ -192,7 +199,6 @@ export function TransactionForm({
         note_10: data.note_10 || 0,
         coin_5: data.coin_5 || 0,
         source_reference_type: "payments-receipts",
-
       },
     };
   };
@@ -217,7 +223,12 @@ export function TransactionForm({
     (transactionType === "received"
       ? watchedFields.line_Item.amount_received > 0
       : watchedFields.line_Item.amount_paid > 0);
-
+// 🔥 NEW: Update date when slipDate prop changes
+// useEffect(() => {
+//   if (slipDate && !initialData) {
+//     setValue("line_Item.date", slipDate);
+//   }
+// }, [slipDate, setValue, initialData]);
   useEffect(() => {
     if (initialData) {
       reset(transformInitialData(initialData));
@@ -271,7 +282,7 @@ export function TransactionForm({
                 name="line_Item.date"
                 control={control}
                 render={({ field }) => (
-                  <Input id="date" type="date" {...field}  readOnly={isSales}/>
+                  <Input id="date" type="date" {...field} readOnly={isSales} />
                 )}
               />
               {errors.line_Item?.date && (
@@ -281,7 +292,7 @@ export function TransactionForm({
               )}
             </div>
 
-            <div className="grid gap-2">
+            {/* <div className="grid gap-2">
               <Label htmlFor="account_name">Account Name</Label>
               <Controller
                 name="line_Item.account_id"
@@ -307,6 +318,90 @@ export function TransactionForm({
                     </SelectContent>
                   </Select>
                 )}
+              />
+              {errors.line_Item?.account_id && (
+                <p className="text-sm text-red-500">
+                  {errors.line_Item.account_id.message}
+                </p>
+              )}
+            </div> */}
+            <div className="grid gap-2">
+              <Label htmlFor="account_name">Account Name</Label>
+              <Controller
+                name="line_Item.account_id"
+                control={control}
+                render={({ field }) => {
+                  const [searchQuery, setSearchQuery] = useState("");
+                  const [isOpen, setIsOpen] = useState(false);
+
+                  const filteredAccounts =
+                    accountName?.filter((account) =>
+                      account.account_name
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase()),
+                    ) || [];
+
+                  const selectedAccount = accountName?.find(
+                    (acc) => acc.id === field.value,
+                  );
+
+                  return (
+                    <div className="relative">
+                      <InputGroup>
+                        <InputGroupAddon>
+                          <Search className="h-4 w-4" />
+                        </InputGroupAddon>
+                        <InputGroupInput
+                          id="account_name"
+                          placeholder="Search account..."
+                          value={
+                            searchQuery || selectedAccount?.account_name || ""
+                          }
+                          onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                            setIsOpen(true);
+                          }}
+                          onFocus={() => setIsOpen(true)}
+                        />
+                        {filteredAccounts.length > 0 && (
+                          <InputGroupAddon align="inline-end">
+                            {filteredAccounts.length} results
+                          </InputGroupAddon>
+                        )}
+                      </InputGroup>
+
+                      {isOpen && searchQuery && (
+                        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md">
+                          <div className="max-h-60 overflow-auto p-1">
+                            {isLoading ? (
+                              <div className="px-2 py-1.5 text-sm">
+                                Loading...
+                              </div>
+                            ) : filteredAccounts.length === 0 ? (
+                              <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                                No account found
+                              </div>
+                            ) : (
+                              filteredAccounts.map((account) => (
+                                <div
+                                  key={account.id}
+                                  className="cursor-pointer rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground"
+                                  onClick={() => {
+                                    handleAccountSelect(account.id as string);
+                                    setSearchQuery("");
+                                    setIsOpen(false);
+                                  }}
+                                >
+                                  {account.account_name}
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                }}
               />
               {errors.line_Item?.account_id && (
                 <p className="text-sm text-red-500">
@@ -610,8 +705,8 @@ export function TransactionForm({
           {isEditMode
             ? "Update Transaction"
             : transactionType === "received"
-            ? "Add Cash Received"
-            : "Add Cash Paid"}
+              ? "Add Cash Received"
+              : "Add Cash Paid"}
         </Button>
       </div>
     </div>

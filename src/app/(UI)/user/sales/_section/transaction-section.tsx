@@ -258,7 +258,8 @@ type Transaction = {
 
 type TransactionsPageProps = {
   isSales?: boolean
-  onSalesSubmit?: (transaction: any) => void
+  onSalesSubmit?: (transaction: any) => void;
+  slipDate?:string
 }
 
 /* ================= COMPONENT ================= */
@@ -266,6 +267,7 @@ type TransactionsPageProps = {
 export default function TransactionsPage({
   isSales = false,
   onSalesSubmit,
+  slipDate,
 }: TransactionsPageProps) {
   const [openReceived, setOpenReceived] = useState(false)
   const [openPaid, setOpenPaid] = useState(false)
@@ -336,6 +338,7 @@ export default function TransactionsPage({
                   </DialogTitle>
                 </DialogHeader>
                 <TransactionForm
+                slipDate={slipDate}
                   isSales={isSales}
                   transactionType="received"
                   onSubmit={(transaction) =>
@@ -363,6 +366,7 @@ export default function TransactionsPage({
                   </DialogTitle>
                 </DialogHeader>
                 <TransactionForm
+                slipDate={slipDate}
                   isSales={isSales}
                   transactionType="paid"
                   onSubmit={(transaction) =>

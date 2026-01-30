@@ -118,11 +118,9 @@ export const validateDeliveryReportWithCalculations = (
   const errors: string[] = [];
 
   // Check cash mismatch (requirement 7)
-  if (Math.abs(calculations.cashMismatch) > 10) {
+  if (calculations.cashMismatch !== 0) {
     errors.push(
-      `Cash mismatch is ₹${calculations.cashMismatch.toFixed(
-        2,
-      )}. Maximum allowed difference is ±₹10`,
+      `Cash mismatch is ₹${calculations.cashMismatch.toFixed(2)}. Cash must tally exactly.`,
     );
   }
 
@@ -130,13 +128,13 @@ export const validateDeliveryReportWithCalculations = (
   const difference = Math.abs(
     calculations.actualCashCounted - calculations.expectedCashInHand,
   );
-  if (difference > 10) {
+  if (difference !== 0) {
     errors.push(
       `Difference between counted cash (₹${calculations.actualCashCounted.toFixed(
         2,
       )}) and expected cash (₹${calculations.expectedCashInHand.toFixed(
         2,
-      )}) exceeds ±₹10`,
+      )}) must be 0.`,
     );
   }
 

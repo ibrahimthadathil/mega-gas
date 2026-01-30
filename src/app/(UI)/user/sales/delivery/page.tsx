@@ -124,7 +124,12 @@ const transformEditDataToForm = (
       "amount received": txn.amount_received || 0,
       remark: txn.remark || "Transaction",
     })) || [];
-  const expenses: Expense[] = editData.expenses || [];
+  // const expenses: Expense[] = editData.expenses || [];
+  const expenses: Expense[] =
+    editData.expenses?.map((exp: any) => ({
+      ...exp,
+      description: exp.description ?? "", // 🔥 FIX
+    })) || [];
 
   return {
     date: editData.sales_slip?.date
@@ -174,13 +179,21 @@ export default function Home() {
     getWarehouse,
   );
 
-  const { data: payload, isLoading: payloadLoading } = UseRQ<any>(
+  const {
+    data: payload,
+    isLoading: payloadLoading,
+    refetch: reloadData,
+  } = UseRQ<any>(
     ["payload", currentVehicle],
     () => getVehiclePayload(currentVehicle),
     { enabled: !!currentVehicle },
   );
 
-  const { data: editReport, isLoading: editLoading } = UseRQ<any>(
+  const {
+    data: editReport,
+    isLoading: editLoading,
+    refetch: reloadEdit,
+  } = UseRQ<any>(
     ["delivery-report", reportId],
     async () => {
       if (!reportId) {
@@ -190,7 +203,6 @@ export default function Home() {
     },
     { enabled: !!isEditMode },
   );
-  console.log("001", editReport);
 
   const {
     control,
@@ -231,6 +243,8 @@ export default function Home() {
   const onlinePayments = watch("onlinePayments");
   const currencyDenominations = watch("currencyDenominations");
   const formExpenses = watch("expenses");
+  const selectedDate = watch("date");
+
   // // Populate form with edit data
 
   // useEffect(() => {
@@ -356,17 +370,13 @@ export default function Home() {
 
   const onSubmit = async (data: DeliveryReportFormData) => {
     // Additional validation with calculations
-    if (Math.abs(cashMismatch) > 10) {
-      toast.error(
-        `Cash mismatch is ₹${cashMismatch.toFixed(
-          2,
-        )}. Maximum allowed difference is ±₹10`,
-      );
+    if (Math.abs(cashMismatch) !== 0) {
+      toast.error(`Cash mismatch `);
       return;
     }
 
     const difference = Math.abs(actualCashCounted - expectedCashInHand);
-    if (difference > 10) {
+    if (difference !== 0) {
       toast.error(
         `Difference between counted cash (₹${actualCashCounted.toFixed(
           2,
@@ -479,7 +489,8 @@ export default function Home() {
         route.push("/user/sales");
       } else {
         response = await updateSalesSlip(report, report.id as string);
-        route.push("/admin/sales-report");
+        // route.push("/admin/sales-report");
+        route.back();
       }
       if (response.success) {
         toast.success(response.message);
@@ -546,7 +557,6 @@ export default function Home() {
                 />
                 <ErrorMessage message={errors.vehicleId?.message} />
               </div>
-
               {!currentVehicle && !payload ? (
                 <div className="self-center">Select your vehicle</div>
               ) : payloadLoading || editLoading ? (
@@ -563,8 +573,8 @@ export default function Home() {
                         control={control}
                         render={({ field }) => (
                           <DatePicker
-                            date={field.value}
-                            onDateChange={field.onChange}
+                          date={field.value}
+                          onDateChange={field.onChange}
                           />
                         )}
                       />
@@ -583,10 +593,11 @@ export default function Home() {
                           />
                           <ErrorMessage
                             message={errors.deliveryBoys?.message}
-                          />
+                            />
                         </>
                       )}
                     />
+                      <Button type="button" className="m-1" onClick={() => reloadData()}>Reset</Button>
 
                     <OldStockSection
                       loading={payloadLoading}
@@ -618,14 +629,47 @@ export default function Home() {
                     {/* <ExpensesSection
                       expenses={payload?.expenses as Expense[]}
                     /> */}
-                    <ExpensesSection
+                    {/* <ExpensesSection
                       expenses={
                         (isEditMode
                           ? formExpenses
                           : payload?.expenses) as Expense[]
                       }
-                    />
+                    /> */}
+                    {/* <Controller
+                      name="expenses"
+                      control={control}
+                      render={({ field }) => (
+                        <ExpensesSection
+                          expenses={field.value as Expense[]}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    /> */}
+
+                    {isEditMode ? (
+                      <Controller
+                        name="expenses"
+                        control={control}
+                        render={({ field }) => (
+                          <ExpensesSection
+                            expenses={field.value as Expense[]}
+                            onChange={field.onChange}
+                          />
+                        )}
+                      />
+                    ) : (
+                      <ExpensesSection
+                        expenses={payload?.expenses as Expense[]}
+                      />
+                    )}
+
                     <TransactionsPage
+                      slipDate={
+                        selectedDate
+                          ? selectedDate.toISOString().split("T")[0]
+                          : new Date().toISOString().split("T")[0]
+                      }
                       isSales={true}
                       onSalesSubmit={handleSalesTransaction}
                     />
@@ -771,7 +815,7 @@ export default function Home() {
                   )}
                 />
 
-                {Math.abs(cashMismatch) > 10 && (
+                {/* {Math.abs(cashMismatch) > 10 && (
                   <div className="p-4 border border-red-500 bg-red-50 rounded-md">
                     <p className="text-sm text-red-600 font-medium">
                       ⚠️ Cash Mismatch Alert
@@ -785,7 +829,7 @@ export default function Home() {
                       before submitting.
                     </p>
                   </div>
-                )}
+                )} */}
 
                 <div className="space-y-2">
                   <Label htmlFor="chestName" className="text-md font-medium">
