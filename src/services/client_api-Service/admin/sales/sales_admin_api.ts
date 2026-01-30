@@ -39,6 +39,8 @@ export const getAllDeliveryReport = async (filters?: FilterParams) => {
         startDate: filters?.startDate,
         endDate: filters?.endDate,
         chest: filters?.chest,
+        page:filters?.page||1,
+        limit:filters?.limit||16
       },
     });
     return data;

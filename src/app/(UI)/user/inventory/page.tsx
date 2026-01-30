@@ -60,8 +60,6 @@ const page = () => {
       enabled: true,
     },
   );
-  console.log(inventoryLevel);
-
   const totalPages = useMemo(() => {
     const totalCount = inventoryLevel?.count ?? 0;
     const limit = filters.limit ?? 10;

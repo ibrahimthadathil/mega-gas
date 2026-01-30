@@ -6,7 +6,6 @@ import { InventoryFilters } from "@/types/inventory";
 export const GET = async (req: NextRequest) => {
   try {
     const searchParams = req.nextUrl.searchParams;
-
     const filters: InventoryFilters = {
       warehouseNames: searchParams.get("warehouseNames")?.split(","),
       productNames: searchParams.get("productNames")?.split(","),
