@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/table";
 import React, { useMemo, useState } from "react";
 import Pagination from "@/components/ui/pagination";
+type PaginationMode = "client" | "server";
+
 interface IColumns<T> {
   key?: string;
   header: string;
@@ -18,8 +20,12 @@ interface TableProps<T> {
   data: T[];
   columns: IColumns<T>[];
   itemsPerPage?: number;
+  paginationMode?: PaginationMode;
   onChange?: (page: number) => void;
   rowClassName?: (item: T, index: number) => string;
+
+  currentPage?: number;
+  totalPages?: number;
 }
 export default function DataTable<T extends Record<string, any>>({
   data,
@@ -27,26 +33,59 @@ export default function DataTable<T extends Record<string, any>>({
   itemsPerPage = 5,
   onChange,
   rowClassName,
-}: TableProps<T>) {
-  const [currentPage, setCurrentpage] = useState(1);
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-  const currentData = useMemo(() => {
-    const firstPage = (currentPage - 1) * itemsPerPage;
-    const lastPage = firstPage + itemsPerPage;
-    return data?.slice(firstPage, lastPage);
-  }, [currentPage, data, itemsPerPage]);
+  paginationMode="client",
+  currentPage: serverPage,
+  totalPages: serverTotalPages,
 
-  const pageChange = (page: number) => {
-    setCurrentpage(page);
-    if (onChange) {
-      onChange(page);
+}: TableProps<T>) {
+  // const [currentPage, setCurrentpage] = useState(1);
+  // const totalPages = Math.ceil(data.length / itemsPerPage);
+  // const currentData = useMemo(() => {
+  //   const firstPage = (currentPage - 1) * itemsPerPage;
+  //   const lastPage = firstPage + itemsPerPage;
+  //   return data?.slice(firstPage, lastPage);
+  // }, [currentPage, data, itemsPerPage]);
+
+  // const pageChange = (page: number) => {
+  //   setCurrentpage(page);
+  //   if (onChange) {
+  //     onChange(page);
+  //   }
+  // };
+  const [clientPage, setClientPage] = useState(1);
+
+  const isServer = paginationMode === "server";
+
+  const currentPage = isServer ? serverPage ?? 1 : clientPage;
+
+  const totalPages = isServer
+    ? serverTotalPages ?? 1
+    : Math.ceil(data.length / itemsPerPage);
+
+  const currentData = useMemo(() => {
+    if (isServer) {
+      // API already paginated
+      return data;
+    }
+
+    // client-side slicing
+    const start = (clientPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return data.slice(start, end);
+  }, [isServer, data, clientPage, itemsPerPage]);
+   const pageChange = (page: number) => {
+    if (isServer) {
+      onChange?.(page);   // parent controls
+    } else {
+      setClientPage(page);
+      onChange?.(page);  // optional callback
     }
   };
   return (
     <>
       <div>
-        <Table >
-          <TableHeader className="bg-muted/50 sticky top-0 z-10">
+        <Table>
+          <TableHeader className="bg-muted/50 sticky top-0">
             <TableRow className="hover:bg-transparent">
               {columns.map((e, i) => (
                 <TableHead key={i} className="text-center">

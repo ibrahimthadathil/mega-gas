@@ -58,14 +58,27 @@ const page = () => {
     () => getDashboardData(filters),
     {
       enabled: true,
-    }
+    },
   );
-
   console.log(inventoryLevel);
+
+  const totalPages = useMemo(() => {
+    const totalCount = inventoryLevel?.count ?? 0;
+    const limit = filters.limit ?? 10;
+
+    return Math.max(1, Math.ceil(totalCount / limit));
+  }, [inventoryLevel?.count, filters.limit]);
 
   // Define columns
   const Columns = useMemo(
     () => [
+      {
+        header: "No",
+        render: (_row: TransferedInventory, ind: number) => (
+          <p>{(filters.page! - 1) * filters.limit! + ind + 1}</p>
+        ),
+      },
+
       {
         header: "Transaction Date",
         render: (row: TransferedInventory) =>
@@ -96,7 +109,7 @@ const page = () => {
         render: (row: TransferedInventory) => row.source_form_type,
       },
     ],
-    []
+    [],
   );
 
   // Handle filter application
@@ -273,7 +286,10 @@ const page = () => {
         <DataTable
           columns={Columns}
           itemsPerPage={filters.limit ?? 10}
+          paginationMode="server"
           data={inventoryLevel?.data ?? []}
+          totalPages={totalPages}
+          currentPage={filters.page ?? 1}
           onChange={handlePageChange}
         />
       )}
