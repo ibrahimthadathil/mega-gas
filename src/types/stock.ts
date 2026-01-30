@@ -32,3 +32,11 @@ export interface StockTransfer {
 
   remarks: string;
 }
+
+
+export interface TransferStockFilters {
+  startDate?: string; // ISO string
+  endDate?: string;   // ISO string
+  page?: number;
+  limit?: number;
+}

@@ -776,7 +776,7 @@ const Home = () => {
         <DataTable
           columns={columns}
           paginationMode="server"
-          itemsPerPage={16}
+          // itemsPerPage={16}
           data={report?.data ?? []}
           currentPage={filters.page}
           totalPages={totalPages}
