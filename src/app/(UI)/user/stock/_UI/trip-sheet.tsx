@@ -137,8 +137,8 @@ export default function TripSheet({ loadSlipId }: { loadSlipId: string }) {
   } = useForm<DialogFormData>({
     defaultValues: {
       to_warehouse_id: "",
-      fullQuantity: "",
-      emptyQuantity: "",
+      fullQuantity: "0",
+      emptyQuantity: "0",
       return_warehouse_id: "",
     },
   });
