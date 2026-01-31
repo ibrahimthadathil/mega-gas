@@ -13,7 +13,9 @@ export const GET = async (
     const { user, error: authError } = await getAuthUser();
     if (user?.id) {
       const { id } = await params;
-      const {result,success} = await getunloadData(id);            
+      const {result,success} = await getunloadData(id);
+      console.log(JSON.stringify(result));
+                  
       return NextResponse.json({data:result,success}, { status: STATUS.SUCCESS.code });
     } else
       return NextResponse.json(

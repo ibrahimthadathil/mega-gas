@@ -16,13 +16,13 @@ const get_All_Unload_Details = async () => {
 };
 
 const edit_unload_slip = async (payload: {
-  p_unload_slip_id: string;
+  p_plant_load_register_id: string;
   p_payload: any;
-  payload_parent: any | null;
+  p_payload_parent: any | null;
   p_user_id: string;
 }) => {
   try {
-    const { error } = await supabase.rpc("edit_unload_slip_rpc", payload);
+    const { error } = await supabase.rpc("edit_unload_slip", payload);
     if (error) throw error;
     return true;
   } catch (error) {
