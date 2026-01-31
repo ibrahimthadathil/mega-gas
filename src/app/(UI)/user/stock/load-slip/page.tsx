@@ -38,14 +38,14 @@ import { useRouter } from "next/navigation";
 const page = () => {
   const { data: unloadedRecord, isLoading } = UseRQ<PlantLoadUnloadView[]>(
     "unloadRecord",
-    getAllUnloadDetails
+    getAllUnloadDetails,
   );
   const queryClient = useQueryClient();
   const { role } = useSelector((user: Rootstate) => user.user);
-  const router = useRouter()
-  const handleDelete = async (id: string,unloaded:boolean) => {
+  const router = useRouter();
+  const handleDelete = async (id: string, unloaded: boolean) => {
     try {
-      if(!unloaded)return toast.warning('Not possible until unload')
+      if (!unloaded) return toast.warning("Not possible until unload");
       const data = await deleteUnloadSlip(id);
       if (data.success)
         queryClient.invalidateQueries({ queryKey: ["unloadRecord"] });
@@ -55,9 +55,9 @@ const page = () => {
     }
   };
 
-  const handleEdit = async(id:string)=>{
-    router.push(`/user/stock/load-slip/${id}`)
-  }
+  const handleEdit = async (id: string) => {
+    router.push(`/user/stock/load-slip/${id}?mode=edit`);
+  };
   const columns = useMemo(() => {
     return [
       {
@@ -103,7 +103,7 @@ const page = () => {
             variant="outline"
             className={cn(
               "text-white bg-red-400",
-              row?.unload_details?.length > 0 && "bg-green-800"
+              row?.unload_details?.length > 0 && "bg-green-800",
             )}
           >
             {row?.unload_details?.length > 0 ? "Unloaded" : "Not Unloaded"}
@@ -121,7 +121,10 @@ const page = () => {
                   View Details
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-scroll [&>button]:hidden" aria-describedby={undefined}>
+              <DialogContent
+                className="max-w-6xl max-h-[80vh] overflow-y-scroll [&>button]:hidden"
+                aria-describedby={undefined}
+              >
                 <DialogHeader>
                   <DialogTitle>Unload Details</DialogTitle>
                 </DialogHeader>
@@ -191,7 +194,12 @@ const page = () => {
               ]}
               style=" p-2"
               varient="ghost"
-              action={() => handleDelete(row?.plant_load_register_id,row?.unload_details?.length>=1)}
+              action={() =>
+                handleDelete(
+                  row?.plant_load_register_id,
+                  row?.unload_details?.length >= 1,
+                )
+              }
             />
           ) : (
             <>

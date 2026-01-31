@@ -29,3 +29,12 @@ export const getLoadslipByLoad = async (id:string)=>{
     }
 }
 
+export const updateUnloadSlip = async(id:string,data:any)=>{
+    try {
+        const result = await axios.put(`/api/user/unload/${id}`,data)
+        return result.data
+    } catch (error) {
+        
+    }
+}
+

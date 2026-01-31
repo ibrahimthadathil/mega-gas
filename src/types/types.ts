@@ -139,6 +139,7 @@ export interface PurchaseRegisterPayload extends PlantLoadFormData {
 
 interface LineItem {
   qty: number;
+  return_qty?:any
   trip_type: string;
   product_name: string;
 }
@@ -147,6 +148,8 @@ export interface PlantLoadRecord {
   id: string;
   sap_number: string;
   bill_date: string;
+  unload_details?:any[]
+  unloading_staff?:any[]
   unloading_date: Date ;
   total_full_qty: number;
   unloaded_qty: number;
