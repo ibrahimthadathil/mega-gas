@@ -150,7 +150,7 @@ export default function Home() {
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="max-w-[100px] truncate cursor-pointer text-left">
+            <div className="max-w-[100px] truncate cursor-pointer text-center">
               {remark}
             </div>
           </TooltipTrigger>
