@@ -337,35 +337,34 @@ const Home = () => {
   };
 
   const handleEdit = (id: string) => {
-    router.push(`/user/sales/delivery?id=${id}`);
+    // router.push(`/user/sales/delivery?id=${id}`);
+    window.open(`/user/sales/delivery?id=${id}`, "_blank");
   };
 
   const handleApplyFilters = () => {
-  setFilters((prev) => ({
-    ...prev,
-    ...tempFilters,
-    page: 1,          // reset to first page on filter change
-  }));
+    setFilters((prev) => ({
+      ...prev,
+      ...tempFilters,
+      page: 1, // reset to first page on filter change
+    }));
 
-  setShowFilters(false);
-};
+    setShowFilters(false);
+  };
 
+  const handleClearFilters = () => {
+    setTempFilters({});
 
- const handleClearFilters = () => {
-  setTempFilters({});
-
-  setFilters((prev) => ({
-    ...prev,
-    startDate: undefined,
-    endDate: undefined,
-    dayFilter: undefined,
-    status: undefined,
-    users: undefined,
-    chest: undefined,
-    page: 1,   // keep pagination valid
-  }));
-};
-
+    setFilters((prev) => ({
+      ...prev,
+      startDate: undefined,
+      endDate: undefined,
+      dayFilter: undefined,
+      status: undefined,
+      users: undefined,
+      chest: undefined,
+      page: 1, // keep pagination valid
+    }));
+  };
 
   const handleDayFilterChange = (value: string) => {
     const today = new Date();
@@ -417,7 +416,10 @@ const Home = () => {
       {
         header: "No",
         render: (_row: SalesSlipPayload, index: number) => (
-          <span className="font-medium"> {(filters.page - 1) * filters.limit + index + 1}</span>
+          <span className="font-medium">
+            {" "}
+            {(filters.page - 1) * filters.limit + index + 1}
+          </span>
         ),
       },
       {
