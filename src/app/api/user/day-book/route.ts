@@ -10,8 +10,7 @@ export const GET = async (req:NextRequest) => {
          chest : searchParams.get('chest')??undefined,
          status : searchParams.get('status')??undefined,
     }
-    const { success, data, message } = await getDayBookDetails(filter);
-    
+    const { success, data, message } = await getDayBookDetails(filter);    
     if (success)
       return NextResponse.json(
         { success, data, message },

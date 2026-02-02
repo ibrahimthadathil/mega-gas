@@ -8,6 +8,7 @@ import {
   BookAIcon,
   History,
   Cylinder,
+  Wallet,
 } from "lucide-react";
 export const navItems = [
   {
@@ -52,6 +53,17 @@ export const navItems = [
       "godown_staff",
       "office_staff",
     ],
+  },
+  {
+    title:" Day Book",
+    url:'/user/day-book',
+    icon: Wallet,
+    roles:[
+      "admin",
+      "manager",
+      "accountant",
+      "office_staff",
+    ]
   },
   {
     title: "Sales",
@@ -190,6 +202,7 @@ export const roleRouteConfig = {
     "/user/purchase",
     "/user/warehouses",
     "/user/stock",
+    '/user/day-book',
     "/user/expenses",
     "/user/accounts",
     "/user/inventory",
@@ -227,6 +240,7 @@ export const roleRouteConfig = {
     "/user/current-stock",
     "/user/accounts",
     "/user/stock",
+    '/user/day-book',
   ],
 };
 
