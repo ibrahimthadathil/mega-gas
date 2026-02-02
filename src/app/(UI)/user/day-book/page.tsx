@@ -99,6 +99,7 @@ interface DayBookRecord {
   upi_payments: UPIPayment[];
   online_payments: OnlinePayment[];
   warehouse_name: string;
+  qumilative_balance: number;
 }
 
 interface TransactionItem {
@@ -123,6 +124,7 @@ interface TransactionBlock {
   blockReceived: number;
   blockPaid: number;
   warehouse_name: string;
+  qumilative_balance: number;
 }
 
 interface FilterForm {
@@ -306,6 +308,7 @@ export default function CashBook() {
       types: types === "all" ? undefined : types,
     }),
   );
+  console.log("@@@", daybook);
 
   // ─── Extract Unique Filter Options ────────────────────────────────────
   const uniqueChests = useMemo(
@@ -431,6 +434,7 @@ export default function CashBook() {
           blockPaid,
           round_off: record.round_off,
           warehouse_name: record.warehouse_name,
+          qumilative_balance: record.qumilative_balance,
         };
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -693,6 +697,9 @@ export default function CashBook() {
                   <th className="py-4 px-6 text-xs font-semibold text-slate-600 uppercase tracking-wider text-right w-44">
                     Received
                   </th>
+                  <th className="py-4 px-6 text-xs font-semibold text-slate-600 uppercase tracking-wider text-right w-44">
+                    Balance
+                  </th>
                 </tr>
               </thead>
 
@@ -704,154 +711,176 @@ export default function CashBook() {
                     return (
                       <React.Fragment key={block.id}>
                         {block.items.map((item, idx) => (
-                          <tr
-                            key={item.id}
-                            className="group border-b last:border-b-0 hover:bg-slate-50/70"
-                          >
-                            {idx === 0 && (
-                              <>
-                                <td
-                                  rowSpan={block.items.length}
-                                  className="py-5 px-6 align-top border-r bg-white/80"
-                                >
-                                  <div className="flex flex-col">
-                                    <span className="text-sm font-medium text-slate-800">
-                                      {formatDate(block.date).split(",")[0]}
-                                    </span>
-                                    <span className="text-xs text-slate-500">
-                                      {formatDate(block.date).split(",")[1] ||
-                                        ""}
-                                    </span>
-                                  </div>
-                                </td>
-
-                                <td
-                                  rowSpan={block.items.length}
-                                  className="py-5 px-6 align-top border-r bg-white/80"
-                                >
-                                  <div className="flex flex-col gap-3">
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-xs font-mono flex gap-1.5 mb-1 bg-slate-100 px-2 py-0.5 rounded">
-                                        <Truck className="w-3 h-3" />
-                                        {block.warehouse_name}
+                          <>
+                            <tr
+                              key={item.id}
+                              className="group border-b last:border-b-0 hover:bg-slate-50/70"
+                            >
+                              {idx === 0 && (
+                                <>
+                                  <td
+                                    rowSpan={block.items.length}
+                                    className="py-5 px-6 align-top border-r bg-white/80"
+                                  >
+                                    <div className="flex flex-col">
+                                      <span className="text-sm font-medium text-slate-800">
+                                        {formatDate(block.date).split(",")[0]}
                                       </span>
-                                    </div>
-
-                                    <div className="flex items-center gap-2 text-sm">
-                                      <span className="w-2 h-2 rounded-full bg-slate-400" />
-                                      <span className="font-medium capitalize">
-                                        {block.chest}
-                                      </span>
-                                    </div>
-
-                                    <button
-                                      onClick={() => setSelectedEntry(block)}
-                                      className="flex items-center gap-2 text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded border border-indigo-100 w-fit mt-1 transition-colors"
-                                    >
-                                      <Eye className="w-3.5 h-3.5" />
-                                      Chest Status
-                                    </button>
-
-                                    {block.deliveryBoys.length > 0 && (
-                                      <div className="mt-2">
-                                        <div className="text-[10px] uppercase text-slate-500 font-bold mb-1 flex items-center gap-1.5">
-                                          <Users className="w-3 h-3" />
-                                          Delivery Boys
-                                        </div>
-                                        <div className="flex flex-wrap gap-1">
-                                          {block.deliveryBoys.map((boy) => (
-                                            <span
-                                              key={boy}
-                                              className="text-[10px] px-2 py-0.5 bg-slate-100 text-slate-700 rounded border"
-                                            >
-                                              {boy}
-                                            </span>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-
-                                    <div className="mt-4 pt-3 border-t text-xs">
-                                      <div className="flex justify-between mb-1.5">
-                                        <span className="text-slate-600">
-                                          Paid:
-                                        </span>
-                                        <span className="font-mono text-red-600 font-medium">
-                                          {formatCurrency(block.blockPaid)}
-                                        </span>
-                                      </div>
-                                      <div className="flex justify-between">
-                                        <span className="text-slate-600">
-                                          Received:
-                                        </span>
-                                        <span className="font-mono text-emerald-600 font-medium">
-                                          {formatCurrency(block.blockReceived)}
-                                        </span>
-                                      </div>
-                                      <div className="flex justify-between">
-                                        <span className="text-slate-600">
-                                          Round Off:
-                                        </span>
-                                        <span className="font-mono text-rose-500 font-medium">
-                                          {formatCurrency(block.round_off)}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </td>
-                              </>
-                            )}
-
-                            <td className="py-5 px-6">
-                              <div className="flex items-start gap-3">
-                                <div
-                                  className={`p-2 rounded-full shrink-0 mt-0.5 ${
-                                    item.category === "Expense"
-                                      ? "bg-red-50"
-                                      : item.category === "UPI" ||
-                                          item.category === "Online"
-                                        ? "bg-orange-50"
-                                        : "bg-blue-50"
-                                  }`}
-                                >
-                                  {getCategoryIcon(item.category)}
-                                </div>
-                                <div>
-                                  <div className="font-medium text-slate-800">
-                                    {item.description}
-                                  </div>
-                                  <div className="flex items-center gap-2 mt-1.5">
-                                    <span
-                                      className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase ${getCategoryBadge(item.category)}`}
-                                    >
-                                      {item.category}
-                                    </span>
-                                    {item.subText && (
                                       <span className="text-xs text-slate-500">
-                                        {item.subText}
+                                        {formatDate(block.date).split(",")[1] ||
+                                          ""}
                                       </span>
-                                    )}
+                                    </div>
+                                  </td>
+
+                                  <td
+                                    rowSpan={block.items.length}
+                                    className="py-5 px-6 align-top border-r bg-white/80"
+                                  >
+                                    <div className="flex flex-col gap-3">
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-xs font-mono flex gap-1.5 mb-1 bg-slate-100 px-2 py-0.5 rounded">
+                                          <Truck className="w-3 h-3" />
+                                          {block.warehouse_name}
+                                        </span>
+                                      </div>
+
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <span className="w-2 h-2 rounded-full bg-slate-400" />
+                                        <span className="font-medium capitalize">
+                                          {block.chest}
+                                        </span>
+                                      </div>
+
+                                      <button
+                                        onClick={() => setSelectedEntry(block)}
+                                        className="flex items-center gap-2 text-xs font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded border border-indigo-100 w-fit mt-1 transition-colors"
+                                      >
+                                        <Eye className="w-3.5 h-3.5" />
+                                        Chest Status
+                                      </button>
+
+                                      {block.deliveryBoys.length > 0 && (
+                                        <div className="mt-2">
+                                          <div className="text-[10px] uppercase text-slate-500 font-bold mb-1 flex items-center gap-1.5">
+                                            <Users className="w-3 h-3" />
+                                            Delivery Boys
+                                          </div>
+                                          <div className="flex flex-wrap gap-1">
+                                            {block.deliveryBoys.map((boy) => (
+                                              <span
+                                                key={boy}
+                                                className="text-[10px] px-2 py-0.5 bg-slate-100 text-slate-700 rounded border"
+                                              >
+                                                {boy}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      <div className="mt-4 pt-3 border-t text-xs">
+                                        <div className="flex justify-between mb-1.5">
+                                          <span className="text-slate-600">
+                                            Paid:
+                                          </span>
+                                          <span className="font-mono text-red-600 font-medium">
+                                            {formatCurrency(block.blockPaid) ||
+                                              "-"}
+                                          </span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="text-slate-600">
+                                            Received:
+                                          </span>
+                                          <span className="font-mono text-emerald-600 font-medium">
+                                            {formatCurrency(
+                                              block.blockReceived,
+                                            ) || "-"}
+                                          </span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span className="text-slate-600">
+                                            Round Off:
+                                          </span>
+                                          <span className="font-mono text-rose-500 font-medium">
+                                            {formatCurrency(block.round_off) ||
+                                              "-"}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </td>
+                                </>
+                              )}
+
+                              <td className="py-5 px-6">
+                                <div className="flex items-start gap-3">
+                                  <div
+                                    className={`p-2 rounded-full shrink-0 mt-0.5 ${
+                                      item.category === "Expense"
+                                        ? "bg-red-50"
+                                        : item.category === "UPI" ||
+                                            item.category === "Online"
+                                          ? "bg-orange-50"
+                                          : "bg-blue-50"
+                                    }`}
+                                  >
+                                    {getCategoryIcon(item.category)}
+                                  </div>
+                                  <div>
+                                    <div className="font-medium text-slate-800">
+                                      {item.description}
+                                    </div>
+                                    <div className="flex items-center gap-2 mt-1.5">
+                                      <span
+                                        className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase ${getCategoryBadge(item.category)}`}
+                                      >
+                                        {item.category}
+                                      </span>
+                                      {item.subText && (
+                                        <span className="text-xs text-slate-500">
+                                          {item.subText}
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            </td>
+                              </td>
 
-                            <td className="py-5 px-6 text-right font-mono">
-                              {item.type === "debit" && (
-                                <span className="text-red-600 font-medium">
-                                  {formatCurrency(item.amount)}
-                                </span>
-                              )}
-                            </td>
+                              <td className="py-5 px-6 text-right font-mono">
+                                {item.type === "debit" && (
+                                  <span className="text-red-600 font-medium">
+                                    {formatCurrency(item.amount)}
+                                  </span>
+                                )}
+                              </td>
 
-                            <td className="py-5 px-6 text-right font-mono">
-                              {item.type === "credit" && (
-                                <span className="text-emerald-600 font-medium">
-                                  {formatCurrency(item.amount)}
-                                </span>
-                              )}
-                            </td>
-                          </tr>
+                              <td className="py-5 px-6 text-right font-mono">
+                                {item.type === "credit" && (
+                                  <span className="text-emerald-600 font-medium">
+                                    {formatCurrency(item.amount)}
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                            {idx === block.items.length - 1 && (
+                              <tr className="bg-slate-50 border-b">
+                                {/* Empty cells to reach Balance column */}
+                                <td
+                                  colSpan={5}
+                                  className="py-3 px-6 text-right text-sm font-semibold text-slate-600"
+                                >
+                                  Cumulative Balance
+                                </td>
+
+                                {/* Balance column */}
+                                <td className="py-3 px-6 text-right font-mono font-bold text-indigo-700">
+                                  {formatCurrency(block.qumilative_balance)}
+                                </td>
+                              </tr>
+                            )}
+                          </>
                         ))}
                       </React.Fragment>
                     );
