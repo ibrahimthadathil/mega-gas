@@ -1,0 +1,63 @@
+import supabase from "@/lib/supabase/supabaseClient";
+
+// const get_Day_Book = async () => {
+//   try {
+//     const {data,error} = await supabase.from("sales_slip_merged_summary2").select('*');
+//     if(error) throw error
+//     return {success:true ,data}
+// } catch (error) {
+//     console.log((error as Error).message);
+//     throw error;
+//   }
+// };
+// export { get_Day_Book };
+
+
+interface DayBookFilters {
+  date?: string;
+  chest?: string;
+  status?: string;
+}
+
+const get_Day_Book = async (filters?: DayBookFilters) => {
+  try {
+    // Start building the query
+    let query = supabase
+      .from("sales_slip_merged_summary2")
+      .select('*');
+
+    // Apply filters if provided
+    if (filters) {
+      // Date filter - filter by transaction_date
+      if (filters.date) {
+        // Match exact date (ignoring time)
+        query = query.gte('transaction_date', `${filters.date}T00:00:00`)
+                     .lt('transaction_date', `${filters.date}T23:59:59`);
+      }
+
+      // Chest filter
+      if (filters.chest) {
+        query = query.eq('chest_name', filters.chest);
+      }
+
+      // Status filter
+      if (filters.status) {
+        query = query.eq('status', filters.status);
+      }
+    }
+
+    // Order by transaction_date descending (newest first)
+    query = query.order('transaction_date', { ascending: false });
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    
+    return { success: true, data };
+  } catch (error) {
+    console.log((error as Error).message);
+    throw error;
+  }
+};
+
+export { get_Day_Book };
