@@ -125,6 +125,7 @@ interface TransactionBlock {
   blockPaid: number;
   warehouse_name: string;
   qumilative_balance: number;
+  total_amount:number
 }
 
 interface FilterForm {
@@ -308,8 +309,6 @@ export default function CashBook() {
       types: types === "all" ? undefined : types,
     }),
   );
-  console.log("@@@", daybook);
-
   // ─── Extract Unique Filter Options ────────────────────────────────────
   const uniqueChests = useMemo(
     () => [...new Set(daybook?.map((r) => r.chest_name).filter(Boolean))],
@@ -435,6 +434,7 @@ export default function CashBook() {
           round_off: record.round_off,
           warehouse_name: record.warehouse_name,
           qumilative_balance: record.qumilative_balance,
+          total_amount:record.total_amount
         };
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -780,6 +780,16 @@ export default function CashBook() {
                                       )}
 
                                       <div className="mt-4 pt-3 border-t text-xs">
+                                        <div className="flex justify-between">
+                                          <span className="text-slate-600">
+                                            Received:
+                                          </span>
+                                          <span className="font-mono text-emerald-600 font-medium">
+                                            {formatCurrency(
+                                              block.blockReceived,
+                                            ) || "-"}
+                                          </span>
+                                        </div>
                                         <div className="flex justify-between mb-1.5">
                                           <span className="text-slate-600">
                                             Paid:
@@ -791,21 +801,20 @@ export default function CashBook() {
                                         </div>
                                         <div className="flex justify-between">
                                           <span className="text-slate-600">
-                                            Received:
-                                          </span>
-                                          <span className="font-mono text-emerald-600 font-medium">
-                                            {formatCurrency(
-                                              block.blockReceived,
-                                            ) || "-"}
-                                          </span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                          <span className="text-slate-600">
                                             Round Off:
                                           </span>
                                           <span className="font-mono text-rose-500 font-medium">
                                             {formatCurrency(block.round_off) ||
                                               "-"}
+                                          </span>
+                                        </div>
+                                        <hr className="my-1 bg-gray-950" />
+                                        <div className="flex justify-between">
+                                          <span className="text-slate-600">
+                                            Net AMT:
+                                          </span>
+                                          <span className="font-mono text-rose-500 font-medium">
+                                            ₹{block.total_amount}.00
                                           </span>
                                         </div>
                                       </div>
@@ -848,7 +857,7 @@ export default function CashBook() {
                                 </div>
                               </td>
 
-                              <td className="py-5 px-6 text-right font-mono">
+                              <td className="py-5 px-6 border text-right font-mono">
                                 {item.type === "debit" && (
                                   <span className="text-red-600 font-medium">
                                     {formatCurrency(item.amount)}
@@ -856,7 +865,7 @@ export default function CashBook() {
                                 )}
                               </td>
 
-                              <td className="py-5 px-6 text-right font-mono">
+                              <td className="py-5 px-6 border text-right font-mono">
                                 {item.type === "credit" && (
                                   <span className="text-emerald-600 font-medium">
                                     {formatCurrency(item.amount)}
