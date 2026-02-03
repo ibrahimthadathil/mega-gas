@@ -235,8 +235,8 @@ const DenominationModal: React.FC<{
               </thead>
               <tbody className="divide-y">
                 {denominationData.length > 0 ? (
-                  denominationData.map((d) => (
-                    <tr key={d.label}>
+                  denominationData.map((d,ind) => (
+                    <tr key={ind}>
                       <td className="px-4 py-2.5 font-medium">₹{d.label}</td>
                       <td className="px-4 py-2.5 text-center text-slate-600">
                         × {d.count}
@@ -639,8 +639,8 @@ export default function CashBook() {
                 className="w-full pl-10 pr-8 py-2.5 bg-slate-50 border rounded-lg appearance-none focus:ring-2 focus:ring-indigo-400"
               >
                 <option value="all">All Chests</option>
-                {uniqueChests.map((c) => (
-                  <option key={c} value={c}>
+                {uniqueChests.map((c,ind) => (
+                  <option key={ind} value={c}>
                     {c}
                   </option>
                 ))}
@@ -654,8 +654,8 @@ export default function CashBook() {
                 className="w-full pl-10 pr-8 py-2.5 bg-slate-50 border rounded-lg appearance-none focus:ring-2 focus:ring-indigo-400"
               >
                 <option value="all">All Status</option>
-                {uniqueStatuses.map((s) => (
-                  <option key={s} value={s}>
+                {uniqueStatuses.map((s,ind) => (
+                  <option key={ind} value={s}>
                     {s}
                   </option>
                 ))}
@@ -713,7 +713,7 @@ export default function CashBook() {
                         {block.items.map((item, idx) => (
                           <>
                             <tr
-                              key={item.id}
+                              key={idx}
                               className="group border-b last:border-b-0 hover:bg-slate-50/70"
                             >
                               {idx === 0 && (
@@ -767,9 +767,9 @@ export default function CashBook() {
                                             Delivery Boys
                                           </div>
                                           <div className="flex flex-wrap gap-1">
-                                            {block.deliveryBoys.map((boy) => (
+                                            {block.deliveryBoys.map((boy,ind) => (
                                               <span
-                                                key={boy}
+                                                key={ind}
                                                 className="text-[10px] px-2 py-0.5 bg-slate-100 text-slate-700 rounded border"
                                               >
                                                 {boy}
@@ -978,7 +978,7 @@ export default function CashBook() {
                   ) {
                     return (
                       <button
-                        key={page}
+                        key={i}
                         onClick={() => setCurrentPage(page)}
                         className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                           page === currentPage

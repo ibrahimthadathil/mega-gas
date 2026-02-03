@@ -171,7 +171,7 @@ export function TransactionForm({
           note_20: 0,
           note_10: 0,
           coin_5: 0,
-          source_reference_type: "payments-receipts",
+          source_reference_type: "Account transaction",
         },
       };
     }
