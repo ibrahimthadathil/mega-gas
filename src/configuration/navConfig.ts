@@ -20,14 +20,18 @@ export const navItems = [
       {
         title: "User Management",
         url: "/admin/ums",
-        roles: ["admin", "manager"],
+        roles: ["admin", "manager",],
       },
       {
         title: "Daily Sales Report",
         url: "/admin/sales-report",
         roles: ["admin", "manager", "accountant"],
       },
-      // { title: "Inventory Level", url: "/admin/inventory", roles: ["admin", "manager"] },
+      {
+        title:"Chest Summary",
+        url:"/admin/chest-summary",
+        roles:["admin","manager","accountant"]
+      },
       {
         title: "Product Management",
         url: "/admin/product",
@@ -197,6 +201,7 @@ export const roleRouteConfig = {
   accountant: [
     "/admin/dashboard",
     "admin/sales-report",
+    "/admin/chest-summary",
     "/user/dashboard",
     "/user/sales",
     "/user/purchase",
