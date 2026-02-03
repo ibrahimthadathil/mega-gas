@@ -489,8 +489,7 @@ export default function Home() {
         route.push("/user/sales");
       } else {
         response = await updateSalesSlip(report, report.id as string);
-        // route.push("/admin/sales-report");
-        route.back();
+        if(window.opener)window.close()
       }
       if (response.success) {
         toast.success(response.message);
@@ -625,27 +624,6 @@ export default function Home() {
                       oldStock={payload?.currentStock}
                       sales={sales || []}
                     />
-
-                    {/* <ExpensesSection
-                      expenses={payload?.expenses as Expense[]}
-                    /> */}
-                    {/* <ExpensesSection
-                      expenses={
-                        (isEditMode
-                          ? formExpenses
-                          : payload?.expenses) as Expense[]
-                      }
-                    /> */}
-                    {/* <Controller
-                      name="expenses"
-                      control={control}
-                      render={({ field }) => (
-                        <ExpensesSection
-                          expenses={field.value as Expense[]}
-                          onChange={field.onChange}
-                        />
-                      )}
-                    /> */}
 
                     {isEditMode ? (
                       <Controller

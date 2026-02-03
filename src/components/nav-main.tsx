@@ -47,7 +47,7 @@ export function NavMain({
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <Link href={item.url }>
+                <Link onDoubleClick={()=>window.open(item.url,'_blank')} href={item.url }>
                   <SidebarMenuButton tooltip={item.title}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
