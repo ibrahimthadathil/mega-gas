@@ -176,7 +176,7 @@ const CashDepositDashboard = () => {
                     Denomination
                   </th>
 
-                  {filteredData?.map((item,ind) => (
+                  {filteredData?.map((item, ind) => (
                     <th key={ind} className="px-6 py-4 text-center">
                       <div className="flex flex-col items-center">
                         <span className="text-slate-900 font-bold capitalize">
@@ -206,18 +206,15 @@ const CashDepositDashboard = () => {
                     (acc, item) => acc + (item[denom.key] || 0),
                     0,
                   );
-                    console.log(rowTotalQty,'####');
-                    
-                  let rowTotalAmount =  rowTotalQty||0 * denom.value;
-                  console.log(rowTotalAmount);
-                  
+
+                  let rowTotalAmount = rowTotalQty || 0 * denom.value;
                   return (
                     <tr key={denom.key}>
                       <td className="px-6 py-3 sticky left-0 bg-white">
                         ₹{denom.value}
                       </td>
 
-                      {filteredData?.map((item,ind) => (
+                      {filteredData?.map((item, ind) => (
                         <td key={ind} className="px-6 py-3 text-center">
                           {item[denom.key] || "-"}
                         </td>
@@ -226,8 +223,10 @@ const CashDepositDashboard = () => {
                       <td className="px-6 py-3 text-right">
                         {rowTotalQty || "-"}
                       </td>
-                      <td className="px-6 py-3 text-right">
-                        {rowTotalQty ? formatCurrency(rowTotalAmount) : "-"}
+                      <td className="px-6 py-3 text-right font-bold">
+                        {rowTotalQty
+                          ? formatCurrency(rowTotalAmount * denom.value)
+                          : "-"}
                       </td>
                     </tr>
                   );
@@ -240,16 +239,23 @@ const CashDepositDashboard = () => {
                     Grand Total
                   </td>
 
-                  {filteredData?.map((item,ind) => (
-                    <td
-                      key={ind}
-                      className="px-6 py-4 text-center text-xs"
-                    >
+                  {filteredData?.map((item, ind) => (
+                    <td key={ind} className="px-6 py-4 text-center text-xs">
                       {formatCurrency(parseFloat(item.total_amount_sum))}
                     </td>
                   ))}
 
-                  <td className="px-6 py-4 text-right font-bold">—</td>
+                  <td className="px-6 py-4 text-right font-bold">
+                    {denominations?.reduce((total, denom) => {
+                      const rowTotalQty =
+                        filteredData?.reduce(
+                          (acc, item) => acc + (item[denom?.key] || 0),
+                          0,
+                        ) || 0;
+                      return total + rowTotalQty;
+                    }, 0)}
+                  </td>
+
                   <td className="px-6 py-4 text-right font-bold text-xl">
                     {formatCurrency(grandTotalAmount as number)}
                   </td>
