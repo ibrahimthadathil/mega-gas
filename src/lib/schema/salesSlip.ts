@@ -25,7 +25,7 @@ const saleSchema = z.object({
 
 // Schema for Transaction
 const transactionSchema = z.object({
-  "date":z.string(),
+  "date":z.string().optional(),
   "account id": z.string(),
   "account name": z.string().optional(),
   "amount paid": z.number().min(0),

@@ -520,7 +520,7 @@ export default function Home() {
 
         <form
           onSubmit={handleSubmit(
-            onSubmit,
+            onSubmit,onError
             //     (errors) => {
             // console.log('❌ FORM VALIDATION FAILED:', errors);
             // alert('Validation errors: ' + JSON.stringify(errors, null, 2));}
