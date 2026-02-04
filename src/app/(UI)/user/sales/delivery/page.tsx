@@ -69,6 +69,7 @@ interface Sale {
 }
 
 interface TransactionItem {
+  "date":string;
   "account id": string;
   "account name"?: string;
   "amount paid": number;
@@ -331,14 +332,15 @@ export default function Home() {
     );
   }
   const handleSalesTransaction = (transaction: any) => {
+    
     const formattedTransaction: TransactionItem = {
+      "date":transaction.line_Item.date,
       "account id": transaction.line_Item.account_id,
       "account name": transaction.line_Item.account_name,
       "amount paid": transaction.line_Item.amount_paid || 0,
       "amount received": transaction.line_Item.amount_received || 0,
-      remark: transaction.line_Item.source_form || "Transaction",
+      remark: transaction.line_Item.remarks || "sales slip Transaction",
     };
-
     const current = watch("salesTransactions") || [];
     setValue("salesTransactions", [...current, formattedTransaction]);
   };

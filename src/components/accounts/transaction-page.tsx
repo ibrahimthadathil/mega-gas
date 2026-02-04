@@ -24,36 +24,6 @@ import {
 import { Transaction } from "@/types/types";
 import AlertModal from "@/components/alert-dialog";
 
-// type LineItem = {
-//   date: string;
-//   account_name: string;
-//   account_id: string;
-//   amount_received: number;
-//   amount_paid: number;
-//   source_form: string;
-//   source_form_reference_id: string | null;
-//   created_by: string;
-//   created_at: string;
-// };
-
-// type CashChest = {
-//   note_500: number;
-//   note_200: number;
-//   note_100: number;
-//   note_50: number;
-//   note_20: number;
-//   note_10: number;
-//   coin_5: number;
-//   source_reference_type: string;
-//   created_by: string;
-//   created_at: string;
-// };
-
-// type Transaction = {
-//   line_Item: LineItem;
-//   cash_chest: CashChest;
-// };
-
 export default function TransactionsPage() {
   const queryClient = useQueryClient();
   const [openReceived, setOpenReceived] = useState(false);
@@ -62,8 +32,7 @@ export default function TransactionsPage() {
   const [openEdit, setOpenEdit] = useState(false);
   const { data: Transaction, isLoading: transactionLoading } = UseRQ<
     Transaction[]
-  >("transaction", getAllTransactions);
-
+  >("transaction", getAllTransactions);  
   const handleAddTransaction = async (
     transaction: any,
     type: "received" | "paid"
@@ -203,14 +172,9 @@ export default function TransactionsPage() {
                         {transaction.account_name}
                       </CardTitle>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        {new Date(
-                          transaction.transaction_date
-                        ).toLocaleDateString("en-US", {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
+                        {
+                          transaction.date
+                       }
                       </p>
                     </div>
                     <div className="text-right">
