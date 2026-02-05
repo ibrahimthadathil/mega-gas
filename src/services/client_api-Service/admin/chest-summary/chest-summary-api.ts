@@ -1,3 +1,4 @@
+import { CashAdjustmentForm } from "@/components/accounts/denominatio";
 import axios from "axios";
 
 export const getAllChestSummary = async (filter: {
@@ -16,3 +17,12 @@ export const getAllChestSummary = async (filter: {
     throw error;
   }
 };
+
+export const makeAdjustment = async (data:CashAdjustmentForm)=>{
+    try {
+        const result = await axios.post('/api/admin/chest-summary',data)
+        return result.data
+    } catch (error) {
+        throw error
+    }
+}

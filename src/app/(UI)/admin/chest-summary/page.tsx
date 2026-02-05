@@ -1,11 +1,19 @@
 "use client";
 
+import CashAdjustmentDialog from "@/components/accounts/denominatio";
+
 import { UseRQ } from "@/hooks/useReactQuery";
-import { getAllChestSummary } from "@/services/client_api-Service/admin/chest-summary/chest-summary-api";
+import {
+  getAllChestSummary,
+  makeAdjustment,
+} from "@/services/client_api-Service/admin/chest-summary/chest-summary-api";
 import { ChestSummary, ChestSummaryFilterForm } from "@/types/chest-summery";
+import { useQueryClient } from "@tanstack/react-query";
 import { Wallet, Building2, CheckCircle2, ArrowRightLeft } from "lucide-react";
+
 import { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 const denominations = [
   { label: "2000", value: 2000, key: "note_2000_sum" },
@@ -43,7 +51,7 @@ const CashDepositDashboard = () => {
         status: selectedStatus !== "All" ? selectedStatus : undefined,
       }),
   );
-
+  const queryClient = useQueryClient();
   // -----------------------
   // Derived Dropdowns
   // -----------------------
@@ -65,6 +73,19 @@ const CashDepositDashboard = () => {
     });
   }, [summary, selectedChest, selectedStatus]);
 
+  const handleCashAdjustment = async (data: any) => {
+    try {
+      const result = await makeAdjustment(data);
+      if (result.success) {
+        queryClient.invalidateQueries({ queryKey: ["summary"] });
+        toast.success(result.message);
+      }
+    } catch (error) {
+      toast.error((error as Error).message);
+    }
+
+    // Handle the submission - send to API, update state, etc.
+  };
   // -----------------------
   // Totals
   // -----------------------
@@ -118,6 +139,8 @@ const CashDepositDashboard = () => {
 
           {/* Filters */}
           <div className="flex flex-col sm:flex-row gap-3 bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
+            <CashAdjustmentDialog onSubmit={handleCashAdjustment} />
+
             {/* Chest */}
             <div className="relative">
               <div className="absolute left-2.5 top-2.5 text-slate-400 pointer-events-none">
@@ -207,7 +230,7 @@ const CashDepositDashboard = () => {
                     0,
                   );
 
-                  let rowTotalAmount = rowTotalQty || 0 * denom.value;
+                  let rowTotalAmount = (rowTotalQty || 0) * denom.value;
                   return (
                     <tr key={denom.key}>
                       <td className="px-6 py-3 sticky left-0 bg-white">
