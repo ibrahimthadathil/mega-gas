@@ -50,4 +50,14 @@ const get_Day_Book = async (filters?: DayBookFilters) => {
   }
 };
 
-export { get_Day_Book };
+const add_cash_adjustment = async (payload: any) => {
+  try {
+    const {error} = await supabase.from("cash_chest").insert(payload);
+    if(error) throw error
+    return true
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { get_Day_Book, add_cash_adjustment };

@@ -1,21 +1,10 @@
 import supabase from "@/lib/supabase/supabaseClient";
 import { UnloadFilters } from "@/types/unloadSlip";
 
-// const get_All_Unload_Details = async () => {
-//   try {
-//     const { data, error } = await supabase
-//       .from("plant_load_unload_view")
-//       .select("*")
-//       .order("unload_date", { ascending: true, nullsFirst: true })
-//       .order("bill_date", { ascending: true }); // change this after 
 
-//     if (error) throw error;
-//     return data;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
- const get_All_Unload_Details = async (filters: UnloadFilters = {}) => {
+
+
+const get_All_Unload_Details = async (filters: UnloadFilters = {}) => {
   try {
     const {
       page = 1,
@@ -26,7 +15,6 @@ import { UnloadFilters } from "@/types/unloadSlip";
       unloadDateFrom,
       unloadDateTo,
     } = filters;
-
     // Calculate pagination offsets
     const from = (page - 1) * limit;
     const to = from + limit - 1;
@@ -75,20 +63,13 @@ import { UnloadFilters } from "@/types/unloadSlip";
 
     const totalPages = count ? Math.ceil(count / limit) : 0;
 
-    console.log("Query result:", {
-      dataLength: data?.length,
-      count,
-      page,
-      limit,
-      totalPages,
-    });
-
     return {
       data: data || [],
       page,
       limit,
       total: count || 0,
       totalPages,
+
     };
   } catch (error) {
     console.error("Error in get_All_Unload_Details:", error);

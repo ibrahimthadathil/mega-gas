@@ -52,6 +52,11 @@ export interface PlantLoadUnloadView {
 
   unload_details: UnloadDetail[]
 }
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
 export type UnloadFilters = {
   page?: number;
   limit?: number;

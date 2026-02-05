@@ -4,8 +4,11 @@ import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+<<<<<<< HEAD
 
 import { Plus, AlertCircle } from "lucide-react";
+=======
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
 import {
   Dialog,
   DialogContent,
@@ -13,10 +16,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+<<<<<<< HEAD
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
+=======
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, AlertCircle } from "lucide-react";
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
 
 // Denominations configuration
 const denominations = [
@@ -35,7 +46,11 @@ const cashAdjustmentSchema = z
     note_100: z.number().int("Must be a whole number"),
     note_50: z.number().int("Must be a whole number"),
     note_10: z.number().int("Must be a whole number"),
+<<<<<<< HEAD
     // remarks: z.string().min(3, "Remarks must be at least 3 characters"),
+=======
+    remarks: z.string().min(3, "Remarks must be at least 3 characters"),
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
   })
   .refine(
     (data) => {
@@ -50,10 +65,17 @@ const cashAdjustmentSchema = z
     {
       message: "Total amount must be zero. Use negative values to balance.",
       path: ["totalAmount"],
+<<<<<<< HEAD
     },
   );
 
 export type CashAdjustmentForm = z.infer<typeof cashAdjustmentSchema>;
+=======
+    }
+  );
+
+type CashAdjustmentForm = z.infer<typeof cashAdjustmentSchema>;
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
 
 interface CashAdjustmentDialogProps {
   onSubmit?: (data: CashAdjustmentForm) => void;
@@ -76,7 +98,11 @@ const CashAdjustmentDialog = ({ onSubmit }: CashAdjustmentDialogProps) => {
       note_100: 0,
       note_50: 0,
       note_10: 0,
+<<<<<<< HEAD
       //   remarks: "",
+=======
+      remarks: "",
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
     },
   });
 
@@ -101,6 +127,10 @@ const CashAdjustmentDialog = ({ onSubmit }: CashAdjustmentDialogProps) => {
     if (onSubmit) {
       onSubmit(data);
     }
+<<<<<<< HEAD
+=======
+    console.log("Cash Adjustment Data:", data);
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
     setOpen(false);
     reset();
   };
@@ -182,7 +212,11 @@ const CashAdjustmentDialog = ({ onSubmit }: CashAdjustmentDialogProps) => {
                               onChange={(e) => {
                                 const value = e.target.value;
                                 field.onChange(
+<<<<<<< HEAD
                                   value === "" ? 0 : parseInt(value),
+=======
+                                  value === "" ? 0 : parseInt(value)
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
                                 );
                               }}
                             />
@@ -199,8 +233,13 @@ const CashAdjustmentDialog = ({ onSubmit }: CashAdjustmentDialogProps) => {
                           amount > 0
                             ? "text-green-600"
                             : amount < 0
+<<<<<<< HEAD
                               ? "text-red-600"
                               : "text-slate-500"
+=======
+                            ? "text-red-600"
+                            : "text-slate-500"
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
                         }`}
                       >
                         {formatCurrency(amount)}
@@ -250,17 +289,29 @@ const CashAdjustmentDialog = ({ onSubmit }: CashAdjustmentDialogProps) => {
           )}
 
           {/* Validation Error */}
+<<<<<<< HEAD
           {(errors as any).totalAmount && (
             <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
               <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
               <p className="text-sm text-red-700">
                 {(errors as any).totalAmount.message}
+=======
+          {errors.totalAmount && (
+            <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-red-700">
+                {errors.totalAmount.message}
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
               </p>
             </div>
           )}
 
           {/* Remarks */}
+<<<<<<< HEAD
           {/* <div className="space-y-2">
+=======
+          <div className="space-y-2">
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
             <label className="text-sm font-semibold text-slate-700">
               Remarks <span className="text-red-500">*</span>
             </label>
@@ -280,7 +331,11 @@ const CashAdjustmentDialog = ({ onSubmit }: CashAdjustmentDialogProps) => {
             {errors.remarks && (
               <p className="text-xs text-red-500">{errors.remarks.message}</p>
             )}
+<<<<<<< HEAD
           </div> */}
+=======
+          </div>
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-3 pt-4 border-t">
@@ -306,4 +361,8 @@ const CashAdjustmentDialog = ({ onSubmit }: CashAdjustmentDialogProps) => {
   );
 };
 
+<<<<<<< HEAD
 export default CashAdjustmentDialog;
+=======
+export default CashAdjustmentDialog;
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62

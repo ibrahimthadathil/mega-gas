@@ -8,7 +8,7 @@ import {
 } from "@/services/client_api-Service/admin/chest-summary/chest-summary-api";
 import { ChestSummary, ChestSummaryFilterForm } from "@/types/chest-summery";
 import { useQueryClient } from "@tanstack/react-query";
-import { Wallet, Building2, CheckCircle2, ArrowRightLeft } from "lucide-react";
+import { Wallet, Building2, CheckCircle2 } from "lucide-react";
 import { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -49,7 +49,7 @@ const CashDepositDashboard = () => {
         status: selectedStatus !== "All" ? selectedStatus : undefined,
       }),
   );
-  const queryclient = useQueryClient();
+  const queryClient = useQueryClient();
   // -----------------------
   // Derived Dropdowns
   // -----------------------
@@ -75,7 +75,7 @@ const CashDepositDashboard = () => {
     try {
       const result = await makeAdjustment(data);
       if (result.success) {
-        queryclient.invalidateQueries({ queryKey: ["summary"] });
+        queryClient.invalidateQueries({ queryKey: ["summary"] });
         toast.success(result.message);
       }
     } catch (error) {
@@ -227,7 +227,7 @@ const CashDepositDashboard = () => {
                     0,
                   );
 
-                  let rowTotalAmount = rowTotalQty || 0 * denom.value;
+                  let rowTotalAmount = (rowTotalQty || 0) * denom.value;
                   return (
                     <tr key={denom.key}>
                       <td className="px-6 py-3 sticky left-0 bg-white">

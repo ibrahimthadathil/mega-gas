@@ -1,5 +1,9 @@
 import { UnloadFilters } from "@/types/unloadSlip";
+<<<<<<< HEAD
 import axios from "axios"
+=======
+import axios from "axios";
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
 
 export const getAllUnloadDetails = async (filter?: UnloadFilters) => {
   try {
@@ -22,11 +26,11 @@ export const getAllUnloadDetails = async (filter?: UnloadFilters) => {
   }
 };
 
-export const deleteUnloadSlip = async(id:string)=>{
-    try {
-        const {data} = await axios.delete(`/api/user/unload/${id}`)
-        return data
-    } catch (error) {
-        throw error
-    }
-}
+export const deleteUnloadSlip = async (id: string) => {
+  try {
+    const { data } = await axios.delete(`/api/user/unload/${id}`);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};

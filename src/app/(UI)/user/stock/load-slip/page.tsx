@@ -11,7 +11,7 @@
 // import { PlantLoadUnloadView } from "@/types/unloadSlip";
 // import { Ban, Eye, Pencil, Trash } from "lucide-react";
 // import AlertModal from "@/components/alert-dialog";
-// import React, { useMemo } from "react";
+
 // import { useSelector } from "react-redux";
 // import { Rootstate } from "@/redux/store";
 // import {
@@ -36,13 +36,13 @@
 // import { useRouter } from "next/navigation";
 
 // const page = () => {
-//   const { data: unloadedRecord, isLoading } = UseRQ<PlantLoadUnloadView[]>(
 //     "unloadRecord",
 //     getAllUnloadDetails,
 //   );
 //   const queryClient = useQueryClient();
 //   const { role } = useSelector((user: Rootstate) => user.user);
 //   const router = useRouter();
+
 //   const handleDelete = async (id: string, unloaded: boolean) => {
 //     try {
 //       if (!unloaded) return toast.warning("Not possible until unload");
@@ -55,8 +55,6 @@
 //     }
 //   };
 
-//   const handleEdit = async (id: string) => {
-//     router.push(`/user/stock/load-slip/${id}?mode=edit`);
 //   };
 //   const columns = useMemo(() => {
 //     return [
@@ -173,7 +171,7 @@
 //         render: (row: PlantLoadUnloadView) => (
 //           <Button
 //             variant="ghost"
-//             onClick={() => handleEdit(row?.plant_load_register_id)}
+
 //           >
 //             <Pencil color="skyblue" />
 //           </Button>
@@ -218,8 +216,7 @@
 //       ) : (
 //         <DataTable
 //           columns={columns}
-//           itemsPerPage={10}
-//           data={unloadedRecord ?? []}
+
 //         />
 //       )}
 //     </main>
@@ -805,6 +802,8 @@
 
 
 
+=======
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
 "use client";
 
 import DataTable from "@/components/data-table";
@@ -818,7 +817,7 @@ import {
 import { PlantLoadUnloadView, UnloadFilters } from "@/types/unloadSlip";
 import { Ban, Eye, Pencil, Trash, Filter, X } from "lucide-react";
 import AlertModal from "@/components/alert-dialog";
-import React, { useMemo, useEffect } from "react";
+
 import { useSelector } from "react-redux";
 import { Rootstate } from "@/redux/store";
 import {
@@ -856,51 +855,27 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Card, CardContent } from "@/components/ui/card";
-import { useForm, Controller } from "react-hook-form";
-
-interface UnloadSlipFormData {
-  page: number;
-  limit: number;
-  warehouseId: string;
-  billDateFrom: string;
-  billDateTo: string;
-  unloadDateFrom: string;
-  unloadDateTo: string;
-}
+import { useState } from "react";
 
 const UnloadSlipPage = () => {
-  const { control, watch, setValue, reset } = useForm<UnloadSlipFormData>({
-    defaultValues: {
-      page: 1,
-      limit: 10,
-      warehouseId: "",
-      billDateFrom: "",
-      billDateTo: "",
-      unloadDateFrom: "",
-      unloadDateTo: "",
-    },
+  const [filters, setFilters] = useState<UnloadFilters>({
+    limit: 10,
+    page: 1,
+    warehouseId: undefined,
+    billDateFrom: undefined,
+    billDateTo: undefined,
+    unloadDateFrom: undefined,
+    unloadDateTo: undefined,
   });
 
-  const formValues = watch();
+  const [showFilters, setShowFilters] = useState(false);
 
-  // Convert form values to API filters
-  const apiFilters = useMemo<UnloadFilters>(() => {
-    return {
-      page: formValues.page,
-      limit: formValues.limit,
-      warehouseId: formValues.warehouseId || undefined,
-      billDateFrom: formValues.billDateFrom || undefined,
-      billDateTo: formValues.billDateTo || undefined,
-      unloadDateFrom: formValues.unloadDateFrom || undefined,
-      unloadDateTo: formValues.unloadDateTo || undefined,
-    };
-  }, [formValues]);
-
-  const { data: unloadedRecord, isLoading, refetch } = UseRQ<{
+  const { data: unloadedRecord, isLoading } = UseRQ<{>
     data: PlantLoadUnloadView[];
     limit: number;
     page: number;
     total: number;
+<<<<<<< HEAD
     totalPages: number;
   }>(
     ["unloadRecord", apiFilters],
@@ -911,6 +886,12 @@ const UnloadSlipPage = () => {
   console.log("Unloaded Record:", unloadedRecord);
   console.log("Current Filters:", apiFilters);
 
+=======
+    totalPage: number;
+  }>(["unloadRecord",filters], () => getAllUnloadDetails(filters));
+  console.log(unloadedRecord,'222');
+  
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
   const queryClient = useQueryClient();
   const { role } = useSelector((user: Rootstate) => user.user);
   const router = useRouter();
@@ -927,6 +908,7 @@ const UnloadSlipPage = () => {
   }, [unloadedRecord]);
 
   const handlePageChange = (page: number) => {
+<<<<<<< HEAD
     console.log("Page changed to:", page);
     setValue("page", page);
   };
@@ -949,11 +931,37 @@ const UnloadSlipPage = () => {
       billDateTo: "",
       unloadDateFrom: "",
       unloadDateTo: "",
+=======
+    setFilters((prev) => ({
+      ...prev,
+      page,
+    }));
+  };
+
+  const handleFilterChange = (key: keyof UnloadFilters, value: any) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value,
+      page: 1, // Reset to first page when filtering
+    }));
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      limit: 16,
+      page: 1,
+      warehouseId: undefined,
+      billDateFrom: undefined,
+      billDateTo: undefined,
+      unloadDateFrom: undefined,
+      unloadDateTo: undefined,
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
     });
   };
 
   const hasActiveFilters = useMemo(() => {
     return !!(
+<<<<<<< HEAD
       formValues.warehouseId ||
       formValues.billDateFrom ||
       formValues.billDateTo ||
@@ -961,6 +969,15 @@ const UnloadSlipPage = () => {
       formValues.unloadDateTo
     );
   }, [formValues]);
+=======
+      filters.warehouseId ||
+      filters.billDateFrom ||
+      filters.billDateTo ||
+      filters.unloadDateFrom ||
+      filters.unloadDateTo
+    );
+  }, [filters]);
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
 
   const handleDelete = async (id: string, unloaded: boolean) => {
     try {
@@ -979,19 +996,28 @@ const UnloadSlipPage = () => {
     if (!unloaded) {
       toast.warning("Not possible before unload");
       return;
+<<<<<<< HEAD
     }
     router.push(`/user/stock/load-slip/${id}?mode=edit`);
+=======
+    } else router.push(`/user/stock/load-slip/${id}?mode=edit`);
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
   };
 
   const columns = useMemo(() => {
     return [
       {
         header: "No",
+<<<<<<< HEAD
         render: (_e: PlantLoadUnloadView, i: number) => {
           const rowNumber =
             (formValues.page - 1) * formValues.limit + i + 1;
           return <span className="font-medium">{rowNumber}</span>;
         },
+=======
+        render: (_e: PlantLoadUnloadView, i: number) =>
+          `${(filters?.page - 1) * filters?.limit + i + 1}`,
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
       },
       {
         header: "Bill Date",
@@ -1020,9 +1046,13 @@ const UnloadSlipPage = () => {
       {
         header: "Total Return QTY",
         render: (row: PlantLoadUnloadView) => (
+<<<<<<< HEAD
           <span className="font-semibold text-sm">
             {row?.total_return_qty}
           </span>
+=======
+          <span className="font-semibold text-sm">{row?.total_return_qty}</span>
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
         ),
       },
       {
@@ -1032,7 +1062,15 @@ const UnloadSlipPage = () => {
             {row?.unloading_staff && row.unloading_staff.length > 0 ? (
               <div className="flex flex-wrap gap-1">
                 {row.unloading_staff.map((staff) => (
+<<<<<<< HEAD
                   <Badge key={staff.id} variant="secondary" className="text-xs">
+=======
+                  <Badge
+                    key={staff.id}
+                    variant="secondary"
+                    className="text-xs"
+                  >
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
                     {staff.name}
                   </Badge>
                 ))}
@@ -1049,9 +1087,13 @@ const UnloadSlipPage = () => {
           <span
             className={cn(
               "text-sm",
+<<<<<<< HEAD
               row?.unload_date
                 ? "text-green-700 font-medium"
                 : "text-gray-500"
+=======
+              row?.unload_date ? "text-green-700 font-medium" : "text-gray-500"
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
             )}
           >
             {row?.unload_date || "Not unloaded"}
@@ -1122,10 +1164,14 @@ const UnloadSlipPage = () => {
                       </TableHeader>
                       <TableBody>
                         {row?.unload_details?.map((detail, index) => (
+<<<<<<< HEAD
                           <TableRow
                             key={detail.id}
                             className="hover:bg-muted/30"
                           >
+=======
+                          <TableRow key={detail.id} className="hover:bg-muted/30">
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
                             <TableCell className="font-medium">
                               {index + 1}
                             </TableCell>
@@ -1206,7 +1252,11 @@ const UnloadSlipPage = () => {
         ),
       },
     ];
+<<<<<<< HEAD
   }, [formValues, role]);
+=======
+  }, [filters, role]);
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
 
   return (
     <main className="min-h-screen bg-background p-4 sm:p-6">
@@ -1225,7 +1275,11 @@ const UnloadSlipPage = () => {
                 Clear Filters
               </Button>
             )}
+<<<<<<< HEAD
             <Popover>
+=======
+            <Popover open={showFilters} onOpenChange={setShowFilters}>
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
               <PopoverTrigger asChild>
                 <Button variant="outline" className="gap-2">
                   <Filter className="h-4 w-4" />
@@ -1245,6 +1299,7 @@ const UnloadSlipPage = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="warehouse">Warehouse</Label>
+<<<<<<< HEAD
                     <Controller
                       name="warehouseId"
                       control={control}
@@ -1272,6 +1327,29 @@ const UnloadSlipPage = () => {
                         </Select>
                       )}
                     />
+=======
+                    <Select
+                      value={filters.warehouseId || "all"}
+                      onValueChange={(value) =>
+                        handleFilterChange(
+                          "warehouseId",
+                          value === "all" ? undefined : value
+                        )
+                      }
+                    >
+                      <SelectTrigger id="warehouse">
+                        <SelectValue placeholder="All Warehouses" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Warehouses</SelectItem>
+                        {warehouses.map((wh) => (
+                          <SelectItem key={wh.id} value={wh.id}>
+                            {wh.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
                   </div>
 
                   <div className="space-y-2">
@@ -1281,6 +1359,7 @@ const UnloadSlipPage = () => {
                         <Label htmlFor="billDateFrom" className="text-xs">
                           From
                         </Label>
+<<<<<<< HEAD
                         <Controller
                           name="billDateFrom"
                           control={control}
@@ -1297,12 +1376,22 @@ const UnloadSlipPage = () => {
                               }
                             />
                           )}
+=======
+                        <Input
+                          id="billDateFrom"
+                          type="date"
+                          value={filters.billDateFrom || ""}
+                          onChange={(e) =>
+                            handleFilterChange("billDateFrom", e.target.value)
+                          }
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
                         />
                       </div>
                       <div>
                         <Label htmlFor="billDateTo" className="text-xs">
                           To
                         </Label>
+<<<<<<< HEAD
                         <Controller
                           name="billDateTo"
                           control={control}
@@ -1316,6 +1405,15 @@ const UnloadSlipPage = () => {
                               }
                             />
                           )}
+=======
+                        <Input
+                          id="billDateTo"
+                          type="date"
+                          value={filters.billDateTo || ""}
+                          onChange={(e) =>
+                            handleFilterChange("billDateTo", e.target.value)
+                          }
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
                         />
                       </div>
                     </div>
@@ -1328,6 +1426,7 @@ const UnloadSlipPage = () => {
                         <Label htmlFor="unloadDateFrom" className="text-xs">
                           From
                         </Label>
+<<<<<<< HEAD
                         <Controller
                           name="unloadDateFrom"
                           control={control}
@@ -1344,12 +1443,25 @@ const UnloadSlipPage = () => {
                               }
                             />
                           )}
+=======
+                        <Input
+                          id="unloadDateFrom"
+                          type="date"
+                          value={filters.unloadDateFrom || ""}
+                          onChange={(e) =>
+                            handleFilterChange(
+                              "unloadDateFrom",
+                              e.target.value
+                            )
+                          }
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
                         />
                       </div>
                       <div>
                         <Label htmlFor="unloadDateTo" className="text-xs">
                           To
                         </Label>
+<<<<<<< HEAD
                         <Controller
                           name="unloadDateTo"
                           control={control}
@@ -1366,6 +1478,15 @@ const UnloadSlipPage = () => {
                               }
                             />
                           )}
+=======
+                        <Input
+                          id="unloadDateTo"
+                          type="date"
+                          value={filters.unloadDateTo || ""}
+                          onChange={(e) =>
+                            handleFilterChange("unloadDateTo", e.target.value)
+                          }
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
                         />
                       </div>
                     </div>
@@ -1380,6 +1501,16 @@ const UnloadSlipPage = () => {
                     >
                       Clear
                     </Button>
+<<<<<<< HEAD
+=======
+                    <Button
+                      size="sm"
+                      onClick={() => setShowFilters(false)}
+                      className="flex-1"
+                    >
+                      Apply
+                    </Button>
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
                   </div>
                 </div>
               </PopoverContent>
@@ -1392,15 +1523,24 @@ const UnloadSlipPage = () => {
             <CardContent className="p-3">
               <div className="flex flex-wrap gap-2 items-center text-sm">
                 <span className="font-medium">Active Filters:</span>
+<<<<<<< HEAD
                 {formValues.warehouseId && (
                   <Badge variant="secondary">
                     Warehouse:{" "}
                     {
                       warehouses.find((w) => w.id === formValues.warehouseId)
+=======
+                {filters.warehouseId && (
+                  <Badge variant="secondary">
+                    Warehouse:{" "}
+                    {
+                      warehouses.find((w) => w.id === filters.warehouseId)
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
                         ?.name
                     }
                   </Badge>
                 )}
+<<<<<<< HEAD
                 {formValues.billDateFrom && (
                   <Badge variant="secondary">
                     Bill From: {formValues.billDateFrom}
@@ -1419,6 +1559,26 @@ const UnloadSlipPage = () => {
                 {formValues.unloadDateTo && (
                   <Badge variant="secondary">
                     Unload To: {formValues.unloadDateTo}
+=======
+                {filters.billDateFrom && (
+                  <Badge variant="secondary">
+                    Bill From: {filters.billDateFrom}
+                  </Badge>
+                )}
+                {filters.billDateTo && (
+                  <Badge variant="secondary">
+                    Bill To: {filters.billDateTo}
+                  </Badge>
+                )}
+                {filters.unloadDateFrom && (
+                  <Badge variant="secondary">
+                    Unload From: {filters.unloadDateFrom}
+                  </Badge>
+                )}
+                {filters.unloadDateTo && (
+                  <Badge variant="secondary">
+                    Unload To: {filters.unloadDateTo}
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
                   </Badge>
                 )}
               </div>
@@ -1434,8 +1594,13 @@ const UnloadSlipPage = () => {
           <DataTable
             columns={columns}
             paginationMode="server"
+<<<<<<< HEAD
             currentPage={unloadedRecord?.page || 1}
             totalPages={unloadedRecord?.totalPages || 0}
+=======
+            currentPage={unloadedRecord?.page}
+            totalPages={unloadedRecord?.totalPage}
+>>>>>>> 6dae87681bd68e514ea651efef36e277bc685d62
             onChange={handlePageChange}
             data={unloadedRecord?.data ?? []}
           />

@@ -1,5 +1,6 @@
 import { getAllUnloadDetails } from "@/services/serverside_api_service/user/unload/unload-service";
 import { STATUS } from "@/types/types";
+import { UnloadFilters } from "@/types/unloadSlip";
 import { NextRequest, NextResponse } from "next/server";
 
 
