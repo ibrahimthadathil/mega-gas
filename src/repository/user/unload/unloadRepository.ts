@@ -2,8 +2,6 @@ import supabase from "@/lib/supabase/supabaseClient";
 import { UnloadFilters } from "@/types/unloadSlip";
 
 
-
-
 const get_All_Unload_Details = async (filters: UnloadFilters = {}) => {
   try {
     const {

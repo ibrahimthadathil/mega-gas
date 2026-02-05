@@ -1,6 +1,7 @@
 "use client";
 
 import CashAdjustmentDialog from "@/components/accounts/denominatio";
+
 import { UseRQ } from "@/hooks/useReactQuery";
 import {
   getAllChestSummary,
@@ -8,7 +9,8 @@ import {
 } from "@/services/client_api-Service/admin/chest-summary/chest-summary-api";
 import { ChestSummary, ChestSummaryFilterForm } from "@/types/chest-summery";
 import { useQueryClient } from "@tanstack/react-query";
-import { Wallet, Building2, CheckCircle2 } from "lucide-react";
+import { Wallet, Building2, CheckCircle2, ArrowRightLeft } from "lucide-react";
+
 import { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -138,6 +140,7 @@ const CashDepositDashboard = () => {
           {/* Filters */}
           <div className="flex flex-col sm:flex-row gap-3 bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
             <CashAdjustmentDialog onSubmit={handleCashAdjustment} />
+
             {/* Chest */}
             <div className="relative">
               <div className="absolute left-2.5 top-2.5 text-slate-400 pointer-events-none">
