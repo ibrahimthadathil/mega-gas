@@ -1,15 +1,80 @@
 import supabase from "@/lib/supabase/supabaseClient";
+import { UnloadFilters } from "@/types/unloadSlip";
 
-const get_All_Unload_Details = async () => {
+// const get_All_Unload_Details = async () => {
+//   try {
+//     const { data, error } = await supabase
+//       .from("plant_load_unload_view")
+//       .select("*")
+//       .order("unload_date", { ascending: true, nullsFirst: true })
+//       .order("bill_date", { ascending: true }); // change this after
+
+//     if (error) throw error;
+//     return data;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+
+const get_All_Unload_Details = async (filters: UnloadFilters = {}) => {
   try {
-    const { data, error } = await supabase
+    const {
+      page = 1,
+      limit = 10,
+      warehouseId,
+      billDateFrom,
+      billDateTo,
+      unloadDateFrom,
+      unloadDateTo,
+    } = filters;
+
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    let query = supabase
       .from("plant_load_unload_view")
-      .select("*")
+      .select("*", { count: "exact" })
       .order("unload_date", { ascending: true, nullsFirst: true })
-      .order("bill_date", { ascending: true }); // change this after 
+      .order("bill_date", { ascending: true });
+
+    // 🔹 Warehouse filter (JSON string column case)
+    if (warehouseId) {
+      // If warehouse is stored as JSON string, use ilike
+      query = query.filter("warehouse->>id", "eq", warehouseId);
+    }
+
+    // 🔹 Bill Date filters
+    if (billDateFrom) {
+      query = query.gte("bill_date", billDateFrom);
+    }
+
+    if (billDateTo) {
+      query = query.lte("bill_date", billDateTo);
+    }
+
+    // 🔹 Unload Date filters
+    if (unloadDateFrom) {
+      query = query.gte("unload_date", unloadDateFrom);
+    }
+
+    if (unloadDateTo) {
+      query = query.lte("unload_date", unloadDateTo);
+    }
+
+    // 🔹 Pagination
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
 
     if (error) throw error;
-    return data;
+    // console.log('@@@',data, count, page, limit);
+    return {
+      data,
+      page,
+      limit,
+      total: count,
+      totalPages: count ? Math.ceil(count / limit) : 0,
+    };
   } catch (error) {
     throw error;
   }

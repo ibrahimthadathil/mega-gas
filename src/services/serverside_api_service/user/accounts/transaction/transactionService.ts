@@ -10,6 +10,7 @@ import { lineItemFilterProps } from "@/types/transaction ";
 
 const createNewTransaction = async (newTransaction: any, userId: string) => {
   try {
+    
     const { source_form_reference_id, ...lineItem } = newTransaction.line_Item;
     
     const isPaid = lineItem.amount_paid > 0;

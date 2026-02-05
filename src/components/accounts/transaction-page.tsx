@@ -332,6 +332,8 @@ export default function TransactionsPage() {
     type: "received" | "paid"
   ) => {
     try {
+      console.log("from new ",transaction);
+      
       const data = await createNewLineItem(transaction);
       if (data.success) {
         setOpenReceived(false);
