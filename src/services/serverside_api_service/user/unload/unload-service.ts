@@ -4,11 +4,12 @@ import {
   get_All_Unload_Details,
 } from "@/repository/user/unload/unloadRepository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
+import { UnloadFilters } from "@/types/unloadSlip";
 
-const getAllUnloadDetails = async () => {
+const getAllUnloadDetails = async (filter:UnloadFilters) => {
   try {
-    const data = await get_All_Unload_Details();
-    if (data) return { success: true, data };
+    const {data,page,limit,total,totalPages} = await get_All_Unload_Details(filter);
+    if (data) return { success: true, data,page,limit,total,totalPages };
     else return { success: false };
   } catch (error) {
     return { success: true, message: (error as Error).message };

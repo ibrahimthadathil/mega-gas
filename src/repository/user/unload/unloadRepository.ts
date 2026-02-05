@@ -1,16 +1,97 @@
 import supabase from "@/lib/supabase/supabaseClient";
+import { UnloadFilters } from "@/types/unloadSlip";
 
-const get_All_Unload_Details = async () => {
+// const get_All_Unload_Details = async () => {
+//   try {
+//     const { data, error } = await supabase
+//       .from("plant_load_unload_view")
+//       .select("*")
+//       .order("unload_date", { ascending: true, nullsFirst: true })
+//       .order("bill_date", { ascending: true }); // change this after 
+
+//     if (error) throw error;
+//     return data;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+ const get_All_Unload_Details = async (filters: UnloadFilters = {}) => {
   try {
-    const { data, error } = await supabase
-      .from("plant_load_unload_view")
-      .select("*")
-      .order("unload_date", { ascending: true, nullsFirst: true })
-      .order("bill_date", { ascending: true }); // change this after 
+    const {
+      page = 1,
+      limit = 10,
+      warehouseId,
+      billDateFrom,
+      billDateTo,
+      unloadDateFrom,
+      unloadDateTo,
+    } = filters;
 
-    if (error) throw error;
-    return data;
+    // Calculate pagination offsets
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    console.log("Query params:", { page, limit, from, to, filters });
+
+    // Start building the query
+    let query = supabase
+      .from("plant_load_unload_view")
+      .select("*", { count: "exact" })
+      .order("unload_date", { ascending: true, nullsFirst: true })
+      .order("bill_date", { ascending: false }); // Changed to descending for most recent first
+
+    // 🔹 Warehouse filter
+    if (warehouseId) {
+      query = query.filter("warehouse->>id", "eq", warehouseId);
+    }
+
+    // 🔹 Bill Date filters
+    if (billDateFrom) {
+      query = query.gte("bill_date", billDateFrom);
+    }
+
+    if (billDateTo) {
+      query = query.lte("bill_date", billDateTo);
+    }
+
+    // 🔹 Unload Date filters
+    if (unloadDateFrom) {
+      query = query.gte("unload_date", unloadDateFrom);
+    }
+
+    if (unloadDateTo) {
+      query = query.lte("unload_date", unloadDateTo);
+    }
+
+    // 🔹 Apply pagination LAST
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      console.error("Supabase query error:", error);
+      throw error;
+    }
+
+    const totalPages = count ? Math.ceil(count / limit) : 0;
+
+    console.log("Query result:", {
+      dataLength: data?.length,
+      count,
+      page,
+      limit,
+      totalPages,
+    });
+
+    return {
+      data: data || [],
+      page,
+      limit,
+      total: count || 0,
+      totalPages,
+    };
   } catch (error) {
+    console.error("Error in get_All_Unload_Details:", error);
     throw error;
   }
 };
