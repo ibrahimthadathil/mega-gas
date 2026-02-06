@@ -180,7 +180,9 @@ const daily_Report_View = async (
       .from("daily_sales_report_view")
       .select("*", { count: "exact" })
       .in("created_by", users)
-      .range(offset, offset + limit - 1);
+      .order("date", { ascending: false });
+
+      // .range(offset, offset + limit - 1);
     if (error) throw error;    
     return data;
   } catch (error) {

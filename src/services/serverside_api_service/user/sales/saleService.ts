@@ -106,6 +106,7 @@ const dailyReport = async (authId: string) => {
   try {
     const user = await checkUserByAuthId(authId);
     if (user) {
+      
       const data = await daily_Report_View(user?.delivery_boys);
       if (data) return { success: true, data };
       else return { success: false, message: "Not found" };

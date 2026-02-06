@@ -20,7 +20,7 @@ function getDefaultDashboard(role: string): string {
   const roleLower = role.toLowerCase();
 
   // Admin and Manager go to admin dashboard
-  if (roleLower === "admin" || roleLower === "manager") {
+  if (roleLower === "admin" || roleLower === "manager"||roleLower==="accountant") {
     return "/admin/dashboard";
   }
 
