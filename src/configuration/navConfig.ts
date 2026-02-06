@@ -200,7 +200,7 @@ export const roleRouteConfig = {
   manager: ["/admin", "/user"],
   accountant: [
     "/admin/dashboard",
-    "admin/sales-report",
+    "/admin/sales-report",
     "/admin/chest-summary",
     "/user/dashboard",
     "/user/sales",
