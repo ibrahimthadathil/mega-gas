@@ -1330,7 +1330,7 @@
 //       types: types === "all" ? undefined : types,
 //     }),
 //   );
-  
+
 //   // ─── Extract Unique Filter Options ────────────────────────────────────
 //   const uniqueChests = useMemo(
 //     () => [...new Set(daybook?.map((r) => r.chest_name).filter(Boolean))],
@@ -2068,7 +2068,6 @@
 //   );
 // }
 
-
 "use client";
 
 import React, { useMemo, useState, useEffect, useRef } from "react";
@@ -2457,9 +2456,9 @@ export default function CashBook() {
   const [selectedEntry, setSelectedEntry] = useState<TransactionBlock | null>(
     null,
   );
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1);
   const [selectedWarehouses, setSelectedWarehouses] = useState<string[]>([]);
-  const itemsPerPage = 10;
+  // const itemsPerPage = 10;
 
   const { register, watch } = useForm<FilterForm>({
     defaultValues: {
@@ -2669,17 +2668,17 @@ export default function CashBook() {
   }, [transactionBlocks, search, types, selectedWarehouses]);
 
   // ─── Pagination ────────────────────────────────────────────────────────
-  const paginatedBlocks = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredBlocks.slice(start, start + itemsPerPage);
-  }, [filteredBlocks, currentPage]);
+  // const paginatedBlocks = useMemo(() => {
+  //   const start = (currentPage - 1) * itemsPerPage;
+  //   return filteredBlocks.slice(start, start + itemsPerPage);
+  // }, [filteredBlocks, currentPage]);
 
-  const totalPages = Math.ceil(filteredBlocks.length / itemsPerPage);
+  // const totalPages = Math.ceil(filteredBlocks.length / itemsPerPage);
 
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [date, chest, status, types, search, selectedWarehouses]);
+  // // Reset page when filters change
+  // useEffect(() => {
+  //   setCurrentPage(1);
+  // }, [date, chest, status, types, search, selectedWarehouses]);
 
   // ─── Calculate Totals ──────────────────────────────────────────────────
   const totals = useMemo(() => {
@@ -2937,8 +2936,10 @@ export default function CashBook() {
               </thead>
 
               <tbody>
-                {paginatedBlocks.length > 0 ? (
-                  paginatedBlocks.map((block) => {
+                {/* {paginatedBlocks.length > 0 ? (
+                  paginatedBlocks.map((block) => { */}
+                {filteredBlocks.length > 0 ? (
+                  filteredBlocks.map((block) => {
                     if (block.items.length === 0) return null;
 
                     return (
@@ -2997,14 +2998,16 @@ export default function CashBook() {
                                             Delivery Boys
                                           </div>
                                           <div className="flex flex-wrap gap-1">
-                                            {block.deliveryBoys.map((boy, ind) => (
-                                              <span
-                                                key={ind}
-                                                className="text-[10px] px-2 py-0.5 bg-slate-100 text-slate-700 rounded border"
-                                              >
-                                                {boy}
-                                              </span>
-                                            ))}
+                                            {block.deliveryBoys.map(
+                                              (boy, ind) => (
+                                                <span
+                                                  key={ind}
+                                                  className="text-[10px] px-2 py-0.5 bg-slate-100 text-slate-700 rounded border"
+                                                >
+                                                  {boy}
+                                                </span>
+                                              ),
+                                            )}
                                           </div>
                                         </div>
                                       )}
@@ -3086,6 +3089,13 @@ export default function CashBook() {
                                   </div>
                                 </div>
                               </td>
+                              <td className="py-5 px-6 border text-right font-mono">
+                                {item.type === "credit" && (
+                                  <span className="text-emerald-600 font-medium">
+                                    {formatCurrency(item.amount)}
+                                  </span>
+                                )}
+                              </td>
 
                               <td className="py-5 px-6 border text-right font-mono">
                                 {item.type === "debit" && (
@@ -3095,13 +3105,6 @@ export default function CashBook() {
                                 )}
                               </td>
 
-                              <td className="py-5 px-6 border text-right font-mono">
-                                {item.type === "credit" && (
-                                  <span className="text-emerald-600 font-medium">
-                                    {formatCurrency(item.amount)}
-                                  </span>
-                                )}
-                              </td>
                             </tr>
                             {idx === block.items.length - 1 && (
                               <tr className="bg-slate-50 border-b">
@@ -3147,11 +3150,11 @@ export default function CashBook() {
                   >
                     Grand Totals
                   </td>
-                  <td className="py-5 px-6 text-right text-red-700 text-lg">
-                    {formatCurrency(totals.paid)}
-                  </td>
                   <td className="py-5 px-6 text-right text-emerald-700 text-lg">
                     {formatCurrency(totals.received)}
+                  </td>
+                  <td className="py-5 px-6 text-right text-red-700 text-lg">
+                    {formatCurrency(totals.paid)}
                   </td>
                   <td className="py-5 px-6 text-right"></td>
                 </tr>
@@ -3179,7 +3182,7 @@ export default function CashBook() {
         </div>
 
         {/* Pagination */}
-        {totalPages > 1 && (
+        {/* {totalPages > 1 && (
           <div className="bg-white p-4 rounded-xl border shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="text-sm text-slate-600">
               Showing {(currentPage - 1) * itemsPerPage + 1} –{" "}
@@ -3240,7 +3243,7 @@ export default function CashBook() {
               </button>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
