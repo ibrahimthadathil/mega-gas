@@ -303,14 +303,21 @@ export interface FilterParams {
   status?: string;
   users?: string;
   chest?: string;
+  limit: number;
+  page: number;
 }
+type ReportResponse = {
+  data: SalesSlipPayload[];
+  count: number;
+};
 
 const Home = () => {
-  const [filters, setFilters] = useState<FilterParams>({});
-  const [tempFilters, setTempFilters] = useState<FilterParams>({});
+  const [filters, setFilters] = useState<FilterParams>({ limit: 16, page: 1 });
+  const [tempFilters, setTempFilters] = useState<Partial<FilterParams>>({});
+
   const [showFilters, setShowFilters] = useState(false);
 
-  const { data: report, isLoading } = UseRQ<SalesSlipPayload[]>(
+  const { data: report, isLoading } = UseRQ<ReportResponse>(
     ["reports", filters],
     () => getAllDeliveryReport(filters),
   );
@@ -318,21 +325,9 @@ const Home = () => {
     "warehouse",
     getWarehouse,
   );
+
   const queryClient = useQueryClient();
   const router = useRouter();
-
-  // const warehouses = useMemo(() => {
-  //   if (!report) return [];
-  //   return Array.from(
-  //     new Map(
-  //       report.map((r) => [
-  //         r.warehouse_name,
-  //         { id: r.created_by, name: r.created_by_name },
-  //       ]),
-  //     ).values(),
-  //   );
-  // }, [report]);
-
   const handleDelete = async (id: string) => {
     const data = await deleteDailyReport(id);
     if (data.success) {
@@ -342,17 +337,33 @@ const Home = () => {
   };
 
   const handleEdit = (id: string) => {
-    router.push(`/user/sales/delivery?id=${id}`);
+    // router.push(`/user/sales/delivery?id=${id}`);
+    window.open(`/user/sales/delivery?id=${id}`, "_blank");
   };
 
   const handleApplyFilters = () => {
-    setFilters(tempFilters);
+    setFilters((prev) => ({
+      ...prev,
+      ...tempFilters,
+      page: 1, // reset to first page on filter change
+    }));
+
     setShowFilters(false);
   };
 
   const handleClearFilters = () => {
     setTempFilters({});
-    setFilters({});
+
+    setFilters((prev) => ({
+      ...prev,
+      startDate: undefined,
+      endDate: undefined,
+      dayFilter: undefined,
+      status: undefined,
+      users: undefined,
+      chest: undefined,
+      page: 1, // keep pagination valid
+    }));
   };
 
   const handleDayFilterChange = (value: string) => {
@@ -385,15 +396,30 @@ const Home = () => {
       endDate,
     }));
   };
+  const totalPages = useMemo(() => {
+    const totalCount = report?.count ?? 0;
+    const limit = filters.limit ?? 16;
+
+    return Math.max(1, Math.ceil(totalCount / limit));
+  }, [report?.count, filters.limit]);
 
   const activeFilterCount = Object.values(filters).filter(Boolean).length;
+  const handlePageChange = (page: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      page,
+    }));
+  };
 
   const columns = useMemo(() => {
     return [
       {
         header: "No",
         render: (_row: SalesSlipPayload, index: number) => (
-          <span className="font-medium">{index + 1}</span>
+          <span className="font-medium">
+            {" "}
+            {(filters.page - 1) * filters.limit + index + 1}
+          </span>
         ),
       },
       {
@@ -701,7 +727,10 @@ const Home = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {warehousesData?.map((warehouse) => (
-                      <SelectItem key={warehouse.id} value={warehouse?.name as string}>
+                      <SelectItem
+                        key={warehouse.id}
+                        value={warehouse?.name as string}
+                      >
                         {warehouse.name}
                       </SelectItem>
                     ))}
@@ -746,7 +775,15 @@ const Home = () => {
       {isLoading ? (
         <Skeleton className="w-full h-24 bg-zinc-50" />
       ) : (
-        <DataTable columns={columns} itemsPerPage={16} data={report ?? []} />
+        <DataTable
+          columns={columns}
+          paginationMode="server"
+          // itemsPerPage={16}
+          data={report?.data ?? []}
+          currentPage={filters.page}
+          totalPages={totalPages}
+          onChange={handlePageChange}
+        />
       )}
     </main>
   );

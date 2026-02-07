@@ -1,24 +1,70 @@
 import supabase from "@/lib/supabase/supabaseClient";
+import { lineItemFilterProps } from "@/types/transaction ";
 
-const getAll_transactions = async () => {
+// const getAll_transactions = async (filter?: lineItemFilterProps) => {
+//   try {
+//     const { data, error } = await supabase
+//       .from("account_line_items_with_cash_chest")
+//       .select("*");
+
+//     if (error) throw error;
+//     return data;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+// to set a new transaction
+const getAll_transactions = async (filter?: lineItemFilterProps & { page?: number; limit?: number }) => {
   try {
-    const { data, error } = await supabase
+    const page = filter?.page ?? 1;
+    const limit = filter?.limit ?? 10;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    let query = supabase
       .from("account_line_items_with_cash_chest")
-      .select("*");
+      .select("*", { count: 'exact' })
+      .order('date', { ascending: false })
+      .order('created_at', { ascending: false });
+
+    // Apply filters
+    if (filter?.account_name) {
+      query = query.ilike('account_name', `%${filter.account_name}%`);
+    }
+
+    if (filter?.date) {
+      query = query.eq('date', filter.date);
+    }
+
+    if (filter?.source_form) {
+      query = query.eq('source_form', filter.source_form);
+    }
+
+    if (filter?.type) {
+      if (filter.type === 'amount_received') {
+        query = query.gt('amount_received', '0');
+      } else if (filter.type === 'amount_paid') {
+        query = query.gt('amount_paid', '0');
+      }
+    }
+
+    // Apply pagination
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
 
     if (error) throw error;
-    return data;
+    
+    return { data, total: count ?? 0 };
   } catch (error) {
     throw error;
   }
 };
-// to set a new transaction
-
 const addNewLineItem = async (payload: any) => {
   try {
     const { error } = await supabase.rpc(
       "insert_line_item_and_cash_chest",
-      payload
+      payload,
     );
 
     if (error) throw error;
@@ -43,20 +89,22 @@ const delete_transaction = async (id: string) => {
   }
 };
 
-const edit_transaction = async ( payload: any) => {
+const edit_transaction = async (payload: any) => {
   try {
-    console.log('@@',payload);
-    
-    const { error } = await supabase.rpc(
-  'update_account_transaction',
-  payload
-);    
-if(error) throw error
-  
+    console.log("@@", payload);
+
+    const { error } = await supabase.rpc("update_account_transaction", payload);
+    if (error) throw error;
+
     return true;
   } catch (error) {
     console.log((error as Error).message);
     throw error;
   }
 };
-export { getAll_transactions, addNewLineItem, delete_transaction,edit_transaction };
+export {
+  getAll_transactions,
+  addNewLineItem,
+  delete_transaction,
+  edit_transaction,
+};

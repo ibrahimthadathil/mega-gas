@@ -1,3 +1,6 @@
+
+
+
 "use client";
 
 import type React from "react";
@@ -125,10 +128,11 @@ const createTransactionSchema = (
             ? data.line_Item.amount_received
             : data.line_Item.amount_paid;
 
-        return cashTotal <= transactionAmount;
+        // Cash chest total must match the transaction amount exactly when isSales is false
+        return cashTotal === transactionAmount;
       },
       {
-        message: `Cash chest total cannot exceed the ${
+        message: `Cash chest total must equal the ${
           transactionType === "received" ? "received" : "paid"
         } amount`,
         path: ["cash_chest"],
@@ -171,7 +175,7 @@ export function TransactionForm({
           note_20: 0,
           note_10: 0,
           coin_5: 0,
-          source_reference_type: "payments-receipts",
+          source_reference_type: "Account transaction",
         },
       };
     }
@@ -216,19 +220,7 @@ export function TransactionForm({
   });
 
   const watchedFields = watch();
-  const showCashChest =
-    !isSales &&
-    watchedFields.line_Item.date !== "" &&
-    watchedFields.line_Item.account_id !== "" &&
-    (transactionType === "received"
-      ? watchedFields.line_Item.amount_received > 0
-      : watchedFields.line_Item.amount_paid > 0);
-// 🔥 NEW: Update date when slipDate prop changes
-// useEffect(() => {
-//   if (slipDate && !initialData) {
-//     setValue("line_Item.date", slipDate);
-//   }
-// }, [slipDate, setValue, initialData]);
+
   useEffect(() => {
     if (initialData) {
       reset(transformInitialData(initialData));
@@ -254,6 +246,7 @@ export function TransactionForm({
   };
 
   const onFormSubmit = (data: Transaction) => {
+
     if (onEdit && transactionId) {
       onEdit(data);
     } else {
@@ -267,7 +260,7 @@ export function TransactionForm({
     transactionType === "received"
       ? watchedFields.line_Item.amount_received
       : watchedFields.line_Item.amount_paid;
-  const cashExceedsAmount = !isSales && cashTotal > transactionAmount;
+  const cashMismatch = !isSales && cashTotal !== transactionAmount;
 
   return (
     <div className="space-y-6">
@@ -282,7 +275,7 @@ export function TransactionForm({
                 name="line_Item.date"
                 control={control}
                 render={({ field }) => (
-                  <Input id="date" type="date" {...field} readOnly={isSales} />
+                  <Input id="date" type="date" {...field} disabled={isSales} />
                 )}
               />
               {errors.line_Item?.date && (
@@ -292,39 +285,6 @@ export function TransactionForm({
               )}
             </div>
 
-            {/* <div className="grid gap-2">
-              <Label htmlFor="account_name">Account Name</Label>
-              <Controller
-                name="line_Item.account_id"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={handleAccountSelect}
-                  >
-                    <SelectTrigger id="account_name">
-                      <SelectValue placeholder="Select account" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {!isLoading &&
-                        accountName?.map((account) => (
-                          <SelectItem
-                            key={account.id}
-                            value={account?.id as string}
-                          >
-                            {account.account_name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.line_Item?.account_id && (
-                <p className="text-sm text-red-500">
-                  {errors.line_Item.account_id.message}
-                </p>
-              )}
-            </div> */}
             <div className="grid gap-2">
               <Label htmlFor="account_name">Account Name</Label>
               <Controller
@@ -475,6 +435,7 @@ export function TransactionForm({
                     type="text"
                     placeholder="Add any notes or comments"
                     {...field}
+                   
                   />
                 )}
               />
@@ -483,7 +444,8 @@ export function TransactionForm({
         </div>
       </div>
 
-      {showCashChest && (
+      {/* Cash Chest Section - Only show when isSales is false */}
+      {!isSales && (
         <>
           <Separator />
 
@@ -657,7 +619,7 @@ export function TransactionForm({
 
                 <div
                   className={`rounded-lg p-4 ${
-                    cashExceedsAmount ? "bg-red-50" : "bg-muted"
+                    cashMismatch ? "bg-red-50" : "bg-muted"
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -666,7 +628,7 @@ export function TransactionForm({
                     </span>
                     <span
                       className={`text-lg font-bold ${
-                        cashExceedsAmount ? "text-red-600" : ""
+                        cashMismatch ? "text-red-600" : ""
                       }`}
                     >
                       {new Intl.NumberFormat("en-IN", {
@@ -676,10 +638,22 @@ export function TransactionForm({
                       }).format(cashTotal)}
                     </span>
                   </div>
-                  {cashExceedsAmount && (
+                  <div className="mt-2 flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">
+                      Transaction Amount:
+                    </span>
+                    <span className="font-medium">
+                      {new Intl.NumberFormat("en-IN", {
+                        style: "currency",
+                        currency: "INR",
+                        minimumFractionDigits: 0,
+                      }).format(transactionAmount)}
+                    </span>
+                  </div>
+                  {cashMismatch && transactionAmount > 0 && (
                     <p className="mt-2 text-sm text-red-600">
                       Cash chest total (₹{cashTotal.toLocaleString("en-IN")})
-                      exceeds {transactionType} amount (₹
+                      must equal {transactionType} amount (₹
                       {transactionAmount.toLocaleString("en-IN")})
                     </p>
                   )}
@@ -700,7 +674,7 @@ export function TransactionForm({
         <Button
           onClick={handleSubmit(onFormSubmit)}
           size="lg"
-          disabled={cashExceedsAmount}
+          disabled={!isSales && cashMismatch}
         >
           {isEditMode
             ? "Update Transaction"

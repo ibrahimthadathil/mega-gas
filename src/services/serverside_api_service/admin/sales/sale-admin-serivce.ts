@@ -98,7 +98,7 @@ const editSaleSlip = async (data: any, authId: string, slipId: string) => {
 const getAllSalesReports = async (filters:FilterParams) => {
   try {
     const {data,success,count} = await daily_Report_View(filters);
-    if (success) return { success, data};
+    if (success) return { success, result:data,count};
     else return { success: false };
   } catch (error) {
     return { success: false, message: (error as Error).message };

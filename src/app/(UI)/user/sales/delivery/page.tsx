@@ -69,6 +69,7 @@ interface Sale {
 }
 
 interface TransactionItem {
+  "date":string;
   "account id": string;
   "account name"?: string;
   "amount paid": number;
@@ -331,14 +332,15 @@ export default function Home() {
     );
   }
   const handleSalesTransaction = (transaction: any) => {
+    
     const formattedTransaction: TransactionItem = {
+      "date":transaction.line_Item.date,
       "account id": transaction.line_Item.account_id,
       "account name": transaction.line_Item.account_name,
       "amount paid": transaction.line_Item.amount_paid || 0,
       "amount received": transaction.line_Item.amount_received || 0,
-      remark: transaction.line_Item.source_form || "Transaction",
+      remark: transaction.line_Item.remarks || "sales slip Transaction",
     };
-
     const current = watch("salesTransactions") || [];
     setValue("salesTransactions", [...current, formattedTransaction]);
   };
@@ -489,8 +491,7 @@ export default function Home() {
         route.push("/user/sales");
       } else {
         response = await updateSalesSlip(report, report.id as string);
-        // route.push("/admin/sales-report");
-        route.back();
+        if(window.opener)window.close()
       }
       if (response.success) {
         toast.success(response.message);
@@ -519,7 +520,7 @@ export default function Home() {
 
         <form
           onSubmit={handleSubmit(
-            onSubmit,
+            onSubmit,onError
             //     (errors) => {
             // console.log('❌ FORM VALIDATION FAILED:', errors);
             // alert('Validation errors: ' + JSON.stringify(errors, null, 2));}
@@ -625,27 +626,6 @@ export default function Home() {
                       oldStock={payload?.currentStock}
                       sales={sales || []}
                     />
-
-                    {/* <ExpensesSection
-                      expenses={payload?.expenses as Expense[]}
-                    /> */}
-                    {/* <ExpensesSection
-                      expenses={
-                        (isEditMode
-                          ? formExpenses
-                          : payload?.expenses) as Expense[]
-                      }
-                    /> */}
-                    {/* <Controller
-                      name="expenses"
-                      control={control}
-                      render={({ field }) => (
-                        <ExpensesSection
-                          expenses={field.value as Expense[]}
-                          onChange={field.onChange}
-                        />
-                      )}
-                    /> */}
 
                     {isEditMode ? (
                       <Controller

@@ -1,9 +1,14 @@
 import axios from "axios";
 
 // to view all the transferd stock
-export const getTransferedStockSTatus = async () => {
+export const getTransferedStockSTatus = async (filter: {
+  page: number;
+  limit: number;
+}) => {
   try {
-    const result = await axios.get("/api/user/stock/transfer");
+    const result = await axios.get("/api/user/stock/transfer", {
+      params: { page: filter?.page || 1, limit: filter?.limit || 10 },
+    });
     return result.data;
   } catch (error) {
     throw error;

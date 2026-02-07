@@ -10,6 +10,7 @@ import {
   view_Transfered_stock,
 } from "@/repository/user/stock/stockRepository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
+import { TransferStockFilters } from "@/types/stock";
 import { STATUS } from "@/types/types";
 
 const unloadSlipRegister = async (data: TripFormData, userId: string) => {
@@ -93,11 +94,11 @@ const getTransferedView = async (id: string) => {
   }
 };
 
-const displayStockTransfer = async () => {
+const displayStockTransfer = async (filter:TransferStockFilters) => {
   try {
-    const viewData = await view_Transfered_stock();
-    if (viewData) return { success: true, viewData };
-    else return { success: true, viewData: [] };
+    const {count,data} = await view_Transfered_stock(filter);
+    if (data) return { success: true, data,count };
+    else return { success: true, data: [] };
   } catch (error) {
     throw error;
   }

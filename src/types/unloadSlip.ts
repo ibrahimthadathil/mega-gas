@@ -52,3 +52,16 @@ export interface PlantLoadUnloadView {
 
   unload_details: UnloadDetail[]
 }
+
+export type UnloadFilters = {
+  page?: number;
+  limit?: number;
+
+  warehouseId?: string;
+
+  billDateFrom?: string;   // '2026-01-01'
+  billDateTo?: string;     // '2026-01-31'
+
+  unloadDateFrom?: string; // '2026-01-01'
+  unloadDateTo?: string;   // '2026-01-31';
+};

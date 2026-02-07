@@ -5,37 +5,12 @@ import {
   edit_transaction,
   getAll_transactions,
 } from "@/repository/user/accounts/transaction/transactionRepository";
-
-// const createNewTransaction = async (newTransaction: any, userId: string) => {
-//   console.log(newTransaction,'llll');
-  
-//   try {
-//     const { source_form_reference_id, ...lineItem } = newTransaction.line_Item;
-//     const payload = {
-//       p_line_item: {
-//         ...lineItem,
-//         created_by: userId,
-//       },
-//       p_cash_chest: {
-//         chest_name: "office",
-//         ...newTransaction.cash_chest,
-//         created_by: userId,
-//       },
-//     };
-
-//     const result = await addNewLineItem(payload);
-//     if (result) return { success: true };
-//     else return { success: false };
-//   } catch (error) {
-//     console.log((error as Error).message);
-
-//     throw error;
-//   }
-// };
+import { lineItemFilterProps } from "@/types/transaction ";
 
 
 const createNewTransaction = async (newTransaction: any, userId: string) => {
   try {
+    
     const { source_form_reference_id, ...lineItem } = newTransaction.line_Item;
     
     const isPaid = lineItem.amount_paid > 0;
@@ -62,10 +37,10 @@ const createNewTransaction = async (newTransaction: any, userId: string) => {
 };
 
 
-const getAllTransaction = async () => {
+const getAllTransaction = async (filter?:lineItemFilterProps) => {
   try {
-    const result = await getAll_transactions();
-    if (result) return { success: true, result };
+    const {data,total} = await getAll_transactions(filter);
+    if (data) return { success: true, data,total };
     else return { success: false };
   } catch (error) {
     console.log((error as Error).message);

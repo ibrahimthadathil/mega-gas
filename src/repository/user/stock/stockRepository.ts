@@ -1,4 +1,5 @@
 import supabase from "@/lib/supabase/supabaseClient";
+import { TransferStockFilters } from "@/types/stock";
 
 const unload_Slip = async (payload: Record<string, unknown>) => {
   try {
@@ -85,20 +86,65 @@ const Edit_stock_transfer = async (transferId: string, payload: Record<string,un
 };
 
 // view all transfered stock
-const view_Transfered_stock = async () => {
+// const view_Transfered_stock = async () => {
+//   try {
+//     const { data, error } = await supabase
+//       .from("stock_transfer_view")
+//       .select("*")
+//       .order("created_at", { ascending: false });
+//     if (error) throw error;
+//     return data;
+//   } catch (error) {
+//     console.log((error as Error).message);
+
+//     throw error;
+//   }
+// };
+const view_Transfered_stock = async (filters: TransferStockFilters = {}) => {
   try {
-    const { data, error } = await supabase
+    const {
+      startDate,
+      endDate,
+      page = 1,
+      limit = 10,
+    } = filters;
+
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+
+    let query = supabase
       .from("stock_transfer_view")
-      .select("*")
-      .order("created_at", { ascending: false });
+      .select("*", { count: "exact" }) // 👈 get total count
+      .order("created_at", { ascending: false }); // 👈 latest first
+
+    // ✅ Date filters
+    if (startDate) {
+      query = query.gte("created_at", startDate);
+    }
+
+    if (endDate) {
+      query = query.lte("created_at", endDate);
+    }
+
+    // ✅ Pagination
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
+
     if (error) throw error;
-    return data;
+
+    return {
+      data,
+      count, // 👈 total rows for pagination UI
+      // page,
+      // limit,
+    };
   } catch (error) {
     console.log((error as Error).message);
-
     throw error;
   }
 };
+
 
 // delete stock transfer
 const delete_stock_transfer = async (transferId: string) => {

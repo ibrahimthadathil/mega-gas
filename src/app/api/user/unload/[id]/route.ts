@@ -2,7 +2,10 @@ import { getAuthUser } from "@/lib/auth/jwt";
 import {
   deleteUnloadSlipById,
   editUnloadSlip,
+<<<<<<< HEAD
   getunloadData,
+=======
+>>>>>>> stage
 } from "@/services/serverside_api_service/user/unload/unload-service";
 import { STATUS } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
@@ -13,6 +16,10 @@ export const DELETE = async (
 ) => {
   try {
     const { id } = await params;
+<<<<<<< HEAD
+=======
+    console.log("👀👀👀", id);
+>>>>>>> stage
 
     const { user, error: authError } = await getAuthUser();
     const { message, success } = await deleteUnloadSlipById(
@@ -37,6 +44,7 @@ export const DELETE = async (
   }
 };
 
+<<<<<<< HEAD
 export const PUT = async (
   req: NextRequest,
   { params }: { params: { id: string } },
@@ -49,6 +57,22 @@ export const PUT = async (
       { succes, message },
       { status: STATUS.SUCCESS.code },
     );
+=======
+export const PUT = async (req: NextRequest) => {
+  try {
+    const data = await req.json();
+    const { message, success } = await editUnloadSlip(data);
+    if (success)
+      return NextResponse.json(
+        { success, message },
+        { status: STATUS.SUCCESS.code },
+      );
+    else
+      return NextResponse.json(
+        { success, message },
+        { status: STATUS.BAD_REQUEST.code },
+      );
+>>>>>>> stage
   } catch (error) {
     return NextResponse.json(
       { message: STATUS.SERVER_ERROR.message },
