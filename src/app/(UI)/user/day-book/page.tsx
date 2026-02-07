@@ -2924,10 +2924,10 @@ export default function CashBook() {
                     Description
                   </th>
                   <th className="py-4 px-6 text-xs font-semibold text-slate-600 uppercase tracking-wider text-right w-44">
-                    Paid
+                    Received
                   </th>
                   <th className="py-4 px-6 text-xs font-semibold text-slate-600 uppercase tracking-wider text-right w-44">
-                    Received
+                    Paid
                   </th>
                   <th className="py-4 px-6 text-xs font-semibold text-slate-600 uppercase tracking-wider text-right w-44">
                     Balance
