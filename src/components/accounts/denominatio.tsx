@@ -23,6 +23,7 @@ const denominations = [
   { label: "₹200", value: 200, key: "note_200" },
   { label: "₹100", value: 100, key: "note_100" },
   { label: "₹50", value: 50, key: "note_50" },
+  { label: "₹20", value: 20, key: "note_20" },
   { label: "₹10", value: 10, key: "note_10" },
 ] as const;
 
@@ -33,6 +34,7 @@ const cashAdjustmentSchema = z
     note_200: z.number().int("Must be a whole number"),
     note_100: z.number().int("Must be a whole number"),
     note_50: z.number().int("Must be a whole number"),
+    note_20: z.number().int("Must be a whole number"),
     note_10: z.number().int("Must be a whole number"),
     // remarks: z.string().min(3, "Remarks must be at least 3 characters"),
   })
@@ -43,6 +45,7 @@ const cashAdjustmentSchema = z
         data.note_200 * 200 +
         data.note_100 * 100 +
         data.note_50 * 50 +
+        data.note_20 * 20 +
         data.note_10 * 10;
       return total === 0;
     },
@@ -74,6 +77,7 @@ const CashAdjustmentDialog = ({ onSubmit }: CashAdjustmentDialogProps) => {
       note_200: 0,
       note_100: 0,
       note_50: 0,
+      note_20: 0,
       note_10: 0,
       // remarks: "",
     },
@@ -89,6 +93,7 @@ const CashAdjustmentDialog = ({ onSubmit }: CashAdjustmentDialogProps) => {
       (watchedValues.note_200 || 0) * 200 +
       (watchedValues.note_100 || 0) * 100 +
       (watchedValues.note_50 || 0) * 50 +
+      (watchedValues.note_20 || 0) * 20 +
       (watchedValues.note_10 || 0) * 10
     );
   };
