@@ -8,23 +8,25 @@ import {
 import { checkUserByAuthId } from "@/repository/user/userRepository";
 import { lineItemFilterProps } from "@/types/transaction ";
 
-
 const createNewTransaction = async (newTransaction: any, userId: string) => {
   try {
-    const user = await checkUserByAuthId(userId)
+    const user = await checkUserByAuthId(userId);
+
     const { source_form_reference_id, ...lineItem } = newTransaction.line_Item;
-    
+
     const isPaid = lineItem.amount_paid > 0;
 
     const payload = {
       p_line_item: {
         ...lineItem,
-        created_by: user.id,
+
+        created_by: user?.id,
       },
       p_cash_chest: {
         chest_name: "office",
         ...adjustCashChest(newTransaction.cash_chest, isPaid),
-        created_by: user.id,
+
+        created_by: user?.id,
       },
     };
 
@@ -37,11 +39,10 @@ const createNewTransaction = async (newTransaction: any, userId: string) => {
   }
 };
 
-
-const getAllTransaction = async (filter?:lineItemFilterProps) => {
+const getAllTransaction = async (filter?: lineItemFilterProps) => {
   try {
-    const {data,total} = await getAll_transactions(filter);
-    if (data) return { success: true, data,total };
+    const { data, total } = await getAll_transactions(filter);
+    if (data) return { success: true, data, total };
     else return { success: false };
   } catch (error) {
     console.log((error as Error).message);
@@ -62,7 +63,7 @@ const deleteTransactionAccount = async (id: string) => {
 const editTransaction = async (
   id: string,
   updatedTransaction: any,
-  userId: string
+  userId: string,
 ) => {
   try {
     const { source_form_reference_id, ...lineItem } =
