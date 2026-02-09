@@ -40,6 +40,7 @@ export default function Home() {
         account_type: type,
       });      
       if (data.success)
+        toast.success('Created')
         queryClient.invalidateQueries({ queryKey: ["accounts"] });
     } catch (error) {
       toast.error("failed to add accounts");
