@@ -75,7 +75,7 @@ const editTransaction = async (
         ...rest,
       },
       p_cash_chest: {
-        chest_name: "default",
+        chest_name: "office",
         ...updatedTransaction.cash_chest,
       },
     };
