@@ -908,8 +908,7 @@ const UnloadSlipPage = () => {
   
   );
 
-  console.log("Unloaded Record:", unloadedRecord);
-  console.log("Current Filters:", apiFilters);
+ 
 
   const queryClient = useQueryClient();
   const { role } = useSelector((user: Rootstate) => user.user);

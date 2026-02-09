@@ -3,11 +3,11 @@ import supabaseAdmin from "@/lib/supabase/supabaseAdmin";
 const getAllInventory = async () => {
   try {
     const { data, error } = await supabaseAdmin
-      .from("current_inventory_levels") // change this to "current_inventory_levels" table later
+      .from("current_inventory_levels")
       .select("*");
+
     if (error) throw error;
-    console.log(data.length);
-    
+
     return data;
   } catch (error) {
     console.log((error as Error).message);
