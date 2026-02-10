@@ -581,6 +581,7 @@ export default function TransactionsPage() {
                       {transaction.amount_paid}
                     </TableCell>
                     <TableCell>
+                      {transaction.source_form!=="Sales Slip"?
                       <div className="flex gap-2">
                         <Button
                           variant="ghost"
@@ -613,7 +614,7 @@ export default function TransactionsPage() {
                           ]}
                           action={() => onDelete(transaction.line_item_id as string)}
                         />
-                      </div>
+                      </div>:"-"}
                     </TableCell>
                   </TableRow>
                 ))
