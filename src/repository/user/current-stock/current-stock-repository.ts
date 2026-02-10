@@ -17,5 +17,16 @@ const show_the_product_qty_by_product = async (
     throw error;
   }
 };
-
-export {show_the_product_qty_by_product}
+const getCurrentInventory = async () => {
+  try {
+    const { data, error } = await supabase
+      .from("current_inventory_levels")
+      .select("*");
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.log((error as Error).message);
+    throw error;
+  }
+};
+export {show_the_product_qty_by_product,getCurrentInventory}

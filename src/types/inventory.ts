@@ -19,3 +19,26 @@ export interface TransferedInventory  {
   page?: number;
   limit?: number;
 };
+
+export interface InventoryItem {
+  idx: number;
+  warehouse_id: string;
+  product_id: string;
+  warehouse_name: string;
+  product_name: string;
+  tags: string;
+  qty: string;
+  is_empty: boolean;
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  memberIds: string[];
+}
+
+export interface PivotTableData {
+  items: InventoryItem[];
+  warehouseGroups: Group[];
+  productGroups: Group[];
+}
