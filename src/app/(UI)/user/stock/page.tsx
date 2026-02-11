@@ -18,7 +18,12 @@ import { useSelector } from "react-redux";
 import { Rootstate } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type ReportResponse = {
   data: StockTransfer[];
@@ -33,26 +38,25 @@ export default function Home() {
     ["stock", filters.page, filters.limit],
     () => getTransferedStockSTatus(filters),
   );
-  console.log(stocks);
 
   const { role } = useSelector((user: Rootstate) => user.user);
-  const queryClieny = useQueryClient();
+  const queryClient = useQueryClient();
   const router = useRouter();
   const handleDelete = async (id: string) => {
     try {
       const data = await deleteTransferedStockRecord(id);
       if (data.success) {
-        queryClieny.invalidateQueries({ queryKey: ["stock"] });
+        queryClient.invalidateQueries({ queryKey: ["stock"] });
         toast.success(data.message);
       } else toast.warning(data.message);
     } catch (error) {
       toast.error((error as Error).message);
     }
   };
-  // const handleEdit = (data: StockTransfer) => {
-  //   // Navigate to transfer page with edit mode and stock data
-  //   router.push(`/user/stock/transfer?mode=edit&id=${data.id}`);
-  // };
+  const handleEdit = (rowData: StockTransfer) => {
+    queryClient.setQueryData(["stock-transfer-edit", rowData.id], rowData);
+    router.push(`/user/stock/transfer/${rowData.id}`);
+  };
   const handlePageChange = (page: number) => {
     setFilters((prev) => ({
       ...prev,
@@ -134,43 +138,41 @@ export default function Home() {
         </span>
       ),
     },
- {
-  header: "Remark",
-  render: (row: StockTransfer) => {
-    const remark = row.remarks;
+    {
+      header: "Remark",
+      render: (row: StockTransfer) => {
+        const remark = row.remarks;
 
-    if (!remark || remark.trim() === "") {
-      return <div className="text-muted-foreground text-center">—</div>;
-    }
+        if (!remark || remark.trim() === "") {
+          return <div className="text-muted-foreground text-center">—</div>;
+        }
 
-    // Split into chunks of 25 characters
-    const formattedRemark = remark.match(/.{1,25}/g)?.join("\n") || remark;
+        // Split into chunks of 25 characters
+        const formattedRemark = remark.match(/.{1,25}/g)?.join("\n") || remark;
 
-    return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="max-w-[100px] truncate cursor-pointer text-center">
-              {remark}
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className="max-w-xs whitespace-pre-wrap">{formattedRemark}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  },
-},
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="max-w-[100px] truncate cursor-pointer text-center">
+                  {remark}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs whitespace-pre-wrap">
+                  {formattedRemark}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      },
+    },
     {
       header: "Actions",
       render: (row: StockTransfer) =>
         role == "admin" ? (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => alert("Not implemented")}
-          >
+          <Button variant="ghost" size="sm" onClick={() => handleEdit(row)}>
             <Pencil className="h-4 w-4" />
           </Button>
         ) : (

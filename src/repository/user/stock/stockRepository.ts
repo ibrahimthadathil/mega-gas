@@ -85,20 +85,6 @@ const Edit_stock_transfer = async (transferId: string, payload: Record<string,un
   }
 };
 
-// view all transfered stock
-// const view_Transfered_stock = async () => {
-//   try {
-//     const { data, error } = await supabase
-//       .from("stock_transfer_view")
-//       .select("*")
-//       .order("created_at", { ascending: false });
-//     if (error) throw error;
-//     return data;
-//   } catch (error) {
-//     console.log((error as Error).message);
-
-//     throw error;
-//   }
 // };
 const view_Transfered_stock = async (filters: TransferStockFilters = {}) => {
   try {

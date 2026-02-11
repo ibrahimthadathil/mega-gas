@@ -50,7 +50,7 @@ const unloadSlipRegister = async (data: TripFormData, userId: string) => {
 };
 
 const transferStock = async (data: StockTransferFormData, userId: string) => {
-  try {    
+  try {
     const existUser = await checkUserByAuthId(userId);
     if (existUser.id) {
       const payloadData = {
@@ -61,8 +61,8 @@ const transferStock = async (data: StockTransferFormData, userId: string) => {
           "from warehouse": data.from,
           "to warehouse": data.to,
           Empty_inclusive: data.withEmpty,
-          "return product id": data.withEmpty ? data.return_product_id: null,
-          "return qty": data.withEmpty ?data.quantity:0,
+          "return product id": data.withEmpty ? data.return_product_id : null,
+          "return qty": data.withEmpty ? data.quantity : 0,
           "return from warehouse": data.to,
           "return to warehouse": data.from,
           remarks: data.remarks,
@@ -102,10 +102,10 @@ const getTransferedView = async (id: string) => {
   }
 };
 
-const displayStockTransfer = async (filter:TransferStockFilters) => {
+const displayStockTransfer = async (filter: TransferStockFilters) => {
   try {
-    const {count,data} = await view_Transfered_stock(filter);
-    if (data) return { success: true, data,count };
+    const { count, data } = await view_Transfered_stock(filter);
+    if (data) return { success: true, data, count };
     else return { success: true, data: [] };
   } catch (error) {
     throw error;
@@ -125,25 +125,43 @@ const deleteTransferStock = async (transferId: string) => {
 const EditStockTranfer = async (
   authId: string,
   transferId: string,
-  data: StockTransferFormData
+  data: StockTransferFormData,
 ) => {
   try {
     const checkUser = await checkUserByAuthId(authId);
-    const payload ={
-      "created by":checkUser.id
-    }
+    const payload = {
+      date: data.date,
+      "product id": data.product,
+      qty: data.quantity,
+      "from warehouse": data.from,
+      "to warehouse": data.to,
+      Empty_inclusive: data.withEmpty,
+      "return product id": data.withEmpty ? data.return_product_id : null,
+      "return qty": data.withEmpty ? data.quantity : 0,
+      "return from warehouse": data.to,
+      "return to warehouse": data.from,
+      remarks: data.remarks,
+      "created by": checkUser.id,
+    };
+
     if (checkUser) {
       const Edited = await Edit_stock_transfer(transferId, payload);
-      if(Edited)return {success:true,message:'Transfer Edited'}
-      else return {success:false,message:'Failed to edit'}
+      if (Edited) return { success: true, message: "Transfer Edited" };
+      else return { success: false, message: "Failed to edit" };
     } else throw Error(STATUS.UNAUTHORIZED.message);
   } catch (error) {
     return { success: false, message: (error as Error).message };
   }
 };
+
+const getTransferById = async () => {
+  try {
+  } catch (error) {}
+};
 export {
   unloadSlipRegister,
   transferStock,
+  getTransferById,
   getunloadData,
   getTransferedView,
   displayStockTransfer,

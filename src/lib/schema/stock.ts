@@ -1,4 +1,5 @@
 export type StockTransferFormData = {
+  id?:string
   product: string;
   date: Date;
   from: string;

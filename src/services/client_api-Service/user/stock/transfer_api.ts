@@ -23,3 +23,11 @@ export const deleteTransferedStockRecord = async (id: string) => {
     throw error;
   }
 };
+export const EditTransferedStockRecord = async (id: string,data:any) => {
+  try {
+    const result = await axios.put(`/api/user/stock/transfer/${id}`,data);
+    return result.data;
+  } catch (error) {
+    throw error;
+  }
+};
