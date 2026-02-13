@@ -931,7 +931,6 @@ const UnloadSlipPage = () => {
   };
 
   const handleFilterChange = (key: keyof UnloadSlipFormData, value: any) => {
-    console.log(`Filter ${key} changed to:`, value);
     setValue(key, value);
     // Reset to first page when any filter changes (except page and limit)
     if (key !== "page" && key !== "limit") {

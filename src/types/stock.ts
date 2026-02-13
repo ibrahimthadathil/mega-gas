@@ -36,7 +36,8 @@ export interface StockTransfer {
 
 export interface TransferStockFilters {
   startDate?: string; // ISO string
-  endDate?: string;   // ISO string
+  endDate?: string; 
+  warehouseId?:string;  // ISO string
   page?: number;
   limit?: number;
 }
