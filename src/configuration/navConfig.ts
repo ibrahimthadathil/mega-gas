@@ -20,7 +20,7 @@ export const navItems = [
       {
         title: "User Management",
         url: "/admin/ums",
-        roles: ["admin", "manager",],
+        roles: ["admin", "manager"],
       },
       {
         title: "Daily Sales Report",
@@ -28,9 +28,9 @@ export const navItems = [
         roles: ["admin", "manager", "accountant"],
       },
       {
-        title:"Chest Summary",
-        url:"/admin/chest-summary",
-        roles:["admin","manager","accountant"]
+        title: "Chest Summary",
+        url: "/admin/chest-summary",
+        roles: ["admin", "manager", "accountant"],
       },
       {
         title: "Product Management",
@@ -48,6 +48,21 @@ export const navItems = [
     title: "User Dashboard",
     url: "/user/dashboard",
     icon: LayoutDashboardIcon,
+    items: [
+      {
+        title: "Dashboard view",
+        url: "/user/dashboard",
+        roles: [
+          "admin",
+          "manager",
+          "accountant",
+          "driver",
+          "plant_driver",
+          "godown_staff",
+          "office_staff",
+        ],
+      },
+    ],
     roles: [
       "admin",
       "manager",
@@ -59,19 +74,21 @@ export const navItems = [
     ],
   },
   {
-    title:" Day Book",
-    url:'/user/day-book',
+    title: " Day Book",
+    url: "#",
     icon: Wallet,
-    roles:[
-      "admin",
-      "manager",
-      "accountant",
-      "office_staff",
-    ]
+    items: [
+      {
+        title: "Day Book view",
+        url: "/user/day-book",
+        roles: ["admin", "manager", "accountant", "office_staff"],
+      },
+    ],
+    roles: ["admin", "manager", "accountant", "office_staff"],
   },
   {
     title: "Sales",
-    url: "/user/sales",
+    url: "#",
     icon: ClipboardCheck,
     roles: [
       "admin",
@@ -82,6 +99,18 @@ export const navItems = [
       "office_staff",
     ],
     items: [
+      {
+        title: "Sales Report",
+        url: "/user/sales",
+        roles: [
+          "admin",
+          "manager",
+          "accountant",
+          "driver",
+          "godown_staff",
+          "office_staff",
+        ],
+      },
       {
         title: "Delivery",
         url: "/user/sales/delivery",
@@ -98,14 +127,36 @@ export const navItems = [
   },
   {
     title: "Inventory Level",
-    url: "/user/inventory",
+    url: "#",
     icon: History,
+    items: [
+      {
+        title: "Current Inventory ",
+        url: "/user/inventory",
+        roles: ["admin", "manager", "accountant", "driver", "office_staff"],
+      },
+    ],
     roles: ["admin", "manager", "accountant", "driver", "office_staff"],
   },
   {
     title: "Current Stock",
-    url: "/user/current-stock",
+    url: "#",
     icon: Cylinder,
+    items: [
+      {
+        title: "Current Stock Level",
+        url: "/user/current-stock",
+        roles: [
+          "admin",
+          "manager",
+          "accountant",
+          "godown_staff",
+          "driver",
+          "plant_driver",
+          "office_staff",
+        ],
+      },
+    ],
     roles: [
       "admin",
       "manager",
@@ -118,10 +169,21 @@ export const navItems = [
   },
   {
     title: "Purchase",
-    url: "/user/purchase",
+    url: "#",
     icon: BookOpen,
     roles: ["admin", "manager", "accountant", "plant_driver", "godown_staff"],
     items: [
+      {
+        title: "Purchase Report",
+        url: "/user/purchase",
+        roles: [
+          "admin",
+          "manager",
+          "accountant",
+          "plant_driver",
+          "godown_staff",
+        ],
+      },
       {
         title: "Plant Load",
         url: "/user/purchase/plant-load",
@@ -131,16 +193,28 @@ export const navItems = [
   },
   {
     title: "Warehouse",
-    url: "/user/warehouses",
+    url: "#",
     icon: Warehouse,
+    items: [
+      {
+        title: "Warehouse List",
+        url: "/user/warehouses",
+        roles: ["admin", "manager", "accountant", "godown_staff"],
+      },
+    ],
     roles: ["admin", "manager", "accountant", "godown_staff"],
   },
   {
     title: "Stock",
-    url: "/user/stock",
+    url: "#",
     icon: Settings2,
     roles: ["admin", "manager", "accountant", "godown_staff", "office_staff"],
     items: [
+      {
+        title: "Stock Transfer List",
+        url: "/user/stock",
+        roles: ["admin", "manager", "accountant", "godown_staff", "office_staff"],
+      },
       {
         title: "unload Slip",
         url: "/user/stock/load-slip",
@@ -161,8 +235,22 @@ export const navItems = [
   },
   {
     title: "Expenses",
-    url: "/user/expenses",
+    url: "#",
     icon: BookOpen,
+    items:[{
+      title: "Expenses List",
+      url: "/user/expenses",
+      
+      roles: [
+        "admin",
+        "manager",
+        "accountant",
+        "driver",
+        "plant_driver",
+        "godown_staff",
+        "office_staff",
+      ],
+    }],
     roles: [
       "admin",
       "manager",
@@ -173,13 +261,24 @@ export const navItems = [
       "office_staff",
     ],
   },
-
   {
     title: "Accounts",
-    url: "/user/accounts",
+    url: "#",
     icon: BookAIcon,
     roles: ["admin", "manager", "accountant", "godown_staff", "office_staff"],
     items: [
+      {
+
+        title: "Accounts List",
+        url: "/user/accounts",
+        roles: [
+          "admin",
+          "manager",
+          "accountant",
+          "godown_staff",
+          "office_staff",
+        ],
+      },
       {
         title: "Transactions",
         url: "/user/accounts/transactions",
@@ -207,7 +306,7 @@ export const roleRouteConfig = {
     "/user/purchase",
     "/user/warehouses",
     "/user/stock",
-    '/user/day-book',
+    "/user/day-book",
     "/user/expenses",
     "/user/accounts",
     "/user/inventory",
@@ -245,7 +344,7 @@ export const roleRouteConfig = {
     "/user/current-stock",
     "/user/accounts",
     "/user/stock",
-    '/user/day-book',
+    "/user/day-book",
   ],
 };
 

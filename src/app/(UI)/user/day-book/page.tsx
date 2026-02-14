@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import React, { useMemo, useState, useEffect, useRef } from "react";
@@ -26,9 +24,12 @@ import {
   Loader2,
   Users,
   ChevronDown,
+  ExternalLink,
 } from "lucide-react";
 import { UseRQ } from "@/hooks/useReactQuery";
 import { getDayBook } from "@/services/client_api-Service/user/day-book/day-book-api";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 // ─── TypeScript Types ────────────────────────────────────────────────
 interface Denomination {
@@ -129,6 +130,7 @@ interface TransactionBlock {
   warehouse_name: string;
   qumilative_balance: number;
   total_amount: number;
+  sales_slip_id: string;
 }
 
 interface FilterForm {
@@ -284,7 +286,7 @@ const DenominationModal: React.FC<{
     { label: "20", value: 20, count: entry.denominations[20] },
     { label: "10", value: 10, count: entry.denominations[10] },
     { label: "5", value: 5, count: entry.denominations[5] },
-  ].filter((d) => d.count > 0);
+  ].filter((d) => d.count > 0 || d.count < 0);
 
   const totalCash = denominationData.reduce(
     (sum, d) => sum + d.value * d.count,
@@ -347,7 +349,12 @@ const DenominationModal: React.FC<{
                     <tr key={ind}>
                       <td className="px-4 py-2.5 font-medium">₹{d.label}</td>
                       <td className="px-4 py-2.5 text-center text-slate-600">
-                        × {d.count}
+                        ×{" "}
+                        <span
+                          className={`${d.count < 0 ? "text-red-400" : ""}`}
+                        >
+                          {d.count}
+                        </span>
                       </td>
                       <td className="px-4 py-2.5 text-right font-mono">
                         {formatCurrency(d.value * d.count)}
@@ -418,6 +425,7 @@ export default function CashBook() {
       types: types === "all" ? undefined : types,
     }),
   );
+  console.log(daybook);
 
   // ─── Extract Unique Filter Options ────────────────────────────────────
   const uniqueChests = useMemo(
@@ -555,9 +563,10 @@ export default function CashBook() {
           blockReceived,
           blockPaid,
           round_off: record.round_off,
-          warehouse_name: record.warehouse_name||"Other",
+          warehouse_name: record.warehouse_name || "Other",
           qumilative_balance: record.qumilative_balance,
           total_amount: record.total_amount,
+          sales_slip_id: record.sales_slip_id,
         };
       })
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -914,6 +923,20 @@ export default function CashBook() {
                                           <Truck className="w-3 h-3" />
                                           {block.warehouse_name}
                                         </span>
+                                        {block?.sales_slip_id&&<button
+                                          onClick={() => {
+                                            window.open(
+                                              `/user/sales/delivery?id=${
+                                                block.sales_slip_id
+                                              }`,
+                                              "_blank",
+                                            );
+                                          }}
+                                          className="flex items-center gap-1 text-[12px] font-normal text-blue-500 hover:text-blue-700 hover:underline transition-colors"
+                                        >
+                                          Check Slip
+                                          <ExternalLink className="w-3.5 h-3.5" />
+                                        </button>}
                                       </div>
 
                                       <div className="flex items-center gap-2 text-sm">
