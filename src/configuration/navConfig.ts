@@ -156,6 +156,19 @@ export const navItems = [
           "office_staff",
         ],
       },
+      {
+        title: "Running Balance",
+        url: "/user/running",
+        roles: [
+          "admin",
+          "manager",
+          "accountant",
+          "godown_staff",
+          "driver",
+          "plant_driver",
+          "office_staff",
+        ],
+      },
     ],
     roles: [
       "admin",
