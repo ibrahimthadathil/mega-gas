@@ -3,6 +3,7 @@ import {
   running_balance_by_warehouse,
   show_the_product_qty_by_product,
 } from "@/repository/user/current-stock/current-stock-repository";
+import { RunningBalanceFilters } from "@/types/stock";
 import { STATUS } from "@/types/types";
 
 const getQtyByProductAndWarehouse = async (data: {
@@ -31,9 +32,9 @@ const getInventoryStatus = async () => {
   }
 };
 // running balance
-const runningBalancebyWarehouse = async () => {
+const runningBalancebyWarehouse = async (filter?:RunningBalanceFilters) => {
   try {
-    const result = await running_balance_by_warehouse();
+    const result = await running_balance_by_warehouse(filter);
     if (result) return { success: true, data: result };
     else throw Error("failed to fgetch");
   } catch (error) {

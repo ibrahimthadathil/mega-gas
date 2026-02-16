@@ -24,9 +24,21 @@ export const getInventoryDetails = async()=>{
     }
 }
 
-export const getRunning_balance = async ()=>{
+export const getRunning_balance = async (filter:{
+  endDate?: string;
+  productId?: string;
+  startDate?: string;
+  warehouseId?: string;
+})=>{
   try {
-    const result = await axios.get('/api/user/running-balance')
+    const result = await axios.get('/api/user/running-balance',{
+      params:{
+        endDate:filter?.endDate ,
+        productId:filter?.productId,
+        startDate:filter?.startDate,
+        warehouseId:filter?.warehouseId
+      }
+    })
     return result.data
   } catch (error) {
     throw error
