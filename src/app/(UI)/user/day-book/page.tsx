@@ -48,6 +48,7 @@ interface AccountItem {
   amount_paid: number;
   account_name: string;
   amount_received: number;
+  remark?:string
 }
 
 interface Expense {
@@ -113,6 +114,7 @@ interface TransactionItem {
   category: "Sale" | "Expense" | "Account" | "UPI" | "Online";
   type: "credit" | "debit";
   amount: number;
+  remark?:string
 }
 
 interface TransactionBlock {
@@ -493,6 +495,7 @@ export default function CashBook() {
               category: "Account",
               type: "credit",
               amount: acc.amount_received,
+              remark:acc.remark
             });
           }
           if (acc.amount_paid > 0) {
@@ -503,6 +506,7 @@ export default function CashBook() {
               category: "Account",
               type: "debit",
               amount: acc.amount_paid,
+              remark:acc.remark
             });
           }
         });
@@ -1049,6 +1053,9 @@ export default function CashBook() {
                                         </span>
                                       )}
                                     </div>
+                                      {
+                                        item.remark&&<span className="text-xs text-red-500">Remark : {item?.remark}</span>
+                                      }
                                   </div>
                                 </div>
                               </td>

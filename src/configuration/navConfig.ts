@@ -290,6 +290,16 @@ export const navItems = [
           "office_staff",
         ],
       },
+      {
+        title: "Account Summary",
+        url: "/user/accounts/summary",
+        roles: [
+          "admin",
+          "manager",
+          "accountant",
+          "office_staff",
+        ],
+      }
     ],
   },
 ];

@@ -228,7 +228,7 @@
 import DataTable from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import { UseRQ } from "@/hooks/useReactQuery";
-import { formatDate } from "@/lib/utils";
+import { currentDate, formatDate } from "@/lib/utils";
 import {
   deleteTransferedStockRecord,
   getTransferedStockSTatus,
@@ -530,6 +530,29 @@ export default function Home() {
           </TooltipProvider>
         );
       },
+    },
+    {
+      header:'created',
+      render:(row:StockTransfer)=>{
+        const remark = currentDate(row.created_at)
+        return (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="max-w-[100px] truncate cursor-pointer text-center">
+                  {remark.slice(0,8)}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs whitespace-pre-wrap">
+                  {remark}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        );
+      }
+      
     },
     {
       header: "Actions",
