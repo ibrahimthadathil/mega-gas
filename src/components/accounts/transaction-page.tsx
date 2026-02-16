@@ -32,13 +32,13 @@
 //   const [openEdit, setOpenEdit] = useState(false);
 //   const { data: Transaction, isLoading: transactionLoading } = UseRQ<
 //     Transaction[]
-//   >("transaction", getAllTransactions);  
+//   >("transaction", getAllTransactions);
 //   const handleAddTransaction = async (
 //     transaction: any,
 //     type: "received" | "paid"
 //   ) => {
 //     try {
-      
+
 //       const data = await createNewLineItem(transaction);
 //       if (data.success) {
 //         setOpenReceived(false);
@@ -52,7 +52,7 @@
 
 //   const handleEdit = async (payload: any) => {
 //     if (!editingTransaction) return;
-    
+
 //     try {
 //       const data = await updateTransaction(editingTransaction.line_item_id, payload);
 //       if (data.success) {
@@ -75,7 +75,6 @@
 //       } else throw Error("Failed to Delete  Transaction");
 //     } catch (error) {}
 //   };
-
 
 //   return (
 //     <div className="min-h-screen bg-background p-6">
@@ -133,8 +132,8 @@
 //         </div>
 
 //         {/* Edit Transaction Dialog */}
-//         <Dialog 
-//           open={openEdit} 
+//         <Dialog
+//           open={openEdit}
 //           onOpenChange={(open) => {
 //             setOpenEdit(open);
 //             if (!open) {
@@ -252,7 +251,6 @@
 //   );
 // }
 
-
 "use client";
 
 import { useState } from "react";
@@ -282,7 +280,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TransactionForm } from "@/components/accounts/transaction-form";
-import { Plus, Trash2, Pencil, ChevronLeft, ChevronRight, X } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Pencil,
+  ChevronLeft,
+  ChevronRight,
+  X,
+} from "lucide-react";
 import { createNewLineItem } from "@/services/client_api-Service/user/accounts/accounts_api";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -295,6 +300,13 @@ import {
 import { Transaction } from "@/types/types";
 import AlertModal from "@/components/alert-dialog";
 import { lineItemFilterProps } from "@/types/transaction ";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
+import { currentDate } from "@/lib/utils";
 interface FilterState extends lineItemFilterProps {
   page: number;
   limit: number;
@@ -303,9 +315,10 @@ export default function TransactionsPage() {
   const queryClient = useQueryClient();
   const [openReceived, setOpenReceived] = useState(false);
   const [openPaid, setOpenPaid] = useState(false);
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [editingTransaction, setEditingTransaction] =
+    useState<Transaction | null>(null);
   const [openEdit, setOpenEdit] = useState(false);
-  
+
   // Filter states
   const [filter, setFilter] = useState<FilterState>({
     account_name: "",
@@ -321,19 +334,19 @@ export default function TransactionsPage() {
     total: number;
     page: number;
     limit: number;
-  }>(["transaction",filter], () => getAllTransactions(filter));
-  
+  }>(["transaction", filter], () => getAllTransactions(filter));
+
   const transactions = response?.data || [];
   const total = response?.total || 0;
   const totalPages = Math.ceil(total / filter.limit);
 
   const handleAddTransaction = async (
     transaction: any,
-    type: "received" | "paid"
+    type: "received" | "paid",
   ) => {
     try {
-      console.log("from new ",transaction);
-      
+      console.log("from new ", transaction);
+
       const data = await createNewLineItem(transaction);
       if (data.success) {
         setOpenReceived(false);
@@ -349,7 +362,10 @@ export default function TransactionsPage() {
   const handleEdit = async (payload: any) => {
     if (!editingTransaction) return;
     try {
-      const data = await updateTransaction(editingTransaction.line_item_id, payload);
+      const data = await updateTransaction(
+        editingTransaction.line_item_id,
+        payload,
+      );
       if (data.success) {
         setOpenEdit(false);
         setEditingTransaction(null);
@@ -388,7 +404,8 @@ export default function TransactionsPage() {
     });
   };
 
-  const hasActiveFilters = filter.account_name || filter.date || filter.source_form || filter.type;
+  const hasActiveFilters =
+    filter.account_name || filter.date || filter.source_form || filter.type;
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -406,7 +423,10 @@ export default function TransactionsPage() {
                   Cash Received
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto" aria-describedby={undefined}>
+              <DialogContent
+                className="max-h-[90vh] max-w-2xl overflow-y-auto"
+                aria-describedby={undefined}
+              >
                 <DialogHeader>
                   <DialogTitle>Add Cash Received</DialogTitle>
                 </DialogHeader>
@@ -426,7 +446,10 @@ export default function TransactionsPage() {
                   Cash Paid
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto" aria-describedby={undefined}>
+              <DialogContent
+                className="max-h-[90vh] max-w-2xl overflow-y-auto"
+                aria-describedby={undefined}
+              >
                 <DialogHeader>
                   <DialogTitle>Add Cash Paid</DialogTitle>
                 </DialogHeader>
@@ -459,7 +482,9 @@ export default function TransactionsPage() {
                 id="account_name"
                 placeholder="Search account..."
                 value={filter.account_name}
-                onChange={(e) => handleFilterChange("account_name", e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange("account_name", e.target.value)
+                }
               />
             </div>
             <div className="space-y-2">
@@ -475,15 +500,21 @@ export default function TransactionsPage() {
               <Label htmlFor="source_form">Source Form</Label>
               <Select
                 value={filter.source_form}
-                onValueChange={(value) => handleFilterChange("source_form", value)}
+                onValueChange={(value) =>
+                  handleFilterChange("source_form", value)
+                }
               >
                 <SelectTrigger id="source_form">
                   <SelectValue placeholder="Select source" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value=" ">All</SelectItem>
-                  <SelectItem value="Transaction received">Transaction Received</SelectItem>
-                  <SelectItem value="Transaction paid">Transaction Paid</SelectItem>
+                  <SelectItem value="Transaction received">
+                    Transaction Received
+                  </SelectItem>
+                  <SelectItem value="Transaction paid">
+                    Transaction Paid
+                  </SelectItem>
                   <SelectItem value="Sales Slip">Sales Slip</SelectItem>
                 </SelectContent>
               </Select>
@@ -508,8 +539,8 @@ export default function TransactionsPage() {
         </div>
 
         {/* Edit Transaction Dialog */}
-        <Dialog 
-          open={openEdit} 
+        <Dialog
+          open={openEdit}
           onOpenChange={(open) => {
             setOpenEdit(open);
             if (!open) {
@@ -517,7 +548,10 @@ export default function TransactionsPage() {
             }
           }}
         >
-          <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto" aria-describedby={undefined}>
+          <DialogContent
+            className="max-h-[90vh] max-w-2xl overflow-y-auto"
+            aria-describedby={undefined}
+          >
             <DialogHeader>
               <DialogTitle>Edit Transaction</DialogTitle>
             </DialogHeader>
@@ -545,6 +579,7 @@ export default function TransactionsPage() {
                 <TableHead>Source Form</TableHead>
                 <TableHead>Amount Received</TableHead>
                 <TableHead>Amount Paid</TableHead>
+                <TableHead>Created</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -565,8 +600,9 @@ export default function TransactionsPage() {
                 transactions.map((transaction, index) => (
                   <TableRow key={index}>
                     <TableCell>
-                      {new Date(transaction.transaction_date || transaction.date).toLocaleDateString("en-US", {
-                        weekday: "long",
+                      {new Date(
+                        transaction.transaction_date || transaction.date,
+                      ).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
                         day: "numeric",
@@ -581,40 +617,70 @@ export default function TransactionsPage() {
                       {transaction.amount_paid}
                     </TableCell>
                     <TableCell>
-                      {transaction.source_form!=="Sales Slip"?
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setEditingTransaction(transaction);
-                            setOpenEdit(true);
-                          }}
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <AlertModal
-                          data={transaction}
-                          varient={"ghost"}
-                          contents={[
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>,
-                            <>
-                              This action cannot be undone. This will permanently delete{" "}
-                              <span className="font-semibold text-orange-400">
-                                {transaction.account_name || "This Account"}
-                              </span>
-                              's transaction and remove their data from our servers.
-                            </>,
-                          ]}
-                          action={() => onDelete(transaction.line_item_id as string)}
-                        />
-                      </div>:"-"}
+                      {(() => {
+                        const remark = currentDate(transaction.created_at);
+
+                        return (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="max-w-[100px] truncate cursor-pointer text-center">
+                                  {remark.slice(0, 7)}..
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="max-w-xs whitespace-pre-wrap">
+                                  {remark}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        );
+                      })()}
+                    </TableCell>
+
+                    <TableCell>
+                      {transaction.source_form !== "Sales Slip" ? (
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditingTransaction(transaction);
+                              setOpenEdit(true);
+                            }}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <AlertModal
+                            data={transaction}
+                            varient={"ghost"}
+                            contents={[
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>,
+                              <>
+                                This action cannot be undone. This will
+                                permanently delete{" "}
+                                <span className="font-semibold text-orange-400">
+                                  {transaction.account_name || "This Account"}
+                                </span>
+                                's transaction and remove their data from our
+                                servers.
+                              </>,
+                            ]}
+                            action={() =>
+                              onDelete(transaction.line_item_id as string)
+                            }
+                          />
+                        </div>
+                      ) : (
+                        "-"
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
@@ -626,14 +692,20 @@ export default function TransactionsPage() {
         {/* Pagination */}
         <div className="mt-4 flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
-            Showing {transactions.length === 0 ? 0 : (filter.page - 1) * filter.limit + 1} to{" "}
-            {Math.min(filter.page * filter.limit, total)} of {total} transactions
+            Showing{" "}
+            {transactions.length === 0
+              ? 0
+              : (filter.page - 1) * filter.limit + 1}{" "}
+            to {Math.min(filter.page * filter.limit, total)} of {total}{" "}
+            transactions
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setFilter((prev) => ({ ...prev, page: prev.page - 1 }))}
+              onClick={() =>
+                setFilter((prev) => ({ ...prev, page: prev.page - 1 }))
+              }
               disabled={filter.page === 1}
             >
               <ChevronLeft className="h-4 w-4" />
@@ -656,7 +728,9 @@ export default function TransactionsPage() {
                     key={i}
                     variant={filter.page === pageNum ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setFilter((prev) => ({ ...prev, page: pageNum }))}
+                    onClick={() =>
+                      setFilter((prev) => ({ ...prev, page: pageNum }))
+                    }
                   >
                     {pageNum}
                   </Button>
@@ -666,7 +740,9 @@ export default function TransactionsPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setFilter((prev) => ({ ...prev, page: prev.page + 1 }))}
+              onClick={() =>
+                setFilter((prev) => ({ ...prev, page: prev.page + 1 }))
+              }
               disabled={filter.page === totalPages}
             >
               Next

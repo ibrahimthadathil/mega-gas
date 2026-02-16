@@ -1,4 +1,8 @@
-import { getCurrentInventory, show_the_product_qty_by_product } from "@/repository/user/current-stock/current-stock-repository";
+import {
+  getCurrentInventory,
+  running_balance_by_warehouse,
+  show_the_product_qty_by_product,
+} from "@/repository/user/current-stock/current-stock-repository";
 import { STATUS } from "@/types/types";
 
 const getQtyByProductAndWarehouse = async (data: {
@@ -17,14 +21,27 @@ const getQtyByProductAndWarehouse = async (data: {
   }
 };
 
-const getInventoryStatus = async()=>{
-    try {
-        const details = await getCurrentInventory()
-        if(details)return { success:true , data:details }
-        else throw Error (STATUS.NOT_FOUND.message)
-    } catch (error) {
-        return{success:false,message:(error as Error).message}
-    }
-}
-
-export { getQtyByProductAndWarehouse, getInventoryStatus };
+const getInventoryStatus = async () => {
+  try {
+    const details = await getCurrentInventory();
+    if (details) return { success: true, data: details };
+    else throw Error(STATUS.NOT_FOUND.message);
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+};
+// running balance
+const runningBalancebyWarehouse = async () => {
+  try {
+    const result = await running_balance_by_warehouse();
+    if (result) return { success: true, data: result };
+    else throw Error("failed to fgetch");
+  } catch (error) {
+    return { success: false, message: (error as Error).message };
+  }
+};
+export {
+  getQtyByProductAndWarehouse,
+  getInventoryStatus,
+  runningBalancebyWarehouse,
+};

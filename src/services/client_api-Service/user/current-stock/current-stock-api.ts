@@ -23,3 +23,12 @@ export const getInventoryDetails = async()=>{
         throw error
     }
 }
+
+export const getRunning_balance = async ()=>{
+  try {
+    const result = await axios.get('/api/user/running-balance')
+    return result.data
+  } catch (error) {
+    throw error
+  }
+}
