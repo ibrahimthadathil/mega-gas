@@ -304,8 +304,8 @@ export const navItems = [
         ],
       },
       {
-        title: "Account Summary",
-        url: "/user/accounts/summary",
+        title: "Account Ledger",
+        url: "/user/accounts/ledger",
         roles: [
           "admin",
           "manager",

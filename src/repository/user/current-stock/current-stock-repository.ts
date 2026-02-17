@@ -39,7 +39,7 @@ export const running_balance_by_warehouse = async (
   console.log(filters);
   
   try {
-    const lastNDays = filters.lastNDays ?? 3;
+    const lastNDays = filters.lastNDays ?? 0;
     
     let query = supabase
       .from('inventory_running_balance_view')
