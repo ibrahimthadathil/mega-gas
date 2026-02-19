@@ -51,6 +51,7 @@ import { Product, StockTransaction, Warehouse } from "@/types/stock";
 import { useState } from "react";
 import { subDays } from "date-fns";
 import type { DateRange } from "react-day-picker";
+import moment from "moment";
 
 function getUniqueProducts(transactions: StockTransaction[]): Product[] {
   const products = new Map<string, string>();
@@ -82,10 +83,14 @@ export default function Home() {
 
   // Build filter object for API call
   const apiFilter = {
-    startDate: dateRange?.from ? dateRange.from.toISOString().split('T')[0] : undefined,
-    endDate: dateRange?.to ? dateRange.to.toISOString().split('T')[0] : undefined,
-    warehouseId: selectedWarehouse !== 'all' ? selectedWarehouse : undefined,
-    productId: selectedProduct !== 'all' ? selectedProduct : undefined,
+    // startDate: dateRange?.from ? dateRange.from.toISOString().split('T')[0] : undefined,
+    // endDate: dateRange?.to ? dateRange.to.toISOString().split('T')[0] : undefined,
+    // warehouseId: selectedWarehouse !== 'all' ? selectedWarehouse : undefined,
+    // productId: selectedProduct !== 'all' ? selectedProduct : undefined,
+    startDate: dateRange?.from ? moment(dateRange.from).format("YYYY-MM-DD") : undefined,
+  endDate: dateRange?.to ? moment(dateRange.to).format("YYYY-MM-DD") : undefined,
+  warehouseId: selectedWarehouse !== 'all' ? selectedWarehouse : undefined,
+  productId: selectedProduct !== 'all' ? selectedProduct : undefined,
   };
 
   const { data: response, isLoading } = UseRQ< StockTransaction[]>(

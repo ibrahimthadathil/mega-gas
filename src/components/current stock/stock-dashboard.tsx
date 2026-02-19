@@ -248,7 +248,8 @@ export function StockDashboard({
 
     return sorted.reduce((acc, transaction) => {
         const dateOnly = transaction.transaction_date.split(' ')[0]; // Gets '2026-01-19'
-    const date = moment(dateOnly).format('LL');
+    const date = moment.parseZone(transaction.transaction_date).utcOffset("+05:30").format("DD/MM/YYYY")
+
       if (!acc[date]) {
         acc[date] = [];
       }
