@@ -14,7 +14,9 @@ import { lineItemFilterProps } from "@/types/transaction ";
 //   }
 // };
 // to set a new transaction
-const getAll_transactions = async (filter?: lineItemFilterProps & { page?: number; limit?: number }) => {
+const getAll_transactions = async (
+  filter?: lineItemFilterProps & { page?: number; limit?: number },
+) => {
   try {
     const page = filter?.page ?? 1;
     const limit = filter?.limit ?? 10;
@@ -23,28 +25,28 @@ const getAll_transactions = async (filter?: lineItemFilterProps & { page?: numbe
 
     let query = supabase
       .from("account_line_items_with_cash_chest")
-      .select("*", { count: 'exact' })
-      .order('date', { ascending: false })
-      .order('created_at', { ascending: false });
+      .select("*", { count: "exact" })
+      .order("date", { ascending: false })
+      .order("created_at", { ascending: false });
 
     // Apply filters
     if (filter?.account_name) {
-      query = query.ilike('account_name', `%${filter.account_name}%`);
+      query = query.ilike("account_name", `%${filter.account_name}%`);
     }
 
     if (filter?.date) {
-      query = query.eq('date', filter.date);
+      query = query.eq("date", filter.date);
     }
 
     if (filter?.source_form) {
-      query = query.eq('source_form', filter.source_form);
+      query = query.eq("source_form", filter.source_form);
     }
 
     if (filter?.type) {
-      if (filter.type === 'amount_received') {
-        query = query.gt('amount_received', '0');
-      } else if (filter.type === 'amount_paid') {
-        query = query.gt('amount_paid', '0');
+      if (filter.type === "amount_received") {
+        query = query.gt("amount_received", "0");
+      } else if (filter.type === "amount_paid") {
+        query = query.gt("amount_paid", "0");
       }
     }
 
@@ -54,7 +56,7 @@ const getAll_transactions = async (filter?: lineItemFilterProps & { page?: numbe
     const { data, error, count } = await query;
 
     if (error) throw error;
-    
+
     return { data, total: count ?? 0 };
   } catch (error) {
     throw error;
@@ -91,8 +93,6 @@ const delete_transaction = async (id: string) => {
 
 const edit_transaction = async (payload: any) => {
   try {
-    console.log("@@", payload);
-
     const { error } = await supabase.rpc("update_account_transaction", payload);
     if (error) throw error;
 
@@ -102,9 +102,25 @@ const edit_transaction = async (payload: any) => {
     throw error;
   }
 };
+
+const get_account_summary = async (payload?:{account?:string,year?:number,month?:number}) => {
+  try {
+    const { data , error } = await supabase.rpc("get_account_ledger_monthly",{
+      p_account_id:payload?.account,
+      p_year:payload?.year,
+      p_month:payload?.month
+    })
+    if(error) throw error
+    return data
+  } catch (error) {
+    throw error
+  }
+};
+
 export {
   getAll_transactions,
   addNewLineItem,
   delete_transaction,
   edit_transaction,
+  get_account_summary
 };

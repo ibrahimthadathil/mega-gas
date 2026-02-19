@@ -3,6 +3,7 @@ import {
   addNewLineItem,
   delete_transaction,
   edit_transaction,
+  get_account_summary,
   getAll_transactions,
 } from "@/repository/user/accounts/transaction/transactionRepository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
@@ -89,9 +90,20 @@ const editTransaction = async (
   }
 };
 
+const getLedger = async(data?:{account?:string,year?:number,month?:number})=>{
+  try {
+   const result =  await get_account_summary(data)
+   if(result) return {success:true, data:result}
+   else return {success:false,data:[]}
+  } catch (error) {
+    return {success:false , message:(error as Error).message}
+  }
+}
+
 export {
   createNewTransaction,
   getAllTransaction,
   deleteTransactionAccount,
   editTransaction,
+  getLedger
 };
