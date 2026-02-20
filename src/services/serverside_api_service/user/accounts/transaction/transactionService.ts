@@ -5,6 +5,7 @@ import {
   edit_transaction,
   get_account_summary,
   getAll_transactions,
+  total_account_summary,
 } from "@/repository/user/accounts/transaction/transactionRepository";
 import { checkUserByAuthId } from "@/repository/user/userRepository";
 import { lineItemFilterProps } from "@/types/transaction ";
@@ -99,9 +100,19 @@ const getLedger = async(data?:{account?:string,year?:number,month?:number})=>{
     return {success:false , message:(error as Error).message}
   }
 }
+const accountSummary = async()=>{
+  try {
+    const result = await total_account_summary()
+    if(result)return {success:true,data:result}
+    else return {success:true,data:[]}
+  } catch (error) {
+    return {success:false,message:(error as Error).message}
+  }
+}
 
 export {
   createNewTransaction,
+  accountSummary,
   getAllTransaction,
   deleteTransactionAccount,
   editTransaction,

@@ -117,8 +117,19 @@ const get_account_summary = async (payload?:{account?:string,year?:number,month?
   }
 };
 
+const total_account_summary = async ()=>{
+  try {
+    const {data,error} = await supabase.from('account_line_summary').select('*')
+    if(error) throw error
+    return data
+  } catch (error) {
+    throw error
+  }
+}
+
 export {
   getAll_transactions,
+  total_account_summary,
   addNewLineItem,
   delete_transaction,
   edit_transaction,

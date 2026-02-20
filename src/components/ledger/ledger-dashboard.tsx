@@ -7,6 +7,9 @@ import { Separator } from "@/components/ui/separator";
 import {  LedgerFilters } from "./ledger-filter";
 import { getLedgerByAccount } from "@/services/client_api-Service/user/accounts/transaction_api";
 import { UseRQ } from "@/hooks/useReactQuery";
+import { Button } from "../ui/button";
+import Link from "next/link";
+import { FileText } from "lucide-react";
 
 export function LedgerDashboard() {
   const [selectedAccount, setSelectedAccount] = useState("");
@@ -86,9 +89,17 @@ const transactions = ledgerData?.transactions ?? [];
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 pb-12">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">LedgerLook</h1>
-        <p className="text-slate-500">Track and manage your account transactions seamlessly.</p>
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">LedgerLook</h1>
+          <p className="text-slate-500">Track and manage your account transactions seamlessly.</p>
+        </div>
+        <Button variant="default" className="bg-primary hover:bg-primary/90" asChild>
+          <Link href="/user/accounts/summary" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            View Account Summary
+          </Link>
+        </Button>
       </header>
 
       <section>

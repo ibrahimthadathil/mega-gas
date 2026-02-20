@@ -56,3 +56,13 @@ export const getLedgerByAccount = async (filter:{account:string,month:number,yea
     throw error
   }
 }
+
+
+export const getAccountSummary = async ()=>{
+  try {
+    const {data} = await axios.get('/api/user/accounts/summary')
+    return data
+  } catch (error) {
+    throw error
+  }
+}

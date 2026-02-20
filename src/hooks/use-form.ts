@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-export const UseHookForm = <T extends z.ZodSchema>(
+export const UseHookForm = <T extends z.ZodType<any, any, any>>(
   schema: T,
   mutation: Function,
   defaultValues?: z.infer<T>
