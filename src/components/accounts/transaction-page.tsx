@@ -418,13 +418,9 @@ export default function TransactionsPage() {
                             data={transaction}
                             varient={"ghost"}
                             contents={[
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-destructive hover:text-destructive"
-                              >
+                             
                                 <Trash2 className="w-4 h-4" />
-                              </Button>,
+                              ,
                               <>
                                 This action cannot be undone. This will
                                 permanently delete{" "}
