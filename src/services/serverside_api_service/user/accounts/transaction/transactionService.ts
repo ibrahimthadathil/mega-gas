@@ -3,27 +3,32 @@ import {
   addNewLineItem,
   delete_transaction,
   edit_transaction,
+  get_account_summary,
   getAll_transactions,
+  total_account_summary,
 } from "@/repository/user/accounts/transaction/transactionRepository";
+import { checkUserByAuthId } from "@/repository/user/userRepository";
 import { lineItemFilterProps } from "@/types/transaction ";
-
 
 const createNewTransaction = async (newTransaction: any, userId: string) => {
   try {
-    
+    const user = await checkUserByAuthId(userId);
+
     const { source_form_reference_id, ...lineItem } = newTransaction.line_Item;
-    
+
     const isPaid = lineItem.amount_paid > 0;
 
     const payload = {
       p_line_item: {
         ...lineItem,
-        created_by: userId,
+
+        created_by: user?.id,
       },
       p_cash_chest: {
         chest_name: "office",
         ...adjustCashChest(newTransaction.cash_chest, isPaid),
-        created_by: userId,
+
+        created_by: user?.id,
       },
     };
 
@@ -36,11 +41,10 @@ const createNewTransaction = async (newTransaction: any, userId: string) => {
   }
 };
 
-
-const getAllTransaction = async (filter?:lineItemFilterProps) => {
+const getAllTransaction = async (filter?: lineItemFilterProps) => {
   try {
-    const {data,total} = await getAll_transactions(filter);
-    if (data) return { success: true, data,total };
+    const { data, total } = await getAll_transactions(filter);
+    if (data) return { success: true, data, total };
     else return { success: false };
   } catch (error) {
     console.log((error as Error).message);
@@ -61,7 +65,7 @@ const deleteTransactionAccount = async (id: string) => {
 const editTransaction = async (
   id: string,
   updatedTransaction: any,
-  userId: string
+  userId: string,
 ) => {
   try {
     const { source_form_reference_id, ...lineItem } =
@@ -73,7 +77,7 @@ const editTransaction = async (
         ...rest,
       },
       p_cash_chest: {
-        chest_name: "default",
+        chest_name: "office",
         ...updatedTransaction.cash_chest,
       },
     };
@@ -87,9 +91,30 @@ const editTransaction = async (
   }
 };
 
+const getLedger = async(data?:{account?:string,year?:number,month?:number})=>{
+  try {
+   const result =  await get_account_summary(data)
+   if(result) return {success:true, data:result}
+   else return {success:false,data:[]}
+  } catch (error) {
+    return {success:false , message:(error as Error).message}
+  }
+}
+const accountSummary = async()=>{
+  try {
+    const result = await total_account_summary()
+    if(result)return {success:true,data:result}
+    else return {success:true,data:[]}
+  } catch (error) {
+    return {success:false,message:(error as Error).message}
+  }
+}
+
 export {
   createNewTransaction,
+  accountSummary,
   getAllTransaction,
   deleteTransactionAccount,
   editTransaction,
+  getLedger
 };

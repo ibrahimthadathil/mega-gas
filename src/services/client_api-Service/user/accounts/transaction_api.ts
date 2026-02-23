@@ -41,3 +41,28 @@ export const updateTransaction = async (id: string, transaction: any) => {
     throw error;
   }
 };
+
+export const getLedgerByAccount = async (filter:{account:string,month:number,year:number})=>{
+  try {
+    const result = await axios.get("/api/user/accounts/ledger",{
+      params:{
+        account:filter.account,
+        month:filter.month,
+        year:filter.year
+      }
+    })
+    return result.data
+  } catch (error) {
+    throw error
+  }
+}
+
+
+export const getAccountSummary = async ()=>{
+  try {
+    const {data} = await axios.get('/api/user/accounts/summary')
+    return data
+  } catch (error) {
+    throw error
+  }
+}

@@ -34,6 +34,7 @@ export const GET = async (req: NextRequest) => {
     const filter = {
       startDate: searchParams.get("startDate") ?? undefined,
       endDate: searchParams.get("endDate") ?? undefined,
+       warehouseId: searchParams.get("warehouseId") ?? undefined,
       page: searchParams.get("page") ? Number(searchParams.get("page")) : 1,
       limit: searchParams.get("limit") ? Number(searchParams.get("limit")) : 16,
     };

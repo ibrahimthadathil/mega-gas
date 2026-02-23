@@ -1,4 +1,4 @@
-import { getInventoryStatus } from "@/services/serverside_api_service/admin/inventory-service/inventory-service";
+import { getInventoryStatus } from "@/services/serverside_api_service/user/current-stock/current-stock-service";
 import { STATUS } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
 

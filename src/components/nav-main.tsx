@@ -47,7 +47,7 @@ export function NavMain({
           >
             <SidebarMenuItem>
               <CollapsibleTrigger asChild>
-                <Link onDoubleClick={()=>window.open(item.url,'_blank')} href={item.url }>
+                
                   <SidebarMenuButton tooltip={item.title}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
@@ -55,7 +55,7 @@ export function NavMain({
                       <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                     )}{" "}
                   </SidebarMenuButton>
-                </Link>
+                
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <SidebarMenuSub>

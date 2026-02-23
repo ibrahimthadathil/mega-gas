@@ -85,18 +85,48 @@ const Edit_stock_transfer = async (transferId: string, payload: Record<string,un
   }
 };
 
-// view all transfered stock
-// const view_Transfered_stock = async () => {
+// };
+// const view_Transfered_stock = async (filters: TransferStockFilters = {}) => {
 //   try {
-//     const { data, error } = await supabase
+//     const {
+//       startDate,
+//       endDate,
+//       page = 1,
+//       limit = 10,
+//     } = filters;
+
+//     const from = (page - 1) * limit;
+//     const to = from + limit - 1;
+
+//     let query = supabase
 //       .from("stock_transfer_view")
-//       .select("*")
-//       .order("created_at", { ascending: false });
+//       .select("*", { count: "exact" }) // 👈 get total count
+//       .order("created_at", { ascending: false }); // 👈 latest first
+
+//     // ✅ Date filters
+//     if (startDate) {
+//       query = query.gte("created_at", startDate);
+//     }
+
+//     if (endDate) {
+//       query = query.lte("created_at", endDate);
+//     }
+
+//     // ✅ Pagination
+//     query = query.range(from, to);
+
+//     const { data, error, count } = await query;
+
 //     if (error) throw error;
-//     return data;
+
+//     return {
+//       data,
+//       count, // 👈 total rows for pagination UI
+//       // page,
+//       // limit,
+//     };
 //   } catch (error) {
 //     console.log((error as Error).message);
-
 //     throw error;
 //   }
 // };
@@ -105,6 +135,7 @@ const view_Transfered_stock = async (filters: TransferStockFilters = {}) => {
     const {
       startDate,
       endDate,
+      warehouseId,
       page = 1,
       limit = 10,
     } = filters;
@@ -114,37 +145,35 @@ const view_Transfered_stock = async (filters: TransferStockFilters = {}) => {
 
     let query = supabase
       .from("stock_transfer_view")
-      .select("*", { count: "exact" }) // 👈 get total count
-      .order("created_at", { ascending: false }); // 👈 latest first
+      .select("*", { count: "exact" })
+      .order("created_at", { ascending: false });
 
-    // ✅ Date filters
+    // Date filters
     if (startDate) {
       query = query.gte("created_at", startDate);
     }
-
     if (endDate) {
       query = query.lte("created_at", endDate);
     }
 
-    // ✅ Pagination
+    // Warehouse filter (adjust column names as per your schema)
+    if (warehouseId) {
+      query = query.or(`from_warehouse_id.eq.${warehouseId},to_warehouse_id.eq.${warehouseId}`);
+    }
+
+    // Pagination
     query = query.range(from, to);
 
     const { data, error, count } = await query;
 
     if (error) throw error;
 
-    return {
-      data,
-      count, // 👈 total rows for pagination UI
-      // page,
-      // limit,
-    };
+    return { data, count };
   } catch (error) {
     console.log((error as Error).message);
     throw error;
   }
 };
-
 
 // delete stock transfer
 const delete_stock_transfer = async (transferId: string) => {

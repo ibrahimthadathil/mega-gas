@@ -247,9 +247,7 @@ const CashDepositDashboard = () => {
                         {rowTotalQty || "-"}
                       </td>
                       <td className="px-6 py-3 text-right font-bold">
-                        {rowTotalQty
-                          ? formatCurrency(rowTotalAmount * denom.value)
-                          : "-"}
+                        {rowTotalAmount || "-"}
                       </td>
                     </tr>
                   );
