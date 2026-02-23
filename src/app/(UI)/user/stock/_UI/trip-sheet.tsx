@@ -39,11 +39,10 @@ import { useSelector } from "react-redux";
 import { Rootstate } from "@/redux/store";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  getLoadslipByLoad,
-  unloadSlip,
   updateUnloadSlip,
 } from "@/services/client_api-Service/user/stock/unload_slip_transfer_api";
 import { getQTYBywarehouseId } from "@/services/client_api-Service/user/current-stock/current-stock-api";
+import { getLoadslipByLoad, unloadSlip } from "@/services/client_api-Service/user/unload/unload_api";
 
 // --- INTERFACES ---
 interface TripLoadRecord {
