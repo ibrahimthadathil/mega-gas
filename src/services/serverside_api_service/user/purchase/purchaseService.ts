@@ -138,10 +138,20 @@ const editPurchasedLoad = async (
     return { success: false, message: (error as Error).message };
   }
 };
+
+const purchaseReport = async()=>{
+  try {
+    
+  } catch (error) {
+    return {success:false, message:(error as Error).message}
+  }
+}
+
 export {
   addPurchase_Register,
   getPlantLoadCredential,
   getPlantLoadRegister,
   deletePurchaseRecord,
   editPurchasedLoad,
+  purchaseReport
 };

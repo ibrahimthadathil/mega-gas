@@ -189,6 +189,10 @@ const edit_Purchased_Load = async (
   }
 };
 
+const get_purchase_report = async(filter:{warhouse:string,})=>{
+  const {} = await supabase.from('plant_load_report').select('*')
+}
+
 export {
   addPurchaseRegister,
   getProductForPurchase,
@@ -196,4 +200,5 @@ export {
   getPurchaseRegister,
   delete_purchase,
   edit_Purchased_Load,
+  get_purchase_report
 };
