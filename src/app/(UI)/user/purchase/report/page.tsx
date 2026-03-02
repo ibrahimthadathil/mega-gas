@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { CalendarDays, Warehouse, PackageCheck, ReceiptText, Users, IndianRupee, ChevronDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useQuery } from "@tanstack/react-query";
+import { purchaseReport } from "@/services/client_api-Service/user/purchase/purchase_api";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -35,14 +37,6 @@ interface Bill {
   per_user_amount: StaffAmount[] | null;
 }
 
-// ── Raw data ───────────────────────────────────────────────────────────────────
-
-const RAW: Bill[] = ([{"id":"0052bb8b","sap_number":"7002247604","bill_date":"2026-01-21","unloading_date":"2026-01-21","total_full_qty":"295","tax_invoice_number":"5541120215","warehouse_name":"2396/Shafeeque","line_items":"[{\"qty\":60,\"product_name\":\"19 FULL\",\"return_qty\":60,\"return_product_name\":\"19 EMPTY\"},{\"qty\":235,\"product_name\":\"14 FULL\",\"return_qty\":235,\"return_product_name\":\"14 EMPTY\"}]","per_user_amount":null},{"id":"068d8092","sap_number":"7002668567","bill_date":"2026-01-31","unloading_date":"2026-01-31","total_full_qty":"358","tax_invoice_number":"KL5541125327","warehouse_name":"3557/Nasar","line_items":"[{\"qty\":308,\"product_name\":\"14 FULL\",\"return_qty\":308,\"return_product_name\":\"14 EMPTY\"},{\"qty\":50,\"product_name\":\"5 BLUE FULL\",\"return_qty\":50,\"return_product_name\":\"5 BLUE EMPTY\"}]","per_user_amount":"[{\"amount\":300,\"user_id\":\"d0457594\",\"user_name\":\"GAFOOR\"},{\"amount\":300,\"user_id\":\"d780bfe3\",\"user_name\":\"NASAR\"},{\"amount\":300,\"user_id\":\"655803da\",\"user_name\":\"JABIR\"}]"},{"id":"06c23b0f","sap_number":"7003240572","bill_date":"2026-02-16","unloading_date":"2026-02-16","total_full_qty":"306","tax_invoice_number":"KL5541130641","warehouse_name":"7481/Aliyan","line_items":"[{\"qty\":306,\"product_name\":\"14 FULL\",\"return_qty\":306,\"return_product_name\":\"14 EMPTY\"}]","per_user_amount":"[{\"amount\":450,\"user_id\":\"d0457594\",\"user_name\":\"GAFOOR\"},{\"amount\":450,\"user_id\":\"655803da\",\"user_name\":\"JABIR\"}]"},{"id":"082e42ad","sap_number":"7003256386","bill_date":"2026-02-16","unloading_date":"2026-02-16","total_full_qty":"337","tax_invoice_number":"30787","warehouse_name":"2396/Shafeeque","line_items":"[{\"qty\":337,\"product_name\":\"14 FULL\",\"return_qty\":337,\"return_product_name\":\"14 EMPTY\"}]","per_user_amount":"[{\"amount\":300,\"user_id\":\"d0457594\",\"user_name\":\"GAFOOR\"},{\"amount\":300,\"user_id\":\"77455237\",\"user_name\":\"SHAFEEK\"},{\"amount\":300,\"user_id\":\"655803da\",\"user_name\":\"JABIR\"}]"},{"id":"0863d115","sap_number":"7003064854","bill_date":"2026-02-10","unloading_date":"2026-02-10","total_full_qty":"358","tax_invoice_number":"9105","warehouse_name":"2396/Shafeeque","line_items":"[{\"qty\":308,\"product_name\":\"14 FULL\",\"return_qty\":308,\"return_product_name\":\"14 EMPTY\"},{\"qty\":50,\"product_name\":\"5 BLUE FULL\",\"return_qty\":50,\"return_product_name\":\"5 BLUE EMPTY\"}]","per_user_amount":"[{\"amount\":300,\"user_id\":\"d0457594\",\"user_name\":\"GAFOOR\"},{\"amount\":300,\"user_id\":\"77455237\",\"user_name\":\"SHAFEEK\"},{\"amount\":300,\"user_id\":\"655803da\",\"user_name\":\"JABIR\"}]"},{"id":"08e6a487","sap_number":"7002772957","bill_date":"2026-02-03","unloading_date":"2026-02-03","total_full_qty":"306","tax_invoice_number":"KL5541126128","warehouse_name":"7481/Aliyan","line_items":"[{\"qty\":306,\"product_name\":\"14 FULL\",\"return_qty\":306,\"return_product_name\":\"14 EMPTY\"}]","per_user_amount":"[{\"amount\":450,\"user_id\":\"d0457594\",\"user_name\":\"GAFOOR\"},{\"amount\":450,\"user_id\":\"655803da\",\"user_name\":\"JABIR\"}]"},{"id":"09e6ff97","sap_number":"7002770078","bill_date":"2026-02-03","unloading_date":"2026-02-03","total_full_qty":"345","tax_invoice_number":"KL5541126101","warehouse_name":"3557/Nasar","line_items":"[{\"qty\":25,\"product_name\":\"5 BLUE FULL\",\"return_qty\":25,\"return_product_name\":\"5 BLUE EMPTY\"},{\"qty\":320,\"product_name\":\"14 FULL\",\"return_qty\":320,\"return_product_name\":\"14 EMPTY\"}]","per_user_amount":"[{\"amount\":300,\"user_id\":\"d0457594\",\"user_name\":\"GAFOOR\"},{\"amount\":300,\"user_id\":\"d780bfe3\",\"user_name\":\"NASAR\"},{\"amount\":300,\"user_id\":\"655803da\",\"user_name\":\"JABIR\"}]"},{"id":"09f89384","sap_number":"7003384464","bill_date":"2026-02-20","unloading_date":"2026-02-20","total_full_qty":"320","tax_invoice_number":"KL5541132356","warehouse_name":"7481/Aliyan","line_items":"[{\"qty\":270,\"product_name\":\"14 FULL\",\"return_qty\":270,\"return_product_name\":\"14 EMPTY\"},{\"qty\":50,\"product_name\":\"5 BLUE FULL\",\"return_qty\":50,\"return_product_name\":\"5 BLUE EMPTY\"}]","per_user_amount":"[{\"amount\":450,\"user_id\":\"d0457594\",\"user_name\":\"GAFOOR\"},{\"amount\":450,\"user_id\":\"655803da\",\"user_name\":\"JABIR\"}]"},{"id":"0bb18888","sap_number":"7002711497","bill_date":"2026-02-02","unloading_date":"2026-02-02","total_full_qty":"337","tax_invoice_number":"KL5541125700","warehouse_name":"3557/Nasar","line_items":"[{\"qty\":337,\"product_name\":\"14 FULL\",\"return_qty\":337,\"return_product_name\":\"14 EMPTY\"}]","per_user_amount":"[{\"amount\":300,\"user_id\":\"d0457594\",\"user_name\":\"GAFOOR\"},{\"amount\":300,\"user_id\":\"d780bfe3\",\"user_name\":\"NASAR\"},{\"amount\":300,\"user_id\":\"655803da\",\"user_name\":\"JABIR\"}]"},{"id":"0e22fa87","sap_number":"7002907533","bill_date":"2026-02-06","unloading_date":"2026-02-06","total_full_qty":"276","tax_invoice_number":"KL5541127487","warehouse_name":"7481/Aliyan","line_items":"[{\"qty\":60,\"product_name\":\"19 FULL\",\"return_qty\":60,\"return_product_name\":\"19 EMPTY\"},{\"qty\":216,\"product_name\":\"14 FULL\",\"return_qty\":216,\"return_product_name\":\"14 EMPTY\"}]","per_user_amount":"[{\"amount\":450,\"user_id\":\"d0457594\",\"user_name\":\"GAFOOR\"},{\"amount\":450,\"user_id\":\"655803da\",\"user_name\":\"JABIR\"}]"},{"id":"0e38771b","sap_number":"7002910451","bill_date":"2026-02-06","unloading_date":"2026-02-06","total_full_qty":"337","tax_invoice_number":"KL5541127477","warehouse_name":"3557/Nasar","line_items":"[{\"qty\":337,\"product_name\":\"14 FULL\",\"return_qty\":337,\"return_product_name\":\"14 EMPTY\"}]","per_user_amount":"[{\"amount\":300,\"user_id\":\"d0457594\",\"user_name\":\"GAFOOR\"},{\"amount\":300,\"user_id\":\"d780bfe3\",\"user_name\":\"NASAR\"},{\"amount\":300,\"user_id\":\"655803da\",\"user_name\":\"JABIR\"}]"},{"id":"101b5a5a","sap_number":"7002213650","bill_date":"2026-01-20","unloading_date":"2026-01-20","total_full_qty":"295","tax_invoice_number":"KL5541119836","warehouse_name":"2396/Shafeeque","line_items":"[{\"qty\":235,\"product_name\":\"14 FULL\",\"return_qty\":235,\"return_product_name\":\"14 EMPTY\"},{\"qty\":60,\"product_name\":\"19 FULL\",\"return_qty\":60,\"return_product_name\":\"19 EMPTY\"}]","per_user_amount":null}] as any[]).map((d) => ({
-  ...d,
-  line_items: typeof d.line_items === "string" ? JSON.parse(d.line_items) : d.line_items,
-  per_user_amount: typeof d.per_user_amount === "string" ? JSON.parse(d.per_user_amount) : d.per_user_amount,
-})) as Bill[];
-
 // ── Constants ──────────────────────────────────────────────────────────────────
 
 const PRODUCT_ORDER = ["19 FULL", "14 FULL", "5 BLUE FULL"] as const;
@@ -55,17 +49,21 @@ const PRODUCT_BADGE: Record<string, string> = {
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
-function parseDateStr(str: string): Date {
-  const [y, m, d] = str.split("-").map(Number);
-  return new Date(y, m - 1, d);
-}
-
 function toDateKey(date: Date): string {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  return date.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" }); // "YYYY-MM-DD"
 }
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+function parseBills(raw: any[]): Bill[] {
+  return (raw ?? []).map((d) => ({
+    ...d,
+    line_items: typeof d.line_items === "string" ? JSON.parse(d.line_items) : d.line_items,
+    per_user_amount:
+      typeof d.per_user_amount === "string" ? JSON.parse(d.per_user_amount) : d.per_user_amount,
+  }));
 }
 
 function totalPayout(bill: Bill): number {
@@ -75,36 +73,39 @@ function totalPayout(bill: Bill): number {
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export default function UnloadingDashboard() {
-  // All unique dates that have data, sorted descending
-  const availableDates = useMemo(() =>
-    [...new Set(RAW.map((b) => b.unloading_date))].sort((a, b) => b.localeCompare(a)),
-    []
-  );
+  const today = useMemo(() => new Date(), []);
 
-  const allWarehouses = useMemo(() =>
-    [...new Set(RAW.map((b) => b.warehouse_name))].sort(),
-    []
-  );
-
-  const [selectedDate, setSelectedDate] = useState<Date>(parseDateStr(availableDates[0]));
+  const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [calOpen, setCalOpen] = useState(false);
   const [warehouse, setWarehouse] = useState("ALL");
 
   const dateKey = toDateKey(selectedDate);
 
-  // Bills matching the current filters
-  const bills = useMemo(() =>
-    RAW.filter((b) => b.unloading_date === dateKey && (warehouse === "ALL" || b.warehouse_name === warehouse)),
-    [dateKey, warehouse]
+  // ── Fetch data from API — re-fetches when date or warehouse changes ──────────
+  const { data: apiResponse, isLoading } = useQuery({
+    queryKey: ["purchase-report", dateKey, warehouse],
+    queryFn: () => purchaseReport({ date: dateKey, warehouse }),
+  });
+
+  const bills: Bill[] = useMemo(
+    () => parseBills(apiResponse?.data ?? []),
+    [apiResponse]
   );
 
-  // Products present in the filtered bills (respecting preferred order)
+  // All unique warehouses from the current result set (for the dropdown)
+  // On initial load (ALL selected), this populates from today's data
+  const allWarehouses = useMemo(
+    () => [...new Set(bills.map((b) => b.warehouse_name))].sort(),
+    [bills]
+  );
+
+  // Products present in the bills (respecting preferred order)
   const activeProducts = useMemo(() => {
     const found = new Set(bills.flatMap((b) => b.line_items.map((l) => l.product_name)));
     return PRODUCT_ORDER.filter((p) => found.has(p));
   }, [bills]);
 
-  // Staff names present in the filtered bills
+  // Staff names present in the bills
   const activeStaff = useMemo(() => {
     const names = new Set(bills.flatMap((b) => b.per_user_amount?.map((u) => u.user_name) ?? []));
     return [...names].sort();
@@ -126,9 +127,6 @@ export default function UnloadingDashboard() {
     warehouses: Object.keys(grouped).length,
     payout: bills.reduce((s, b) => s + totalPayout(b), 0),
   }), [bills, grouped]);
-
-  // Calendar: disable dates that have no data
-  const availableSet = useMemo(() => new Set(availableDates), [availableDates]);
 
   return (
     <div className="min-h-screen bg-slate-50 p-6">
@@ -165,23 +163,9 @@ export default function UnloadingDashboard() {
                     mode="single"
                     selected={selectedDate}
                     onSelect={(d) => { if (d) { setSelectedDate(d); setCalOpen(false); } }}
-                    disabled={(d) => !availableSet.has(toDateKey(d))}
+                    // No disabled dates — user can freely pick any date
                     initialFocus
                   />
-                  <div className="border-t px-3 py-2">
-                    <p className="text-xs text-slate-400 mb-1.5">Quick select</p>
-                    <div className="flex flex-wrap gap-1">
-                      {availableDates.map((ds) => (
-                        <button
-                          key={ds}
-                          onClick={() => { setSelectedDate(parseDateStr(ds)); setCalOpen(false); }}
-                          className={`text-xs px-2 py-0.5 rounded border transition-all ${ds === dateKey ? "bg-slate-800 text-white border-slate-800" : "border-slate-200 text-slate-600 hover:border-slate-400"}`}
-                        >
-                          {formatDate(parseDateStr(ds))}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
                 </PopoverContent>
               </Popover>
             </div>
@@ -191,7 +175,7 @@ export default function UnloadingDashboard() {
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1">
                 <Warehouse size={12} /> Warehouse
               </label>
-              <Select value={warehouse} onValueChange={setWarehouse}>
+              <Select value={warehouse} onValueChange={(val) => setWarehouse(val)}>
                 <SelectTrigger className="w-48 text-slate-700">
                   <div className="flex items-center gap-2">
                     <Warehouse size={14} className="text-slate-400" />
@@ -212,13 +196,13 @@ export default function UnloadingDashboard() {
       </Card>
 
       {/* Summary cards */}
-      {bills.length > 0 && (
+      {!isLoading && bills.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
           {[
-            { label: "Total Bills",    value: summary.bills,                         icon: <ReceiptText size={16} className="text-slate-400" />,  color: "text-slate-700" },
-            { label: "Total Qty",      value: summary.qty.toLocaleString(),           icon: <PackageCheck size={16} className="text-emerald-400" />, color: "text-emerald-700" },
-            { label: "Warehouses",     value: summary.warehouses,                    icon: <Warehouse size={16} className="text-sky-400" />,       color: "text-sky-700" },
-            { label: "Total Payout",   value: `₹${summary.payout.toLocaleString()}`, icon: <IndianRupee size={16} className="text-amber-400" />,   color: "text-amber-700" },
+            { label: "Total Bills",  value: summary.bills,                         icon: <ReceiptText size={16} className="text-slate-400" />,   color: "text-slate-700" },
+            { label: "Total Qty",    value: summary.qty.toLocaleString(),           icon: <PackageCheck size={16} className="text-emerald-400" />, color: "text-emerald-700" },
+            { label: "Warehouses",   value: summary.warehouses,                    icon: <Warehouse size={16} className="text-sky-400" />,        color: "text-sky-700" },
+            { label: "Total Payout", value: `₹${summary.payout.toLocaleString()}`, icon: <IndianRupee size={16} className="text-amber-400" />,    color: "text-amber-700" },
           ].map((s) => (
             <Card key={s.label} className="shadow-sm">
               <CardContent className="pt-3 pb-3">
@@ -241,7 +225,12 @@ export default function UnloadingDashboard() {
         </CardHeader>
 
         <div className="overflow-x-auto">
-          {bills.length === 0 ? (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-16 text-slate-400 gap-2">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-400" />
+              <p className="text-sm font-medium">Loading records…</p>
+            </div>
+          ) : bills.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-slate-400 gap-2">
               <PackageCheck size={36} className="opacity-30" />
               <p className="text-sm font-medium">No records for this selection</p>
@@ -257,14 +246,14 @@ export default function UnloadingDashboard() {
                   <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
                     <div className="flex items-center gap-1"><ReceiptText size={12} /> Invoice</div>
                   </TableHead>
-                  {activeProducts.map((p,ind) => (
-                    <TableHead key={ind} className={`text-xs font-semibold uppercase tracking-wide ${PRODUCT_BADGE[p].split(" ").find(c => c.startsWith("text-"))}`}>
+                  {activeProducts.map((p) => (
+                    <TableHead key={p} className={`text-xs font-semibold uppercase tracking-wide ${PRODUCT_BADGE[p].split(" ").find(c => c.startsWith("text-"))}`}>
                       <div className="flex items-center gap-1"><PackageCheck size={12} />{p}</div>
                     </TableHead>
                   ))}
                   <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Total Qty</TableHead>
-                  {activeStaff.map((s,ind) => (
-                    <TableHead key={ind} className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  {activeStaff.map((s) => (
+                    <TableHead key={s} className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
                       <div className="flex items-center gap-1"><Users size={12} />{s}</div>
                     </TableHead>
                   ))}
@@ -275,11 +264,10 @@ export default function UnloadingDashboard() {
               </TableHeader>
 
               <TableBody>
-                {Object.entries(grouped).map(([wh, whBills],ind) => (
+                {Object.entries(grouped).map(([wh, whBills]) => (
                   <>
-                    {/* Warehouse group header */}
-                    <TableRow key={ind} className="bg-slate-100 hover:bg-slate-100 border-t-2 border-slate-200">
-                      <TableCell key={ind}  colSpan={2 + activeProducts.length + activeStaff.length + 2} className="py-2 px-4">
+                    <TableRow key={`group-${wh}`} className="bg-slate-100 hover:bg-slate-100 border-t-2 border-slate-200">
+                      <TableCell colSpan={2 + activeProducts.length + activeStaff.length + 2} className="py-2 px-4">
                         <div className="flex items-center gap-2">
                           <Warehouse size={13} className="text-slate-500" />
                           <span className="text-xs font-semibold text-slate-700">{wh}</span>
@@ -288,7 +276,6 @@ export default function UnloadingDashboard() {
                       </TableCell>
                     </TableRow>
 
-                    {/* One row per bill */}
                     {whBills.map((bill) => (
                       <TableRow key={bill.id} className="hover:bg-slate-50/80">
                         <TableCell className="mono text-xs font-medium text-sky-700 pl-8">{bill.sap_number}</TableCell>

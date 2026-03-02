@@ -18,6 +18,22 @@ export const addPurchaseRegister = async (data: Record<string, unknown>) => {
   }
 };
 
+
+
+export const purchaseReport = async (filter?: { warehouse?: string; date?: string }) => {
+  try {
+    const result = await axios.get("/api/user/purchase/report", {
+      params: {
+        warehouse: filter?.warehouse ?? "ALL",
+        date: filter?.date ?? undefined, 
+      },
+    });
+    return result.data;
+  } catch (error) {
+    throw error;
+  }
+}
+
 interface FilterParams {
   startDate?: string;
   endDate?: string;

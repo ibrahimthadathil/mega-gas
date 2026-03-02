@@ -2,6 +2,7 @@ import {
   addPurchaseRegister,
   delete_purchase,
   edit_Purchased_Load,
+  get_purchase_report,
   getProductForPurchase,
   getPurchaseRegister,
 } from "@/repository/user/purchase/purchaseRepository";
@@ -139,13 +140,16 @@ const editPurchasedLoad = async (
   }
 };
 
-const purchaseReport = async()=>{
+
+ const purchaseReport = async (filter: { warehouse?: string | null; date?: string | null }) => {
   try {
-    
+    const data = await get_purchase_report(filter);
+    if (data && data.length > 0) return { success: true, data };
+    else return { success: false, data: [], message: "No records found" };
   } catch (error) {
-    return {success:false, message:(error as Error).message}
+    return { success: false, message: (error as Error).message };
   }
-}
+};
 
 export {
   addPurchase_Register,

@@ -189,9 +189,31 @@ const edit_Purchased_Load = async (
   }
 };
 
-const get_purchase_report = async(filter:{warhouse:string,})=>{
-  const {} = await supabase.from('plant_load_report').select('*')
-}
+const get_purchase_report = async (filter: {
+  warehouse?: string | null;
+  date?: string | null;
+}) => {
+  try {
+    console.log(filter);
+
+    const targetDate =
+      filter?.date ??
+      new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+
+    let query = supabase
+      .from("plant_load_report")
+      .select("*")
+      .eq("bill_date", targetDate);
+    if (filter?.warehouse && filter.warehouse !== "ALL") {
+      query = query.ilike("warehouse_name", filter.warehouse);
+    }
+    const { data, error } = await query;
+    if (error) throw error;
+    return data ?? [];
+  } catch (error) {
+    throw new Error((error as Error).message);
+  }
+};
 
 export {
   addPurchaseRegister,
@@ -200,5 +222,5 @@ export {
   getPurchaseRegister,
   delete_purchase,
   edit_Purchased_Load,
-  get_purchase_report
+  get_purchase_report,
 };
