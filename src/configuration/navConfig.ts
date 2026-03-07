@@ -28,6 +28,12 @@ export const navItems = [
         roles: ["admin", "manager", "accountant"],
       },
       {
+        title: "Delivery Report",
+        url: "/admin/delivery-report",
+        roles: ["admin", "manager"],
+      },
+      
+      {
         title: "Chest Summary",
         url: "/admin/chest-summary",
         roles: ["admin", "manager", "accountant"],
