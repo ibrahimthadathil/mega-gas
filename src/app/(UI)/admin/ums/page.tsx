@@ -36,6 +36,7 @@ const Page = () => {
       const data = await deleteUser(id);
       if (data.success) {
         toast.success("User deleted successfully");
+        queryClient.invalidateQueries({queryKey:['users']})
       }
     } catch (error: unknown) {
       toast.error((error as Error).message);
@@ -50,7 +51,7 @@ const Page = () => {
         queryClient.invalidateQueries({queryKey:['users']})
       }
     } catch (error) {
-      
+      toast.error((error as Error).message)
     }    
   };
 

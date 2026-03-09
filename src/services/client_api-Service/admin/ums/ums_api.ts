@@ -27,3 +27,12 @@ export const editUser = async (user:IUser,id?:string)=> {
        throw error 
     }
 }
+
+export const addNewUser = async(data:any)=>{
+    try {
+        const result = await axios.post('/api/admin/auth',data)
+        return result.data
+    } catch (error) {
+        throw error
+    }
+}

@@ -38,6 +38,7 @@ import { UseRQ } from "@/hooks/useReactQuery";
 import { getWarehouse } from "@/services/client_api-Service/user/warehouse/wareHouse_api";
 import { Warehouse } from "@/app/(UI)/user/warehouses/page";
 import { X } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface UserDialogProps {
   user?: IUser;
@@ -50,7 +51,9 @@ interface UserDialogProps {
   users?: IUser[]; // Users list for delivery boys selection
 }
 
-type UserFormValues = z.infer<typeof userFormSchema>;
+// type UserFormValues = z.infer<typeof userFormSchema>;
+// Instead of a static type, infer from the schema function
+type UserFormValues = z.infer<ReturnType<typeof userFormSchema>>;
 
 const UserDialog: React.FC<UserDialogProps> = ({
   user,
@@ -66,9 +69,10 @@ const UserDialog: React.FC<UserDialogProps> = ({
     getWarehouse,
     { enabled: !!user }
   );
- 
+ const isEditMode = !!user;
+
   const form = useForm<UserFormValues>({
-    resolver: zodResolver(userFormSchema),
+    resolver: zodResolver(userFormSchema(isEditMode)),
     defaultValues: {
       user_name: user?.user_name || "",
       password: user?.password || "",
@@ -81,23 +85,23 @@ const UserDialog: React.FC<UserDialogProps> = ({
   });
 
   const deliveryBoysField = form.watch("delivery_boys");
-
+  const queryClient = useQueryClient()
   // Get available delivery boys (not already selected and not the current user if editing)
   const availableDeliveryBoys = users.filter(
     (u) =>
-      !deliveryBoysField.includes(u.id || "") &&
+      !deliveryBoysField?.includes(u.id || "") &&
       (user ? u.id !== user.id : true)
   );
 
   // Get selected delivery boys objects
   const selectedDeliveryBoysObjects = deliveryBoysField
-    .map((id) => users.find((u) => u.id === id))
-    .filter((u): u is IUser => u !== undefined);
+    ?.map((id) => users.find((u) => u.id === id))
+    ?.filter((u): u is IUser => u !== undefined);
     
 
   const handleAddDeliveryBoy = (deliveryBoyId: string) => {
-    if (!deliveryBoysField.includes(deliveryBoyId)) {
-      form.setValue("delivery_boys", [...deliveryBoysField, deliveryBoyId]);
+    if (!deliveryBoysField?.includes(deliveryBoyId)) {
+      form.setValue("delivery_boys", [...deliveryBoysField??'', deliveryBoyId]);
     }
     setSelectedDeliveryBoyValue("");
   };
@@ -105,21 +109,21 @@ const UserDialog: React.FC<UserDialogProps> = ({
   const handleRemoveDeliveryBoy = (deliveryBoyId: string) => {
     form.setValue(
       "delivery_boys",
-      deliveryBoysField.filter((id) => id !== deliveryBoyId)
+      deliveryBoysField?.filter((id) => id !== deliveryBoyId)
     );
   };
 
   const handleSubmit = async (userData: UserFormValues) => {
     try {
       if (user) {
-        // Edit mode - call onSave with user id
         onSave(userData, user.id, user.auth_id);
          setOpen(false);
       } else {
-        // Add mode - call API directly
         const { data } = await axios.post("/api/admin/auth", userData);
         if (data.success) {
           setOpen(false);
+          queryClient.invalidateQueries({queryKey:['users']})
+
           toast.success(data.message);
           form.reset();
         } else {
@@ -324,7 +328,7 @@ const UserDialog: React.FC<UserDialogProps> = ({
                                   All delivery boys selected
                                 </div>
                               ) : (
-                                users.map((deliveryBoy) => (
+                                availableDeliveryBoys.map((deliveryBoy) => (
                                   <SelectItem
                                     key={deliveryBoy.id}
                                     value={deliveryBoy.id || ""}
@@ -337,14 +341,14 @@ const UserDialog: React.FC<UserDialogProps> = ({
                           </Select>
 
                           {/* Selected Delivery Boys */}
-                          {selectedDeliveryBoysObjects.length > 0 && (
+                          {(selectedDeliveryBoysObjects as any)?.length > 0 && (
                             <div className="pt-2 border-t">
                               <label className="text-sm font-medium text-muted-foreground mb-2 block">
                                 Selected Delivery Boys (
-                                {selectedDeliveryBoysObjects.length})
+                                {selectedDeliveryBoysObjects?.length})
                               </label>
                               <div className="flex flex-wrap gap-2">
-                                {selectedDeliveryBoysObjects.map(
+                                {selectedDeliveryBoysObjects?.map(
                                   (deliveryBoy) => (
                                     <div
                                       key={deliveryBoy.id}
@@ -373,7 +377,7 @@ const UserDialog: React.FC<UserDialogProps> = ({
                             </div>
                           )}
 
-                          {selectedDeliveryBoysObjects.length === 0 && (
+                          {selectedDeliveryBoysObjects?.length === 0 && (
                             <p className="text-sm text-muted-foreground pt-2 border-t">
                               No delivery boys selected. Please select from the
                               dropdown above.
@@ -389,7 +393,14 @@ const UserDialog: React.FC<UserDialogProps> = ({
             )}
 
             <DialogFooter>
-              <Button type="submit">
+              <Button type="submit"
+                onClick={() => {
+    form.trigger().then((isValid) => {
+      console.log("isValid:", isValid);
+      console.log("all errors:", form.formState.errors);
+    });
+  }}
+              >
                 {user ? "Save Changes" : "Add User"}
               </Button>
             </DialogFooter>

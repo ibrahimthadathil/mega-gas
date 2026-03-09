@@ -11,7 +11,7 @@ export const formSchema = z.object({
     .min(6, { message: "Password must be at least 6 characters." }),
 });
 
-export const userFormSchema = z.object({
+export const userFormSchema = (isEditMode: boolean)=>z.object({
   user_name: z
     .string()
     .min(3, "Username must be at least 3 characters")
@@ -23,8 +23,15 @@ export const userFormSchema = z.object({
     .min(10, "Phone number must be at least 10 digits")
     .regex(/^[0-9+\-() ]+$/, "Invalid phone number"),
   role: z.nativeEnum(userRole).describe("Please select a role"),
-  warehouse_id: z.string().min(1, "Warehouse is required"),
-  delivery_boys: z.array(z.string()).min(1, "At least one delivery boy is required"),
+  // warehouse_id: z.string().min(1, "Warehouse is required"),
+  // delivery_boys: z.array(z.string()).min(1, "At least one delivery boy is required"),
+   warehouse_id: isEditMode
+      ? z.string().min(1, "Warehouse is required")
+      : z.string().optional(),
+    delivery_boys: isEditMode
+      ? z.array(z.string()).min(1, "At least one delivery boy is required")
+      : z.array(z.string()).optional(),
+
 });
 
 
