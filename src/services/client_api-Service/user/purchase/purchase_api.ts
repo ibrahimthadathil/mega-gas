@@ -18,21 +18,29 @@ export const addPurchaseRegister = async (data: Record<string, unknown>) => {
   }
 };
 
-
-
-export const purchaseReport = async (filter?: { warehouse?: string; date?: string }) => {
+export const purchaseReport = async (filter?: {
+  warehouse?: string;
+  date?: string; // single day (legacy, unused now)
+  from?: string; // "YYYY-MM-DD"
+  to?: string; // "YYYY-MM-DD"
+  month?: number; // 1-12
+  year?: number;
+}) => {
   try {
     const result = await axios.get("/api/user/purchase/report", {
       params: {
         warehouse: filter?.warehouse ?? "ALL",
-        date: filter?.date ?? undefined, 
+        from: filter?.from,
+        to: filter?.to,
+        month: filter?.month,
+        year: filter?.year,
       },
     });
     return result.data;
   } catch (error) {
     throw error;
   }
-}
+};
 
 interface FilterParams {
   startDate?: string;
@@ -45,7 +53,6 @@ interface FilterParams {
 
 export const getPlantLoadRegister = async (filters?: FilterParams) => {
   try {
-    
     const result = await axios.get("/api/user/purchase", {
       params: {
         startDate: filters?.startDate,

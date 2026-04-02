@@ -191,22 +191,37 @@ const edit_Purchased_Load = async (
 
 const get_purchase_report = async (filter: {
   warehouse?: string | null;
-  date?: string | null;
+  from?: string | null;   // "YYYY-MM-DD"
+  to?: string | null;     // "YYYY-MM-DD"
+  month?: number | null;  // 1-12
+  year?: number | null;
 }) => {
   try {
-    console.log(filter);
+    const kolkataToday = new Date().toLocaleDateString("en-CA", {
+      timeZone: "Asia/Kolkata",
+    });
 
-    const targetDate =
-      filter?.date ??
-      new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+    let query = supabase.from("plant_load_report").select("*");
 
-    let query = supabase
-      .from("plant_load_report")
-      .select("*")
-      .eq("bill_date", targetDate);
+    if (filter?.month && filter?.year) {
+      // Month mode: full calendar month range
+      const y = filter.year;
+      const m = String(filter.month).padStart(2, "0");
+      const lastDay = new Date(y, filter.month, 0).getDate(); // last day of month
+      query = query
+        .gte("bill_date", `${y}-${m}-01`)
+        .lte("bill_date", `${y}-${m}-${lastDay}`);
+    } else {
+      // Day / range mode
+      const from = filter?.from ?? kolkataToday;
+      const to   = filter?.to   ?? kolkataToday;
+      query = query.gte("bill_date", from).lte("bill_date", to);
+    }
+
     if (filter?.warehouse && filter.warehouse !== "ALL") {
       query = query.ilike("warehouse_name", filter.warehouse);
     }
+
     const { data, error } = await query;
     if (error) throw error;
     return data ?? [];

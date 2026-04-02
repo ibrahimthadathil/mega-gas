@@ -7,9 +7,12 @@ export const GET = async (req: NextRequest) => {
     const searchParams = req.nextUrl.searchParams;
     const filter = {
       warehouse: searchParams.get("warehouse"),
-      date: searchParams.get("date"),
+      year: searchParams.get("year"),
+      from: searchParams.get("from"),
+      to: searchParams.get("to"),
+      month: searchParams.get("month"),
     };
-    const { data, success, message } = await purchaseReport(filter);
+    const { data, success, message } = await purchaseReport(filter);    
     if (success)
       return NextResponse.json(
         { success, data },
