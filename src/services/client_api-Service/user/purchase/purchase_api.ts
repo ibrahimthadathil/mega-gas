@@ -20,18 +20,28 @@ export const addPurchaseRegister = async (data: Record<string, unknown>) => {
 
 export const purchaseReport = async (filter?: {
   warehouse?: string;
-  date?: string; // single day (legacy, unused now)
+  date?: string; // single day (legacy, mapped to from/to for backwards compatibility)
   from?: string; // "YYYY-MM-DD"
   to?: string; // "YYYY-MM-DD"
   month?: number; // 1-12
   year?: number;
 }) => {
   try {
+    // Handle legacy date parameter: map single date to from/to range
+    let from = filter?.from;
+    let to = filter?.to;
+    
+    if (filter?.date && !from && !to) {
+      from = filter.date;
+      to = filter.date;
+    }
+    
+    // Filter precedence: month/year > from/to > date (legacy)
     const result = await axios.get("/api/user/purchase/report", {
       params: {
         warehouse: filter?.warehouse ?? "ALL",
-        from: filter?.from,
-        to: filter?.to,
+        from,
+        to,
         month: filter?.month,
         year: filter?.year,
       },

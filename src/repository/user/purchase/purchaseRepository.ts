@@ -213,8 +213,12 @@ const get_purchase_report = async (filter: {
         .lte("bill_date", `${y}-${m}-${lastDay}`);
     } else {
       // Day / range mode
-      const from = filter?.from ?? kolkataToday;
-      const to   = filter?.to   ?? kolkataToday;
+      let from = filter?.from ?? kolkataToday;
+      let to   = filter?.to   ?? kolkataToday;
+      // Normalize date range: ensure from <= to
+      if (from > to) {
+        [from, to] = [to, from];
+      }
       query = query.gte("bill_date", from).lte("bill_date", to);
     }
 

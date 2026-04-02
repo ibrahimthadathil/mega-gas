@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   CalendarDays,
   Warehouse,
@@ -577,10 +577,9 @@ const productBadgeClass = useMemo(() => {
 
               <TableBody>
                 {Object.entries(grouped).map(([wh, whBills]) => (
-                  <>
+                  <React.Fragment key={`group-${wh}`}>
                     {/* Warehouse group header */}
                     <TableRow
-                      key={`group-${wh}`}
                       className="bg-slate-100 hover:bg-slate-100 border-t-2 border-slate-200"
                     >
                       <TableCell
@@ -607,7 +606,8 @@ const productBadgeClass = useMemo(() => {
 
                     {/* Bill rows */}
                     {whBills.map((bill) => (
-                      <TableRow key={bill.id} className="hover:bg-slate-50/80">
+                      
+                      <TableRow key={`bill-${bill.id}`} className="hover:bg-slate-50/80">
                         <TableCell className="font-semibold text-xs text-red-400">
                           {bill.bill_date}
                         </TableCell>
@@ -623,21 +623,6 @@ const productBadgeClass = useMemo(() => {
                           )}
                         </TableCell>
 
-                        {/* {activeProducts.map((p) => {
-                          const li = bill.line_items.find(
-                            (l) => l.product_name === p,
-                          );
-                          return (
-                            <TableCell key={p}>
-                              {li ? (
-                                <Badge variant="outline" className={`${productBadgeClass[p]} mono text-xs`}>{li.qty}</Badge>
-
-                              ) : (
-                                <span className="text-slate-200">—</span>
-                              )}
-                            </TableCell>
-                          );
-                        })} */}
                         {activeProducts.map((p) => {
   const totalQty = bill.line_items
     .filter((l) => l.product_name === p)
@@ -651,7 +636,6 @@ const productBadgeClass = useMemo(() => {
     </TableCell>
   );
 })}
-
                         <TableCell className="mono text-sm font-semibold text-slate-700">
                           {bill.total_full_qty}
                         </TableCell>
@@ -683,7 +667,7 @@ const productBadgeClass = useMemo(() => {
                         </TableCell>
                       </TableRow>
                     ))}
-                  </>
+                  </React.Fragment>
                 ))}
 
                 {/* ── Grand Total footer row ── */}

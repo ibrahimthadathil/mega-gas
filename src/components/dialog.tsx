@@ -101,15 +101,16 @@ const UserDialog: React.FC<UserDialogProps> = ({
 
   const handleAddDeliveryBoy = (deliveryBoyId: string) => {
     if (!deliveryBoysField?.includes(deliveryBoyId)) {
-      form.setValue("delivery_boys", [...deliveryBoysField??'', deliveryBoyId]);
+      form.setValue("delivery_boys", [...(deliveryBoysField ?? []), deliveryBoyId]);
     }
     setSelectedDeliveryBoyValue("");
   };
 
   const handleRemoveDeliveryBoy = (deliveryBoyId: string) => {
+    const current = Array.isArray(deliveryBoysField) ? deliveryBoysField : [];
     form.setValue(
       "delivery_boys",
-      deliveryBoysField?.filter((id) => id !== deliveryBoyId)
+      current.filter((id) => id !== deliveryBoyId)
     );
   };
 
@@ -393,14 +394,7 @@ const UserDialog: React.FC<UserDialogProps> = ({
             )}
 
             <DialogFooter>
-              <Button type="submit"
-                onClick={() => {
-    form.trigger().then((isValid) => {
-      console.log("isValid:", isValid);
-      console.log("all errors:", form.formState.errors);
-    });
-  }}
-              >
+              <Button type="submit">
                 {user ? "Save Changes" : "Add User"}
               </Button>
             </DialogFooter>
