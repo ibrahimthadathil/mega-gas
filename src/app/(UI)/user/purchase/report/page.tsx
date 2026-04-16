@@ -196,13 +196,25 @@ const productBadgeClass = useMemo(() => {
     return [...names].sort();
   }, [bills]);
 
+ 
   const grouped = useMemo(() => {
-    const map: Record<string, Bill[]> = {};
-    bills.forEach((b) => {
-      (map[b.warehouse_name] ??= []).push(b);
-    });
-    return map;
-  }, [bills]);
+  const map: Record<string, Bill[]> = {};
+  bills.forEach((b) => {
+    (map[b.warehouse_name] ??= []).push(b);
+  });
+
+  // Sort each warehouse group by bill_date descending
+   Object.values(map).forEach((group) =>
+    group.sort((a, b) => a.bill_date.localeCompare(b.bill_date))
+  );
+
+  // Sort warehouse groups by their latest bill date descending
+  return Object.fromEntries(
+    Object.entries(map).sort(
+      ([, a], [, b]) => a[0].bill_date.localeCompare(b[0].bill_date)
+    )
+  );
+}, [bills]);
 
   const summary = useMemo(
     () => ({

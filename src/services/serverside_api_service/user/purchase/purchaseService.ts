@@ -145,7 +145,8 @@ const editPurchasedLoad = async (
   try {
     const data = await get_purchase_report(filter);
     if (data && data.length > 0) return { success: true, data };
-    else return { success: false, data: [], message: "No records found" };
+    
+    else return { success: true, data: [], message: "No records found" };
   } catch (error) {
     return { success: false, message: (error as Error).message };
   }
