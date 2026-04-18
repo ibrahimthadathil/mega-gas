@@ -1,6 +1,7 @@
 import { getExpensesByStatus } from "@/repository/user/expenses/expenseRepository";
 import {
   daily_Report_View,
+  get_Sales_SlipReport_ById,
   getAllProductsOptions,
   getDeliveryPayloadByVehicle,
   getGSTCustomer,
@@ -106,7 +107,6 @@ const dailyReport = async (authId: string) => {
   try {
     const user = await checkUserByAuthId(authId);
     if (user) {
-      
       const data = await daily_Report_View(user?.delivery_boys);
       if (data) return { success: true, data };
       else return { success: false, message: "Not found" };
@@ -116,9 +116,26 @@ const dailyReport = async (authId: string) => {
   }
 };
 
+const getSalesReportSlipById = async (slipId: string, vehicleId: string) => {
+  try {
+    const data = await get_Sales_SlipReport_ById(slipId);
+    const warehouseId = data?.sales_slip?.warehouse_id;
+    const [products, currentStock] = await Promise.all([
+      getAllProductsOptions(),
+      getDeliveryPayloadByVehicle(warehouseId),
+    ]);
+    
+    if (data) return { success: true, data: { data, products, currentStock } };
+    else throw Error("Failed to fetch Try Later");
+  } catch (error) {
+    return { success: true, message: (error as Error).message };
+  }
+};
+
 export {
   getDeliverableProduct,
   recordDelivery,
   getDeliveryPayload,
   dailyReport,
+  getSalesReportSlipById,
 };

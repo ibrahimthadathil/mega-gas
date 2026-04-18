@@ -15,7 +15,6 @@ export interface DeliveryPayload {
   cashChest: CashChest;
   'Created by'?: string; // Optional - UUID of the user creating the slip
 }
-
 interface StockItem {
   'product name': string;
   qty: number;
@@ -86,4 +85,67 @@ interface CurrencyDenominations {
   '20': number;
   '10': number;
   '5'?: number;
+}
+
+export interface DeliveryReportData {
+    stock: {
+      closing_stock: { qty: number; "product id": string; "product name": string }[];
+      opening_stock: { qty: number; "product id": string; "product name": string }[];
+    };
+    totals: {
+      total_upi_amount: number;
+      total_cash_amount: number;
+      total_sales_amount: number;
+      total_online_amount: number;
+      total_expenses_amount: number;
+      total_transactions_amount: number;
+    };
+    expenses: {
+      id: string;
+      amount: number;
+      status: boolean;
+      description: string | null;
+      account_name: string | null;
+      created_time: string;
+      expenses_type: string;
+    }[];
+    cash_chest: {
+      notes: Record<string, number>;
+      chest_name: string;
+    };
+    sales_slip: {
+      id: string;
+      date: string;
+      remark: string;
+      status: string;
+      round_off: number;
+      created_at: string;
+      created_by: string;
+      warehouse_id: string;
+    };
+    sales_items: {
+      qty: number;
+      rate: number;
+      total: number;
+      components: {
+        qty: number;
+        child_product_id: string;
+        child_product_code: string;
+        child_product_name: string;
+      }[];
+      product_id: string;
+      is_composite: boolean;
+      line_item_id: string;
+      warehouse_id: string;
+    }[];
+    transactions: {
+      id: string;
+      amount: number;
+      type: "received" | "paid";
+      description?: string;
+    }[];
+    upi_payments: { amount: number; upi_id: string }[];
+    online_payments: { amount: number; provider: string }[];
+    delivery_boys: string[];
+  
 }

@@ -210,6 +210,24 @@ const daily_Report_View = async (
     throw error;
   }
 };
+
+const get_Sales_SlipReport_ById = async (slipId: string) => {
+  try {    
+    const { data, error } = await supabase.rpc(
+      "get_sales_slip_full_report",
+      {
+        p_sales_slip_id: slipId,
+      }
+    );
+
+    if (error) throw error;
+    console.log(JSON.stringify(data,null,2));
+    
+    return data;
+  } catch (error) {
+    console.log((error as Error).message);
+  }
+};
 export {
   getDeliveryPayloadByVehicle,
   getAllProductsOptions,
@@ -217,4 +235,5 @@ export {
   reportDailyDelivery,
   getGSTCustomer,
   getUPIQR,
+  get_Sales_SlipReport_ById
 };
