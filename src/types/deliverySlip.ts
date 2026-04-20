@@ -139,10 +139,11 @@ export interface DeliveryReportData {
       warehouse_id: string;
     }[];
     transactions: {
-      id: string;
-      amount: number;
+      account_id: string;
+      amount_paid: number;
+      amount_received: number;
       type: "received" | "paid";
-      description?: string;
+      remark?: string;
     }[];
     upi_payments: { amount: number; upi_id: string }[];
     online_payments: { amount: number; provider: string }[];
