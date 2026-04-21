@@ -8,9 +8,11 @@ export const GET = async (req: NextRequest) => {
     const searchParams = req.nextUrl.searchParams
     const filter:RunningBalanceFilters = {
         endDate: searchParams.get('endDate')||undefined,
-        productId:searchParams.get('productId')||undefined,
         startDate:searchParams.get('startDate')||undefined,
-        warehouseId:searchParams.get('warehouseId')||undefined,
+        // productId:searchParams.get('productId')||undefined,
+        // warehouseId:searchParams.get('warehouseId')||undefined,
+         warehouseIds: searchParams.get('warehouseIds')?.split(',').filter(Boolean) || undefined,
+      productIds: searchParams.get('productIds')?.split(',').filter(Boolean) || undefined,
     }
 
     const { success, data, message } = await runningBalancebyWarehouse(filter);

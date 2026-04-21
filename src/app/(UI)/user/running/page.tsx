@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { format, subDays, startOfDay } from "date-fns";
 import {
   StockDashboard,
@@ -38,28 +37,35 @@ function getUniqueWarehouses(transactions: StockTransaction[]): any[] {
 export default function Home() {
   const [filters, setFilters] = useState<DashboardFilters>({
     dateRange: {
-      from: startOfDay(subDays(new Date(), 3)), // 3 days ago at 00:00
-      to: new Date(), // today right now
+      from: startOfDay(subDays(new Date(), 3)),
+      to: new Date(),
     },
-    warehouseId: "all",
-    productId: "all",
+    warehouseIds: [],
+    productIds: [],
   });
 
-  // Derive API-ready params from filter state
-  const apiFilter = {
-    startDate: filters.dateRange?.from
-      ? format(filters.dateRange.from, "yyyy-MM-dd")
-      : undefined,
-    endDate: filters.dateRange?.to
-      ? format(filters.dateRange.to, "yyyy-MM-dd")
-      : undefined,
-    warehouseId:
-      filters.warehouseId !== "all" ? filters.warehouseId : undefined,
-    productId: filters.productId !== "all" ? filters.productId : undefined,
-  };
+  const [appliedFilters, setAppliedFilters] = useState(filters);
+
+  const apiFilter = useMemo(
+    () => ({
+      startDate: appliedFilters.dateRange?.from
+        ? format(appliedFilters.dateRange.from, "yyyy-MM-dd")
+        : undefined,
+      endDate: appliedFilters.dateRange?.to
+        ? format(appliedFilters.dateRange.to, "yyyy-MM-dd")
+        : undefined,
+      warehouseIds: appliedFilters.warehouseIds.length
+        ? appliedFilters.warehouseIds.join(",")
+        : undefined,
+      productIds: appliedFilters.productIds.length
+        ? appliedFilters.productIds.join(",")
+        : undefined,
+    }),
+    [appliedFilters],
+  );
 
   const { data: response, isLoading } = UseRQ<StockTransaction[]>(
-    ["running", apiFilter], // cache key changes → refetch automatically
+    ["running", apiFilter],
     () => getRunning_balance(apiFilter),
   );
 
@@ -82,6 +88,16 @@ export default function Home() {
         warehouses={uniqueWarehouses}
         filters={filters}
         onFiltersChange={setFilters}
+        onApplyFilters={() => setAppliedFilters(filters)}
+        onResetFilters={() => {
+          const reset: DashboardFilters = {
+            dateRange: undefined,
+            warehouseIds: [],
+            productIds: [],
+          };
+          setFilters(reset);
+          setAppliedFilters(reset); // ✅ reset also re-fetches immediately
+        }}
         isLoading={isLoading}
       />
     </main>

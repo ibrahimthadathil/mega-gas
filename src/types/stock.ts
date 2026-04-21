@@ -72,8 +72,8 @@ export interface Warehouse {
 }
 
 export interface RunningBalanceFilters {
-  warehouseId?: string;
-  productId?: string;
+  warehouseIds?: string[];
+  productIds?: string[];
   startDate?: string; // ISO date string (YYYY-MM-DD)
   endDate?: string;   // ISO date string (YYYY-MM-DD)
   lastNDays?: number; // Default to 3
