@@ -389,21 +389,15 @@ const ExpenseSection = (): ReactElement => {
                   disabled={expense.status}
                 >
                   <Edit2 className="w-4 h-4 mr-1" />
-                  Edit
                 </Button>
                 
                 <AlertModal
                   data={expense}
+                  disable={expense.status}
                   contents={[
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="mt-1 text-destructive hover:text-destructive gap-2 w-full"
-                      disabled={expense.status}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Delete
-                    </Button>,
+                    
+                      <Trash2 className="w-4 h-4" />,
+                     
                     <>
                       This action cannot be undone. This will permanently delete{" "}
                       <span className="font-semibold text-orange-400">

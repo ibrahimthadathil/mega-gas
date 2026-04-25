@@ -140,7 +140,7 @@ export function InventoryTable({ data, warehouseGroups, productGroups }: Invento
 
                   {groupRows.map((row) => (
                     <TableRow key={row.wName} className="hover:bg-accent/5 group transition-colors h-auto border-b">
-                      <TableCell className="font-medium sticky left-0 bg-background z-20 border-r shadow-[1px_0_3px_rgba(0,0,0,0.05)] px-2 py-1 h-auto truncate">
+                      <TableCell className="font-medium sticky left-0 bg-background  border-r shadow-[1px_0_3px_rgba(0,0,0,0.05)] px-2 py-1 h-auto truncate">
                         {row.wName}
                       </TableCell>
                       {row.rowCells.map((pgData) => (

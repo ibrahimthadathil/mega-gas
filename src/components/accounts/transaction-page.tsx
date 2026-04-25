@@ -86,7 +86,6 @@ export default function TransactionsPage() {
     page: number;
     limit: number;
   }>(["transaction", filter], () => getAllTransactions(filter));
-
   const transactions = response?.data || [];
   const total = response?.total || 0;
   const totalPages = Math.ceil(total / filter.limit);
@@ -96,9 +95,10 @@ export default function TransactionsPage() {
     type: "received" | "paid",
   ) => {
     try {
-
+      
       const data = await createNewLineItem(transaction);
       if (data.success) {
+        
         setOpenReceived(false);
         setOpenPaid(false);
         queryClient.invalidateQueries({ queryKey: ["transaction"] });
@@ -111,6 +111,7 @@ export default function TransactionsPage() {
 
   const handleEdit = async (payload: any) => {
     if (!editingTransaction) return;
+      
     try {
       const data = await updateTransaction(
         editingTransaction.line_item_id,
@@ -418,13 +419,9 @@ export default function TransactionsPage() {
                             data={transaction}
                             varient={"ghost"}
                             contents={[
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-destructive hover:text-destructive"
-                              >
+                             
                                 <Trash2 className="w-4 h-4" />
-                              </Button>,
+                              ,
                               <>
                                 This action cannot be undone. This will
                                 permanently delete{" "}

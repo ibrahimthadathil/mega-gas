@@ -28,6 +28,12 @@ export const navItems = [
         roles: ["admin", "manager", "accountant"],
       },
       {
+        title: "Delivery Report",
+        url: "/admin/delivery-report",
+        roles: ["admin", "manager"],
+      },
+      
+      {
         title: "Chest Summary",
         url: "/admin/chest-summary",
         roles: ["admin", "manager", "accountant"],
@@ -202,6 +208,11 @@ export const navItems = [
         url: "/user/purchase/plant-load",
         roles: ["admin", "manager", "accountant", "plant_driver"],
       },
+      {
+        title: "Report",
+        url: "/user/purchase/report",
+        roles: ["admin", "manager", "accountant"],
+      },
     ],
   },
   {
@@ -226,7 +237,13 @@ export const navItems = [
       {
         title: "Stock Transfer List",
         url: "/user/stock",
-        roles: ["admin", "manager", "accountant", "godown_staff", "office_staff"],
+        roles: [
+          "admin",
+          "manager",
+          "accountant",
+          "godown_staff",
+          "office_staff",
+        ],
       },
       {
         title: "unload Slip",
@@ -250,20 +267,22 @@ export const navItems = [
     title: "Expenses",
     url: "#",
     icon: BookOpen,
-    items:[{
-      title: "Expenses List",
-      url: "/user/expenses",
-      
-      roles: [
-        "admin",
-        "manager",
-        "accountant",
-        "driver",
-        "plant_driver",
-        "godown_staff",
-        "office_staff",
-      ],
-    }],
+    items: [
+      {
+        title: "Expenses List",
+        url: "/user/expenses",
+
+        roles: [
+          "admin",
+          "manager",
+          "accountant",
+          "driver",
+          "plant_driver",
+          "godown_staff",
+          "office_staff",
+        ],
+      },
+    ],
     roles: [
       "admin",
       "manager",
@@ -281,7 +300,6 @@ export const navItems = [
     roles: ["admin", "manager", "accountant", "godown_staff", "office_staff"],
     items: [
       {
-
         title: "Accounts List",
         url: "/user/accounts",
         roles: [
@@ -306,24 +324,13 @@ export const navItems = [
       {
         title: "Account Ledger",
         url: "/user/accounts/ledger",
-        roles: [
-          "admin",
-          "manager",
-          "accountant",
-          "office_staff",
-        ],
-      }
-      ,
+        roles: ["admin", "manager", "accountant", "office_staff"],
+      },
       {
         title: "Account Summary",
         url: "/user/accounts/summary",
-        roles: [
-          "admin",
-          "manager",
-          "accountant",
-          "office_staff",
-        ],
-      }
+        roles: ["admin", "manager", "accountant", "office_staff"],
+      },
     ],
   },
 ];
@@ -346,6 +353,7 @@ export const roleRouteConfig = {
     "/user/accounts",
     "/user/inventory",
     "/user/current-stock",
+    "/user/purchase/report"
   ],
   driver: [
     "/user/dashboard",

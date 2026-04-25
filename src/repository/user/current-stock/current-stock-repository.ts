@@ -33,22 +33,45 @@ const getCurrentInventory = async () => {
 
 // running balance 
 
+// export const running_balance_by_warehouse = async (filters: RunningBalanceFilters = {}) => {
+//   try {
+//     let query = supabase.from('inventory_running_balance_view').select('*');
+
+//     if (filters.startDate) {
+//       query = query.gte('transaction_date', filters.startDate);
+//     }
+//     if (filters.endDate) {
+//       query = query.lte('transaction_date', filters.endDate);
+//     }
+//     if (filters.warehouseId) {
+//       query = query.eq('warehouse_id', filters.warehouseId);
+//     }
+//     if (filters.productId) {
+//       query = query.eq('product_id', filters.productId);
+//     }
+
+//     const { data, error } = await query;
+//     if (error) throw error;
+//     return data;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+
+
+
 export const running_balance_by_warehouse = async (filters: RunningBalanceFilters = {}) => {
   try {
     let query = supabase.from('inventory_running_balance_view').select('*');
 
-    if (filters.startDate) {
-      query = query.gte('transaction_date', filters.startDate);
-    }
-    if (filters.endDate) {
-      query = query.lte('transaction_date', filters.endDate);
-    }
-    if (filters.warehouseId) {
-      query = query.eq('warehouse_id', filters.warehouseId);
-    }
-    if (filters.productId) {
-      query = query.eq('product_id', filters.productId);
-    }
+    if (filters.startDate) query = query.gte('transaction_date', filters.startDate);
+    if (filters.endDate)   query = query.lte('transaction_date', filters.endDate);
+
+    // .in() handles the array; skip if empty/undefined (means all)
+    if (filters.warehouseIds?.length)
+      query = query.in('warehouse_id', filters.warehouseIds);
+    if (filters.productIds?.length)
+      query = query.in('product_id', filters.productIds);
 
     const { data, error } = await query;
     if (error) throw error;

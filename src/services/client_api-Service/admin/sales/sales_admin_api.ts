@@ -12,7 +12,11 @@ export const deleteDailyReport = async (id: string) => {
 
 export const getDeliveryDetailsById = async (id: string) => {
   try {
+    console.log(id,'888');
+    
     const { data } = await axios.get(`/api/admin/sales/${id}`);
+    console.log(data,'fff');
+    
     return data;
   } catch (error) {
     throw error;

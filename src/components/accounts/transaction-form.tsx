@@ -1,6 +1,3 @@
-
-
-
 "use client";
 
 import type React from "react";
@@ -153,6 +150,7 @@ export function TransactionForm({
     "accounts",
     getAllAccountsParty,
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const transformInitialData = (data?: ApiTransaction): Transaction => {
     if (!data) {
@@ -220,7 +218,6 @@ export function TransactionForm({
   });
 
   const watchedFields = watch();
-
   useEffect(() => {
     if (initialData) {
       reset(transformInitialData(initialData));
@@ -245,12 +242,16 @@ export function TransactionForm({
     setValue("line_Item.account_name", selectedAccount?.account_name || "");
   };
 
-  const onFormSubmit = (data: Transaction) => {
-
-    if (onEdit && transactionId) {
-      onEdit(data);
-    } else {
-      onSubmit(data);
+  const onFormSubmit = async (data: Transaction) => {
+    setIsSubmitting(true);
+    try {
+      if (onEdit && transactionId) {
+        await onEdit(data);
+      } else {
+        await onSubmit(data);
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -435,7 +436,6 @@ export function TransactionForm({
                     type="text"
                     placeholder="Add any notes or comments"
                     {...field}
-                   
                   />
                 )}
               />
@@ -671,7 +671,7 @@ export function TransactionForm({
       )}
 
       <div className="flex justify-end gap-3">
-        <Button
+        {/* <Button
           onClick={handleSubmit(onFormSubmit)}
           size="lg"
           disabled={!isSales && cashMismatch}
@@ -681,6 +681,25 @@ export function TransactionForm({
             : transactionType === "received"
               ? "Add Cash Received"
               : "Add Cash Paid"}
+        </Button> */}
+
+        <Button
+          onClick={handleSubmit(onFormSubmit)}
+          size="lg"
+          disabled={(!isSales && cashMismatch) || isSubmitting}
+        >
+          {isSubmitting ? (
+            <>
+              <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent inline-block" />
+              {isEditMode ? "Updating..." : "Saving..."}
+            </>
+          ) : isEditMode ? (
+            "Update Transaction"
+          ) : transactionType === "received" ? (
+            "Add Cash Received"
+          ) : (
+            "Add Cash Paid"
+          )}
         </Button>
       </div>
     </div>

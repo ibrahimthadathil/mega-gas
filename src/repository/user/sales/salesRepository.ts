@@ -170,9 +170,28 @@ const getGSTCustomer = async () => {
   }
 };
 
+// const daily_Report_View = async (
+//   users: string[],
+//  { page = 1, limit = 7 }: { page?: number; limit?: number } = {}
+// ) => {
+//   const offset = (page - 1) * limit;
+//   try {
+//     const { data, error } = await supabase
+//       .from("daily_sales_report_view")
+//       .select("*", { count: "exact" })
+//       .in("created_by", users)
+//       .order("date", { ascending: false });
+
+//       // .range(offset, offset + limit - 1);
+//     if (error) throw error;    
+//     return data;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
 const daily_Report_View = async (
   users: string[],
- { page = 1, limit = 7 }: { page?: number; limit?: number } = {}
+  { page = 1, limit = 7 }: { page?: number; limit?: number } = {}
 ) => {
   const offset = (page - 1) * limit;
   try {
@@ -180,16 +199,35 @@ const daily_Report_View = async (
       .from("daily_sales_report_view")
       .select("*", { count: "exact" })
       .in("created_by", users)
-      .order("date", { ascending: false });
+      .order("status", { ascending: false })        // "Settled" comes before others alphabetically (S > P/D etc.)
+      .order("date", { ascending: false })           // then latest date first
+      .range(offset, offset + limit - 1);
 
-      // .range(offset, offset + limit - 1);
-    if (error) throw error;    
+    if (error) throw error;
+    
     return data;
   } catch (error) {
     throw error;
   }
 };
 
+const get_Sales_SlipReport_ById = async (slipId: string) => {
+  try {    
+    const { data, error } = await supabase.rpc(
+      "get_sales_slip_full_report",
+      {
+        p_sales_slip_id: slipId,
+      }
+    );
+
+    if (error) throw error;
+    console.log(JSON.stringify(data,null,2));
+    
+    return data;
+  } catch (error) {
+    console.log((error as Error).message);
+  }
+};
 export {
   getDeliveryPayloadByVehicle,
   getAllProductsOptions,
@@ -197,4 +235,5 @@ export {
   reportDailyDelivery,
   getGSTCustomer,
   getUPIQR,
+  get_Sales_SlipReport_ById
 };

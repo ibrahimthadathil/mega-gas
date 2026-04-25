@@ -37,3 +37,12 @@ export const getDailyReportByUser = async()=>{
     throw error
   }
 }
+
+export const getDeliveryReport = async(id:string)=>{
+  try {
+    const {data} = await axios.get(`/api/user/delivery/report/${id}`)    
+    return data
+  } catch (error) {
+    throw error
+  }
+}
