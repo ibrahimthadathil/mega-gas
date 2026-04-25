@@ -1,9 +1,10 @@
+import api from "@/services/axios-Instance/interceptor";
 import { Accounts } from "@/types/types";
 import axios from "axios";
 
 export const createAccount = async (data: Accounts) => {
   try {
-    const result = await axios.post("/api/user/accounts", data);
+    const result = await api.post("/api/user/accounts", data);
     return result.data;
   } catch (error) {
     throw error;
@@ -12,7 +13,7 @@ export const createAccount = async (data: Accounts) => {
 
 export const getAllAccountsParty = async () => {
   try {
-    const result = await axios.get("/api/user/accounts");
+    const result = await api.get("/api/user/accounts");
     return result.data;
   } catch (error) {
     throw error;
@@ -23,7 +24,7 @@ export const getAllAccountsParty = async () => {
 
 export const createNewLineItem = async (data: any) => {
   try {
-    const result = await axios.post("/api/user/accounts/transactions", data);
+    const result = await api.post("/api/user/accounts/transactions", data);
     return result.data;
   } catch (error) {
     throw error;
@@ -32,7 +33,7 @@ export const createNewLineItem = async (data: any) => {
 
 export const deleteAccount = async (id:string)=> {
    try {
-    const {data} = await axios.delete(`/api/user/accounts/${id}`)
+    const {data} = await api.delete(`/api/user/accounts/${id}`)
     return data
    } catch (error) {
     throw error
@@ -41,7 +42,7 @@ export const deleteAccount = async (id:string)=> {
 
 export const updateAccount = async (id:string,account:Accounts)=> {
   try {
-    const {data} = await axios.put(`/api/user/accounts/${id}`,account)
+    const {data} = await api.put(`/api/user/accounts/${id}`,account)
     return data
   } catch (error) {
     throw error

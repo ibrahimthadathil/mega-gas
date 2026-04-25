@@ -10,7 +10,13 @@ export const POST = async (req: Request) => {
       const res = NextResponse.json(
         { message, profile, success },
         { status: STATUS.SUCCESS.code }
+      )
+       if (!success) {
+      return NextResponse.json(
+        { message },
+        { status: STATUS.UNAUTHORIZED.code } // 401, not 404
       );
+    }
 
       if (session?.access_token) {
         res.cookies.set("access_token", session.access_token, {
@@ -27,7 +33,7 @@ export const POST = async (req: Request) => {
           secure: true,
           sameSite: "strict",
           maxAge: 60 * 60 * 24 * 7, // 7 days
-          path: "/",
+          path: "/api/user/auth/refresh",
         });
       }
 
@@ -39,8 +45,8 @@ export const POST = async (req: Request) => {
     console.log(error);
 
     return NextResponse.json(
-      { error: (error as Error).message },
-      { status: STATUS.UNAUTHORIZED.code }
+      { error: STATUS.SERVER_ERROR.message },
+      { status: STATUS.SERVER_ERROR.code }
     );
   }
 };
