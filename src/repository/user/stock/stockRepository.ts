@@ -150,7 +150,7 @@ const view_Transfered_stock = async (filters: TransferStockFilters = {}) => {
 
     // Date filters
     if (startDate) {
-      query = query.gte("created_at", startDate);
+      query = query.gte("transfer_date", startDate);
     }
     if (endDate) {
       query = query.lte("created_at", endDate);
