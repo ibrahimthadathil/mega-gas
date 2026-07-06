@@ -153,7 +153,7 @@ const view_Transfered_stock = async (filters: TransferStockFilters = {}) => {
       query = query.gte("transfer_date", startDate);
     }
     if (endDate) {
-      query = query.lte("created_at", endDate);
+      query = query.lte("transfer_date", endDate);
     }
 
     // Warehouse filter (adjust column names as per your schema)
